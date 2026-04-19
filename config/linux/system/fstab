@@ -1,0 +1,9 @@
+# How to automount devices
+
+## Template
+
+`<device> <mount point> <fs type> <options> <dump> <fsck>`
+
+```
+/dev/disk/by-uuid/0A80-FBA6 /mnt/0A80-FBA6 auto uid=1000,gid=1000,umask=0022,nosuid,nodev,nofail,x-gvfs-show 0 0
+```
