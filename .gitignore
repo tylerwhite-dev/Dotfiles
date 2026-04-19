@@ -1,0 +1,8 @@
+# system files
+.DS_Store
+
+# auto-generated files
+*-lock.json
+
+# agents files
+AGENTS.md
