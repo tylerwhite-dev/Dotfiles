@@ -1,0 +1,33 @@
+# ansible/modules/dotfiles.yml
+---
+- name: Ensure GNU Stow is installed
+  package:
+    name: stow
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Ensure dotfiles directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/Dotfiles"
+    state: directory
+    mode: "0755"
+
+- name: Define dotfiles packages based on OS
+  set_fact:
+    stow_packages: >-
+      {{
+        ['.', 'wallpaper']
+      + (['zsh_linux'] if ansible_os_family != "Darwin" else ['zsh_mac'])  
+      }}
+
+- name: Install dotfiles with GNU Stow
+  command: stow --target={{ ansible_env.HOME }} {{ item }}
+  loop: "{{ stow_packages }}"
+  register: stow_result
+  changed_when: stow_result.stderr is search('LINK')
+  failed_when: stow_result.rc != 0
+  args:
+    chdir: "{{ ansible_env.HOME }}/Dotfiles"
+  environment:
+    HOME: "{{ ansible_env.HOME }}"

@@ -1,0 +1,26 @@
+---
+common_packages:
+  arch:
+    - sudo
+    - git
+    - git-lfs
+    - curl
+    - openssh
+    - zsh
+    - nano
+    - stow
+    - file
+    - wl-clipboard
+  debian:
+    - sudo
+    - git
+    - git-lfs
+    - curl
+    - ssh
+    - zsh
+    - nala
+    - snapd
+    - nano
+    - stow
+    - file
+    - wl-clipboard

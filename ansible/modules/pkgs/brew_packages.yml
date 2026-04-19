@@ -1,0 +1,35 @@
+---
+brew_packages:
+  extensions:
+    - starship
+    - zsh-autosuggestions
+    - zsh-syntax-highlighting
+    - tmux
+    - pfetch-rs
+    - zoxide
+    - eza
+  cli_tools:
+    - yazi
+    - neovim
+    - btop
+    - nvtop
+    - yt-dlp
+    - opencode
+    - lazygit
+    - fastfetch
+  optional:
+    - go
+    - nvm
+    - rustup
+    - uv
+    - ffmpeg-full
+    - superfile
+    - tree
+    - mailsy
+    - imagemagick-full
+    - gromgit/brewtils/taproom
+  taps:
+    - gromgit/brewtils
+  fonts:
+    - font-jetbrains-mono-nerd-font
+    - font-hack-nerd-font

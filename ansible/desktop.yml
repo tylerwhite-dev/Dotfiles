@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - import_tasks: modules/common.yml
+    - import_tasks: modules/shell.yml
+    - import_tasks: modules/dotfiles.yml
+    - import_tasks: modules/brew.yml

@@ -1,0 +1,17 @@
+---
+- name: Load common packages
+  include_vars: pkgs/common_packages.yml
+
+- name: Install common packages (Debian/Ubuntu)
+  become: true
+  when: ansible_os_family == "Debian"
+  apt:
+    name: "{{ common_packages.debian }}"
+    state: present
+
+- name: Install common packages (Arch Linux)
+  become: true
+  when: ansible_distribution == "Archlinux"
+  pacman:
+    name: "{{ common_packages.arch }}"
+    state: present

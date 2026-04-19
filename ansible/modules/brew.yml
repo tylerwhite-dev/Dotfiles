@@ -1,0 +1,90 @@
+---
+- name: Homebrew. Check existing installation
+  command: /home/linuxbrew/.linuxbrew/bin/brew --version
+  register: brew_installation_check
+  ignore_errors: yes
+  changed_when: false
+  become: no
+
+- name: Homebrew. Configure /home/linuxbrew directory
+  file:
+    path: "/home/linuxbrew"
+    state: directory
+    owner: "{{ ansible_env.HOME | basename }}"
+    group: "{{ ansible_env.HOME | basename }}"
+    mode: "0755"
+  become: true
+  when: brew_installation_check is failed
+
+- name: Homebrew. Run installation script
+  shell: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  environment:
+    HOMEBREW_NO_ANALYTICS: 1
+    HOMEBREW_NO_AUTO_UPDATE: 1
+  become: no
+  when: brew_installation_check is failed
+
+- name: Homebrew. Version check
+  command: /home/linuxbrew/.linuxbrew/bin/brew --version
+  register: brew_version_check
+  changed_when: false
+  become: no
+
+- name: Homebrew. Show version
+  debug:
+    msg: "Linuxbrew version: {{ brew_version_check.stdout }}"
+
+- name: Homebrew. Load packages list
+  include_vars: pkgs/brew_packages.yml
+
+- name: Homebrew. Install shell prompt extensions
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{
+    brew_packages.extensions | join(' ') }}"
+  register: brew_install_extensions_result
+  changed_when: "'Installing' in brew_install_extensions_result.stdout or
+    brew_install_extensions_result.rc == 0"
+  failed_when: false
+  become: no
+  when: brew_version_check is succeeded
+
+- name: Homebrew. Install CLI tools
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.cli_tools | join(' ') }}"
+  register: brew_install_CLI_result
+  changed_when: "'Installing' in brew_install_CLI_result.stdout or
+    brew_install_CLI_result.rc == 0"
+  failed_when: false
+  become: no
+  when: brew_version_check is succeeded
+
+- name: Homebrew. Install fonts
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.fonts | join(' ') }}"
+  register: brew_install_fonts_result
+  changed_when: "'Installing' in brew_install_fonts_result.stdout or
+    brew_install_fonts_result.rc == 0"
+  failed_when: false
+  become: no
+  when:
+    - brew_version_check is succeeded
+
+- name: Homebrew. Tap additional repositories
+  command: "/home/linuxbrew/.linuxbrew/bin/brew tap {{ item }}"
+  loop: "{{ brew_packages.taps }}"
+  register: brew_tap_result
+  changed_when: "'Tapping' in brew_tap_result.stdout or brew_tap_result.rc == 0"
+  failed_when: false
+  become: no
+  when:
+    - brew_version_check is succeeded
+    - not (basic_install | default(false))
+
+- name: Homebrew. Install optional packages
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional
+    | join(' ') }}"
+  register: brew_install_optional_result
+  changed_when: "'Installing' in brew_install_optional_result.stdout or
+    brew_install_optional_result.rc == 0"
+  failed_when: false
+  become: no
+  when:
+    - brew_version_check is succeeded
+    - not (basic_install | default(false))
