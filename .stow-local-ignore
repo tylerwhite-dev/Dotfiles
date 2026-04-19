@@ -1,0 +1,17 @@
+.git
+.gitignore
+.gitattributes
+.DS_Store
+readme.md
+.crush
+
+ansible
+content
+
+nix
+
+wallpaper
+
+zsh_linux
+zsh_mac
+zsh_nix_linux

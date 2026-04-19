@@ -1,0 +1,172 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+continuation_prompt = "[▸▹ ](dimmed white)"
+right_format = """
+$git_branch
+$git_commit
+$git_state
+$git_status"""
+
+[character]
+format = "$symbol "
+success_symbol = "[◎](bold bright-yellow)"
+error_symbol = "[○](purple)"
+vimcmd_symbol = "[■](dimmed green)"
+
+[git_status]
+ahead = ">"
+behind = "<"
+diverged = "<>"
+renamed = "r"
+deleted = "x"
+
+[battery]
+full_symbol = "full "
+charging_symbol = "charging "
+discharging_symbol = "discharging "
+unknown_symbol = "unknown "
+empty_symbol = "empty "
+
+[aws]
+symbol = " "
+[buf]
+symbol = " "
+[bun]
+symbol = " "
+[c]
+symbol = " "
+[cmake]
+symbol = " "
+[conda]
+symbol = " "
+[crystal]
+symbol = " "
+[dart]
+symbol = " "
+[deno]
+symbol = " "
+[directory]
+read_only = " 󰌾"
+[docker_context]
+symbol = " "
+[elixir]
+symbol = " "
+[elm]
+symbol = " "
+[fennel]
+symbol = " "
+[fossil_branch]
+symbol = " "
+[gcloud]
+symbol = " "
+[git_branch]
+symbol = " "
+[git_commit]
+tag_symbol = '  '
+[golang]
+symbol = " "
+[gradle]
+symbol = " "
+[guix_shell]
+symbol = " "
+[haskell]
+symbol = " "
+[haxe]
+symbol = " "
+[hg_branch]
+symbol = " "
+[hostname]
+ssh_symbol = " "
+[java]
+symbol = " "
+[julia]
+symbol = " "
+[kotlin]
+symbol = " "
+[lua]
+symbol = " "
+[memory_usage]
+symbol = "󰍛 "
+[meson]
+symbol = "󰔷 "
+[nim]
+symbol = "󰆥 "
+[nix_shell]
+symbol = " "
+[nodejs]
+symbol = " "
+[ocaml]
+symbol = " "
+[os.symbols]
+# Оставлены только те, что есть в списке поддерживаемых вашей версией
+Alpaquita =  "  "
+Alpine =  "  "
+AlmaLinux =  "  "
+Amazon =  "  "
+Android =  "  "
+Arch =  "  "
+Artix =  "  "
+CachyOS =  "  "
+CentOS =  "  "
+Debian =  "  "
+DragonFly =  "  "
+# Elementary удален (нет в списке поддержки)
+Emscripten =  "  "
+EndeavourOS =  "  "
+Fedora =  "  "
+FreeBSD =  "  "
+Garuda =  "󰛓  "
+Gentoo =  "  "
+HardenedBSD =  "󰞌  "
+Illumos =  "󰈸  "
+# Ios удален (нет в списке поддержки)
+Kali =  "  "
+Linux =  "  "
+Mabox =  "  "
+Macos =  "  "
+Manjaro =  "  "
+Mariner =  "  "
+MidnightBSD =  "  "
+Mint =  "  "
+NetBSD =  "  "
+NixOS =  "  "
+Nobara =  "  "
+OpenBSD =  "󰈺  "
+openSUSE =  "  "
+OracleLinux =  "󰌷  "
+Pop =  "  "
+Raspbian =  "  "
+Redhat =  "  "
+RedHatEnterprise =  "  "
+RockyLinux =  "  "
+Redox =  "󰀘  "
+Solus =  "󰠳  "
+SUSE =  "  "
+Ubuntu =  "  "
+Unknown =  "  "
+Void =  "  "
+Windows =  "󰍲  "
+# Zorin удален (нет в списке поддержки)
+[package]
+symbol = "󰏗 "
+[perl]
+symbol = " "
+[php]
+symbol = " "
+[pijul_channel]
+symbol = " "
+[python]
+symbol = " "
+[rlang]
+symbol = "󰟔 "
+[ruby]
+symbol = " "
+[rust]
+symbol = "󱘗 "
+[scala]
+symbol = " "
+[status]
+symbol = " "
+[swift]
+symbol = " "
+[zig]
+symbol = " "

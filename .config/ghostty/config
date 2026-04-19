@@ -1,0 +1,19 @@
+# theme
+theme = Material Darker
+
+cursor-style = underline
+cursor-style-blink = false
+shell-integration-features = no-cursor
+
+# font
+font-family = JetBrainsMono Nerd Font
+
+# window preferences
+window-padding-x = 6
+window-padding-y = 6
+window-width = 136
+window-height = 40
+
+# keys
+keybind = alt+left=unbind
+keybind = alt+right=unbind

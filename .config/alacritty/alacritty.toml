@@ -1,0 +1,42 @@
+[window.dimensions]
+columns = 136
+lines = 40
+
+[window]
+padding = { x = 6, y = 6 }
+
+[cursor.style]
+shape = "Underline"
+blinking = "Always"
+
+[colors]
+
+[colors.primary]
+background = "#212121"
+foreground = "#eeffff"
+
+[colors.normal]
+black = "#000000"
+red = "#ff5370"
+green = "#c3e88d"
+yellow = "#ffcb6b"
+blue = "#82aaff"
+magenta = "#c792ea"
+cyan = "#89ddff"
+white = "#ffffff"
+
+[colors.bright]
+black = "#545454"
+red = "#ff5370"
+green = "#c3e88d"
+yellow = "#ffcb6b"
+blue = "#82aaff"
+magenta = "#c792ea"
+cyan = "#89ddff"
+white = "#ffffff"
+
+[font]
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
