@@ -41,8 +41,7 @@
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{
     brew_packages.extensions | join(' ') }}"
   register: brew_install_extensions_result
-  changed_when: "'Installing' in brew_install_extensions_result.stdout or
-    brew_install_extensions_result.rc == 0"
+  changed_when: "'Installing' in brew_install_extensions_result.stdout"
   failed_when: false
   become: no
   when: brew_version_check is succeeded
@@ -50,8 +49,7 @@
 - name: Homebrew. Install CLI tools
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.cli_tools | join(' ') }}"
   register: brew_install_CLI_result
-  changed_when: "'Installing' in brew_install_CLI_result.stdout or
-    brew_install_CLI_result.rc == 0"
+  changed_when: "'Installing' in brew_install_CLI_result.stdout"
   failed_when: false
   become: no
   when: brew_version_check is succeeded
@@ -59,8 +57,7 @@
 - name: Homebrew. Install fonts
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.fonts | join(' ') }}"
   register: brew_install_fonts_result
-  changed_when: "'Installing' in brew_install_fonts_result.stdout or
-    brew_install_fonts_result.rc == 0"
+  changed_when: "'Installing' in brew_install_fonts_result.stdout"
   failed_when: false
   become: no
   when:
@@ -70,7 +67,7 @@
   command: "/home/linuxbrew/.linuxbrew/bin/brew tap {{ item }}"
   loop: "{{ brew_packages.taps }}"
   register: brew_tap_result
-  changed_when: "'Tapping' in brew_tap_result.stdout or brew_tap_result.rc == 0"
+  changed_when: "'Tapping' in brew_tap_result.stdout"
   failed_when: false
   become: no
   when:
@@ -81,8 +78,7 @@
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional
     | join(' ') }}"
   register: brew_install_optional_result
-  changed_when: "'Installing' in brew_install_optional_result.stdout or
-    brew_install_optional_result.rc == 0"
+  changed_when: "'Installing' in brew_install_optional_result.stdout"
   failed_when: false
   become: no
   when:
