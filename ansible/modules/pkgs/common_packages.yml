@@ -19,7 +19,6 @@ common_packages:
     - ssh
     - zsh
     - nala
-    - snapd
     - nano
     - stow
     - file
