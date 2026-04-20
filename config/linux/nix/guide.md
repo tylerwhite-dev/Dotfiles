@@ -1,6 +1,5 @@
 # Info
-[pkgs](https://search.nixos.org/packages)
-
+search [pkgs](https://search.nixos.org/packages)
 
 # Install nix
 
@@ -19,52 +18,39 @@ sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daem
 - restart shell
 - run `nix --version`
 
-# Manage pkgs
+# Nix-env
 
 ## Show installed
-```
+```bash
 nix-env -q
 ```
 
-## Install
+## Install by attribute
 
-### From .nix file
-```
-nix-env -f [pkgsfile].nix -i
-```
-
-### As attribute
-```
+```bash
 nix-env -iA nixpkgs.[pkg]
 ```
 
-### By name (slow)
-```
-nix-env -i [pkg]
+
+## Install from nix file
+```bash
+nix-env -f [pkgsfile].nix -i
 ```
 
-## Delete
-```
+
+## Remove
+```bash
 nix-env -e [pkg]
 ```
 
-## Update
-```
-nix-env -u
-```
 
-# Nix-shell
-
-# Channels
-
-## Add "unstable"
-
+# Nix-channel
 check current channels
-```
+```bash
 nix-channel --list
 ```
 
-add nixpkgs-unstable
-```
+add nixpkgs-unstable (used by default in nix)
+```bash
 nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs-unstable
 ```

@@ -31,6 +31,9 @@ bindkey '^[[1;5C' forward-word
 # <-- homebrew -->
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
+# <-- nix -->
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
+
 # <-- starship -->
 eval "$(starship init zsh)"
 
@@ -39,27 +42,7 @@ eval "$(starship init zsh)"
 source /home/linuxbrew/.linuxbrew/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /home/linuxbrew/.linuxbrew/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# installed via pacman
-# source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# installed via apt
-# source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 # <-- nvm -->
-# official way to load
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# lazy nvm load on request installed recommended by script
-# lazynvm() {
-#   unset -f nvm node npm npx
-#   export NVM_DIR="$HOME/.nvm"
-#   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-# }
-
 # lazy nvm load on request installed by brew
 __nvmload() {
   unset -f nvm node npm npx __nvmload 2>/dev/null
