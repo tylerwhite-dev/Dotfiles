@@ -8,7 +8,7 @@ Ansible playbook provides basic package installations via apt/pacman, many tools
 ansible-playbook ansible/desktop.yml --ask-become-pass
 ```
 
-## Only configs via stow
+## Apply configs only via stow
 
 ### ZSH
 
@@ -20,7 +20,7 @@ stow zsh-mac
 stow zsh-linux
 ```
 
-## The rest of configurations
+### The rest of configurations
 ```
 stow .
 ```
