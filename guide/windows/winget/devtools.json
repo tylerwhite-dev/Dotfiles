@@ -39,6 +39,9 @@
         },
         {
           "PackageIdentifier": "Mattermost.MattermostDesktop"
+        },
+        {
+          "PackageIdentifier": "SST.opencode"
         }
       ],
       "SourceDetails": {
