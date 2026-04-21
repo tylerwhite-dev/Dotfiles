@@ -2,12 +2,6 @@
 
 ## shell settings
 
-enable experimental scaling features
-
-``` bash
-gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer', 'xwayland-native-scaling']"
-```
-
 center new windows on the screen
 
 ``` bash
@@ -18,6 +12,11 @@ smart focus behavior for new windows
 
 ``` bash
 gsettings set org.gnome.desktop.wm.preferences focus-new-windows 'smart'
+```
+
+## shell extensions
+```
+gnome-shell-extension-dash-to-panel gnome-shell-extension-rounded-window-corners-reborn
 ```
 
 ## theme for qt apps

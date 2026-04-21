@@ -9,29 +9,38 @@ sudo pacman -Syu --noconfirm && yay -Syu --noconfirm && flatpak update -y && bre
 
 ## apps
 
+loupe (flatpak) - images;
+decibels - music;
+eartag (flatpak) - song tags;
+vlc (flatpak) - video;
+snapshot - camera.
+
 ### pacman
 
-some could be installed as [brew](brew.md)
-```
+``` 
 flatpak openssh cronie wl-clipboard fwupd wmctrl
 
-firefox alacritty gparted veracrypt vlc vlc-plugins-all inkscape foliate eartag virtualbox virtualbox-host-dkms timeshift
+gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar decibels gnome-text-editor gnome-font-viewer baobab snapshot gcolor3
+
+firefox alacritty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
 
 qtcreator qt6-base docker
 ```
 
 ### yay
+
 ```
 google-chrome lmstudio balena-etcher vscodium-bin
 ```
 
 ### brew
-[installation and formulae](brew.md)
 
+some could be installed as brew:
+[installation and formulae](brew.md)
 
 # configurations
 
-some configurations contained in [`configurations file`](configurations.md)
+most configurations contained in [`configurations file`](configurations.md)
 
 ## ssh
 ```
@@ -62,37 +71,5 @@ sudo systemctl enable --now cups.service
 sudo gpasswd -a $USER lp
 ```
 
-
-# gui
-
-## gnome
-
-### base
-```
-gnome-shell gdm gnome-console gnome-keyring
-```
-
-### enable gdm
-```
-sudo systemctl enable gdm.service
-```  
-
-### apps
-
-``` bash
-sudo pacman -S nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar loupe decibels gnome-text-editor gnome-font-viewer baobab snapshot gcolor3
-```
-
-loupe - images;
-decibels - music;
-eartag - song tags;
-vlc - video;
-snapshot - camera.
-
-### extensions
-``` bash
-yay -S gnome-shell-extension-dash-to-panel gnome-shell-extension-rounded-window-corners-reborn
-```
-
-### configurations
+## gui configurations
 gnome settings contained in [`gnome.md`](gui/gnome.md)
