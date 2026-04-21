@@ -2,10 +2,14 @@
 
 ## apt
 
-some could be installed as [brew](brew.md)
+update:
+```
+sudo nala upgrade -y && brew upgrade
 ```
 
-sudo git git-lfs curl flatpak ssh zsh stow build-essential wl-clipboard wmctrl nala
+some could be installed as [brew](brew.md)
+```
+nala sudo git git-lfs curl flatpak ssh zsh stow build-essential wl-clipboard wmctrl
 
 nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar loupe gnome-text-editor gnome-font-viewer baobab snapshot gcolor3 gparted vlc inkscape timeshift foliate eartag gnome-browser-connector gnome-tweaks gnome-control-center 
 
