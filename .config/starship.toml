@@ -1,10 +1,17 @@
 "$schema" = 'https://starship.rs/config-schema.json'
+
 continuation_prompt = "[▸▹ ](dimmed white)"
+
 right_format = """
 $git_branch
 $git_commit
 $git_state
-$git_status"""
+$git_status
+$os
+"""
+
+[os]
+disabled = false
 
 [character]
 format = "$symbol "
@@ -19,12 +26,6 @@ diverged = "<>"
 renamed = "r"
 deleted = "x"
 
-[battery]
-full_symbol = "full "
-charging_symbol = "charging "
-discharging_symbol = "discharging "
-unknown_symbol = "unknown "
-empty_symbol = "empty "
 
 [aws]
 symbol = " "
@@ -96,8 +97,32 @@ symbol = " "
 symbol = " "
 [ocaml]
 symbol = " "
+[package]
+symbol = "󰏗 "
+[perl]
+symbol = " "
+[php]
+symbol = " "
+[pijul_channel]
+symbol = " "
+[python]
+symbol = " "
+[rlang]
+symbol = "󰟔 "
+[ruby]
+symbol = " "
+[rust]
+symbol = "󱘗 "
+[scala]
+symbol = " "
+[status]
+symbol = " "
+[swift]
+symbol = " "
+[zig]
+symbol = " "
+
 [os.symbols]
-# Оставлены только те, что есть в списке поддерживаемых вашей версией
 Alpaquita =  "  "
 Alpine =  "  "
 AlmaLinux =  "  "
@@ -109,16 +134,14 @@ CachyOS =  "  "
 CentOS =  "  "
 Debian =  "  "
 DragonFly =  "  "
-# Elementary удален (нет в списке поддержки)
 Emscripten =  "  "
-EndeavourOS =  "  "
+EndeavourOS =  "  "
 Fedora =  "  "
 FreeBSD =  "  "
 Garuda =  "󰛓  "
 Gentoo =  "  "
 HardenedBSD =  "󰞌  "
 Illumos =  "󰈸  "
-# Ios удален (нет в списке поддержки)
 Kali =  "  "
 Linux =  "  "
 Mabox =  "  "
@@ -145,28 +168,3 @@ Ubuntu =  "  "
 Unknown =  "  "
 Void =  "  "
 Windows =  "󰍲  "
-# Zorin удален (нет в списке поддержки)
-[package]
-symbol = "󰏗 "
-[perl]
-symbol = " "
-[php]
-symbol = " "
-[pijul_channel]
-symbol = " "
-[python]
-symbol = " "
-[rlang]
-symbol = "󰟔 "
-[ruby]
-symbol = " "
-[rust]
-symbol = "󱘗 "
-[scala]
-symbol = " "
-[status]
-symbol = " "
-[swift]
-symbol = " "
-[zig]
-symbol = " "
