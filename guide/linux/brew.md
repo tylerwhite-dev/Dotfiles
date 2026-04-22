@@ -1,7 +1,7 @@
 # installation
 
 [website](https://brew.sh)
-```
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
@@ -12,7 +12,7 @@ which brew
 
 # user access
 To access homebrew packages, add its bin directory to PATH:
-```
+```bash
 export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 ```
 
@@ -23,9 +23,9 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 zsh-autosuggestions zsh-syntax-highlighting yazi starship tmux neovim fastfetch pfetch-rs btop yt-dlp nvtop zoxide eza lazygit
 ```
 
-## optional
+## tap
 ```
-brew tap oven-sh/bun
+oven-sh/bun
 ```
 
 ## fonts
@@ -33,8 +33,9 @@ brew tap oven-sh/bun
 font-jetbrains-mono-nerd-font font-hack-nerd-font
 ```
 
+## optional
 ```
-anomalyco/tap/opencode charmbracelet/tap/crush qwen-code
+opencode charmbracelet/tap/crush qwen-code
 llvm cmake go nvm rustup uv zig bun 
 ffmpeg-full superfile htop tree mailsy imagemagick-full gromgit/brewtils/taproom file-formula 
 ```

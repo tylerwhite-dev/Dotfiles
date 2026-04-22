@@ -1,37 +1,34 @@
-# configurations
+# shell
 
 ## zsh
 
 make ZSH default shell
+```bash
+chsh -s $(/bin/zsh)
 ```
-chsh -s $(which zsh) 
-```
 
-install plugins (pacman, homebrew, etc...)
-
-
-add installation path to `~/.zshrc`
-( some path contained in [`zshrc linux`](../crossplatform/zsh/zshrc%20linux) )
-
-## starship 
-( contained in [`zshrc linux`](../crossplatform/zsh/zshrc%20linux) )
-
-go to: `~/.zshrc` file
-
-```
-eval "$(starship init zsh)"
-```
+# services
 
 ## timeshift
 if scheduled snapshots not working
-```
+```bash
 sudo systemctl enable --now cronie.service
 ```
 
-## nvm
+## docker
+```bash
+sudo usermod -aG docker $USER
+sudo systemctl enable --now docker.service
 ```
-nvm install --lts
 
+reboot system
+
+
+# toolchains
+
+## nvm
+```bash
+nvm install --lts
 nvm use node --lts
 
 nvm --version
@@ -40,18 +37,10 @@ npm -v
 ```
 
 ## rustup
-```
+```bash
 rustup default stable
 
 rustc -V
 cargo -V
 rustup show
 ```
-
-## docker
-```
-sudo usermod -aG docker $USER
-sudo systemctl enable --now docker.service
-```
-
-reboot system

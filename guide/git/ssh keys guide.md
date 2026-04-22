@@ -1,11 +1,11 @@
 ## Generate a SSH key pair (private/public):
 ```
-ssh-keygen -t rsa -C "your_email@example.com"
+ssh-keygen -t rsa -C "..."
 ```
 
 or even better:
 ```
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+ssh-keygen -t rsa -b 4096 -C "..."
 ```
 
 It also possible to use ed25519. There are pros and cons, but personally I've had some issues and that is the reason I've chosen to stick to 4096 rsa for now.

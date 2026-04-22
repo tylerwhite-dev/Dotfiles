@@ -6,12 +6,12 @@ build-essential libpam0g-dev libxcb-xkb-dev xauth xserver-xorg brightnessctl
 ```
 
 2. Compile as systemd module
-```
+```bash
 zig build installexe -Dinit_system=systemd
 ```
 
 3. Disable tty2, enable ly
-```
+```bash
 sudo systemctl daemon-reload
 
 sudo systemctl disable --now gdm3  # disable current DM

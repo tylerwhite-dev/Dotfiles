@@ -4,13 +4,13 @@
 
 center new windows on the screen
 
-``` bash
+```bash
 gsettings set org.gnome.mutter center-new-windows true
 ```
 
 smart focus behavior for new windows
 
-``` bash
+```bash
 gsettings set org.gnome.desktop.wm.preferences focus-new-windows 'smart'
 ```
 
@@ -30,16 +30,16 @@ adw-gtk-theme
 ```
 
 light theme:
-``` bash
+```bash
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3' && gsettings set org.gnome.desktop.interface color-scheme 'default'
 ```
 
 dark theme:
-``` bash
+```bash
 gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' && gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 ```
 
 revert to default:
-``` bash
+```bash
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita' && gsettings set org.gnome.desktop.interface color-scheme 'default'
 ```

@@ -1,7 +1,7 @@
 # installation
 
 [brew](https://brew.sh)
-```
+```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
@@ -32,10 +32,10 @@ font-jetbrains-mono-nerd-font font-hack-nerd-font
 # configurations
 
 ## starship
-( contained in [`zshrc macos`](../multiplatform/zsh/zshrc%20macos) )
+( contained in [`zshrc macos`](../../zsh_mac/.zshrc) )
 
 add to file ~/.zshrc (contained in `.zshrc macos`)
-```
+```bash
 eval "$(starship init bash)"
 ```
 

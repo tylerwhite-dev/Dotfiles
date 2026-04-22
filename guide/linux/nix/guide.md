@@ -4,12 +4,12 @@ search [pkgs](https://search.nixos.org/packages)
 # Install nix
 
 ## Multi-user (recommended)
-```
+```bash
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
 ```
 
 ## Single-user installation
-```
+```bash
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
 ```
 
@@ -31,18 +31,15 @@ nix-env -q
 nix-env -iA nixpkgs.[pkg]
 ```
 
-
 ## Install from nix file
 ```bash
 nix-env -f [pkgsfile].nix -i
 ```
 
-
 ## Remove
 ```bash
 nix-env -e [pkg]
 ```
-
 
 # Nix-channel
 check current channels
