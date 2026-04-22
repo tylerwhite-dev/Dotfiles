@@ -1,10 +1,13 @@
 # packages
 
-# packages
-
-## full no confirm update
+## full upgrade
+```bash
+sudo nala upgrade -y && flatpak update -y && brew upgrade
 ```
-sudo nala upgrade -y && brew upgrade
+
+## cleanup system
+```bash
+sudo nala autoremove -y && sudo nala autoclean && flatpak uninstall --unused -y && brew cleanup
 ```
 
 ## apps
@@ -14,8 +17,6 @@ decibels - music;
 eartag (flatpak) - song tags;
 vlc (flatpak) - video;
 snapshot - camera.
-
-
 
 ### apt
 
@@ -40,12 +41,12 @@ most configurations contained in [`configurations file`](configurations.md)
 
 run as root:
 
-```
+```bash
 sudo usermod -aG sudo USER_NAME
 ```
 
 ## ssh
-```
+```bash
 systemctl enable --now ssh
 ```
 

@@ -2,9 +2,14 @@
 
 # packages
 
-## full no confirm update
+## full upgrade
+```bash
+yay -Syyu && flatpak update -y && brew upgrade
 ```
-sudo pacman -Syu --noconfirm && yay -Syu --noconfirm && flatpak update -y && brew upgrade
+
+## cleanup system
+```bash
+sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && flatpak uninstall --unused -y && brew cleanup
 ```
 
 ## apps
@@ -22,7 +27,7 @@ flatpak openssh cronie wl-clipboard fwupd wmctrl
 
 gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar decibels gnome-text-editor gnome-font-viewer baobab snapshot gcolor3
 
-firefox alacritty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
+firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
 
 qtcreator qt6-base docker
 ```
@@ -43,12 +48,12 @@ some could be installed as brew:
 most configurations contained in [`configurations file`](configurations.md)
 
 ## ssh
-```
+```bash
 sudo systemctl enable --now sshd.service
 ```
 
 ## fwupd
-```
+```bash
 sudo systemctl status fwupd.service
 ```
 
@@ -59,15 +64,15 @@ amnezia has connection bug on Arch, checkout [troubleshoot](troubleshoot/amnezia
 
 ## printers
 
-``` bash
+```bash
 sudo pacman -S cups cups-pdf
 ```
 
-``` bash
+```bash
 sudo systemctl enable --now cups.service
 ```
 
-``` bash
+```bash
 sudo gpasswd -a $USER lp
 ```
 
