@@ -1,23 +1,30 @@
 {
     "$schema": "https://opencode.ai/config.json",
+    
+    "autoupdate": false,
+    
+    "permission": {
+        "bash": { "*": "ask" },
+        "edit": { "*": "allow" }
+    },
+    
+    "model": "opencode/big-pickle",
+    
     "provider": {
         "lmstudio": {
             "npm": "@ai-sdk/openai-compatible",
             "name": "LM Studio",
             "options": {
-                "baseURL": "http://localhost:1234/v1",
+                "baseURL": "http://localhost:1234/v1"
             },
             "models": {
                 "omnicoder-9b": {
-                    "name": "Omnicoder 9b",
+                    "name": "Omnicoder 9b"
                 },
                 "mistralai/ministral-3-3b": {
-                    "name": "Ministral 3 3b",
-                },
-            },
-        },
-    },
-    //"model": "lmstudio/omnicoder-9b",
-    "model": "openrouter/google/gemma-4-31b-it:free",
-    
+                    "name": "Ministral 3 3b"
+                }
+            }
+        }
+    }
 }
