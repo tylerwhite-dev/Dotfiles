@@ -3,3 +3,7 @@
 
 # auto-generated files
 *-lock.json
+
+# Ignore content in VSCodium, except settings.json
+.config/VSCodium/*
+!.config/VScodium/settings.json

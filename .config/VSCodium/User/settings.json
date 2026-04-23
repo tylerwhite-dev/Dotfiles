@@ -1,0 +1,40 @@
+{
+    // default window scale
+    // "window.zoomLevel": 1,
+
+    "telemetry.telemetryLevel": "off",
+    "update.mode": "manual",
+
+    "files.autoSave": "afterDelay",
+
+    "workbench.startupEditor": "none",
+    "workbench.editor.enablePreview": true,
+    "workbench.tree.indent": 16,
+
+    "editor.minimap.showSlider": "always",
+    "editor.fontSize": 14,
+    "editor.fontFamily": "'JetBrainsMono Nerd Font'", 
+    "editor.fontLigatures": true,
+    // font is correct if you see ligatures and symbols: <=>  
+
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
+
+    "git.autofetch": true,
+    "git.replaceTagsWhenPull": true,
+    "git.suggestSmartCommit": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+
+    "diffEditor.ignoreTrimWhitespace": false,
+
+    "scm.graph.pageSize": 75,
+    "scm.inputFontSize": 14,
+
+    "todo-tree.filtering.includeHiddenFiles": true,
+    "todo-tree.tree.showCountsInTree": true,
+    "todo-tree.filtering.excludeGlobs": [
+        "**/node_modules",
+        "**/.git"
+    ]
+}
