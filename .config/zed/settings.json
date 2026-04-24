@@ -1,5 +1,8 @@
 {
     // UI
+    // "use_system_window_tabs": true,
+    "diff_view_style": "split",
+    "tabs": { "show_diagnostics": "errors" },
     "gutter": { "min_line_number_digits": 0 },
     "title_bar": { "show_sign_in": false },
     "minimap": { "thumb": "always", "show": "always" },
