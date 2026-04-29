@@ -1,6 +1,5 @@
 {
     "telemetry.telemetryLevel": "off",
-    "update.mode": "manual",
     
     // "window.zoomLevel": 1,
     "window.menuBarVisibility": "toggle",
@@ -38,5 +37,6 @@
         "**/node_modules",
         "**/.git"
     ],
+    
     "cSpell.language": "en,ru"
 }
