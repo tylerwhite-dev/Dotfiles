@@ -1,6 +1,7 @@
 # alias
-alias ll='eza -a --icons --grid --group-directories-first'
-alias la='eza -la --icons --group-directories-first'
+alias ll='eza -a --tree --level=1 --icons'
+alias la='eza -la --header --icons --group-directories-first'
+alias ld='eza --tree --level=2 --icons --git'
 
 # enable history
 setopt APPEND_HISTORY
