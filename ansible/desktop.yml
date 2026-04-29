@@ -6,3 +6,4 @@
     - import_tasks: modules/shell.yml
     - import_tasks: modules/dotfiles.yml
     - import_tasks: modules/brew.yml
+    - import_tasks: modules/yay.yml

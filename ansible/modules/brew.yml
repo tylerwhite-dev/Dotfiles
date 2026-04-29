@@ -75,7 +75,8 @@
     - not (basic_install | default(false))
 
 - name: Homebrew. Install optional packages
-  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional
+  command:
+    "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional
     | join(' ') }}"
   register: brew_install_optional_result
   changed_when: "'Installing' in brew_install_optional_result.stdout"

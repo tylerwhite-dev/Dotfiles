@@ -6,12 +6,12 @@
   become: true
   when: ansible_facts["os_family"] == "Archlinux"
   pacman:
-      name: "{{ common_packages.arch }}"
-      state: present
+    name: "{{ common_packages.arch }}"
+    state: present
 
 - name: Common. Install packages (Debian/Ubuntu)
   become: true
   when: ansible_facts["os_family"] == "Debian"
   apt:
-      name: "{{ common_packages.debian }}"
-      state: present
+    name: "{{ common_packages.debian }}"
+    state: present
