@@ -10,8 +10,8 @@
   file:
     path: "/home/linuxbrew"
     state: directory
-    owner: "{{ ansible_env.HOME | basename }}"
-    group: "{{ ansible_env.HOME | basename }}"
+    owner: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_id }}"
     mode: "0755"
   become: true
   when: brew_installation_check is failed

@@ -1,24 +1,24 @@
 ---
 - name: Dotfiles. Configure config directory
   file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.config"
+    path: "{{ ansible_facts.env.HOME }}/.config"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Dotfiles. Define needed
   set_fact:
     stow_packages: >-
       {{
-        ['.', 'wallpaper'] + (['zsh_linux'] if ansible_facts["os_family"] != "Darwin" else ['zsh_mac'])
+        ['.', 'wallpaper'] + (['zsh_linux'] if ansible_facts.os_family != "Darwin" else ['zsh_mac'])
       }}
 
 - name: Dotfiles. Apply with GNU Stow
-  command: stow --target={{ ansible_facts["env"]["HOME"] }} {{ item }}
+  command: stow --target={{ ansible_facts.env.HOME }} {{ item }}
   loop: "{{ stow_packages }}"
   register: stow_result
   changed_when: stow_result.stderr is search('LINK')
   failed_when: stow_result.rc != 0
   args:
-    chdir: "{{ ansible_facts['env']['HOME'] }}/Dotfiles"
+    chdir: "{{ ansible_facts.env.HOME }}/Dotfiles"
   environment:
-    HOME: "{{ ansible_facts['env']['HOME'] }}"
+    HOME: "{{ ansible_facts.env.HOME }}"
