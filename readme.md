@@ -2,10 +2,16 @@
 
 ## Apply dotfiles and packages via Ansible
 
-Ansible playbook provides basic package installations via apt/pacman, many tools via brew, set ZSH as default shell, apply dotfiles
+Ansible playbook provides basic package installations via apt/pacman/dnf, many tools via brew, set ZSH as default shell, apply dotfiles
 
+### Basic installation
 ```bash
-ansible-playbook ansible/desktop.yml --ask-become-pass
+ansible-playbook ansible/desktop.yml -K
+```
+
+### Extended brew installation
+```bash
+ansible-playbook desktop.yml -K -e "extended_brew=true"
 ```
 
 ## Apply configs only via stow
