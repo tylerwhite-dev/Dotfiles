@@ -25,7 +25,7 @@ snapshot - camera.
 ``` 
 flatpak openssh cronie wl-clipboard fwupd wmctrl
 
-gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar decibels gnome-text-editor gnome-font-viewer baobab snapshot gcolor3
+gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar decibels gnome-text-editor gnome-font-viewer baobab gcolor3
 
 firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
 

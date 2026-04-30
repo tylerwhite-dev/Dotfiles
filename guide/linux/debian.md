@@ -23,7 +23,7 @@ snapshot - camera.
 ```
 nala sudo git git-lfs curl flatpak ssh zsh stow build-essential wl-clipboard wmctrl
 
-nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar loupe gnome-text-editor gnome-font-viewer baobab snapshot gcolor3 gparted timeshift gnome-browser-connector gnome-tweaks gnome-control-center
+nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gparted timeshift gnome-browser-connector gnome-tweaks gnome-control-center
 
 qt6-base-dev qtcreator qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls
 ```
