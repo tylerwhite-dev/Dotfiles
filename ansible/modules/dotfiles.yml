@@ -1,5 +1,10 @@
-# ansible/modules/dotfiles.yml
 ---
+- name: Dotfiles. Configure config directory
+  file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config"
+    state: directory
+    mode: '0755'
+
 - name: Dotfiles. Define needed
   set_fact:
     stow_packages: >-
