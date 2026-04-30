@@ -23,3 +23,14 @@ common_packages:
     - stow
     - file
     - wl-clipboard
+  fedora:
+    - sudo
+    - git
+    - git-lfs
+    - curl
+    - openssh-clients
+    - zsh
+    - nano
+    - stow
+    - file
+    - wl-clipboard
