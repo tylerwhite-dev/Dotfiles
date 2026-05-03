@@ -2,12 +2,12 @@
 
 ## full upgrade
 ```bash
-sudo nala upgrade -y && flatpak update -y && brew upgrade
+sudo dnf upgrade -y && brew upgrade && flatpak update -y
 ```
 
 ## cleanup system
 ```bash
-sudo nala autoremove -y && sudo nala autoclean && flatpak uninstall --unused -y && brew cleanup
+sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y 
 ```
 
 ## apps

@@ -4,12 +4,12 @@
 
 ## full upgrade
 ```bash
-yay -Syyu && flatpak update -y && brew upgrade
+yay -Syyu && brew upgrade && flatpak update -y
 ```
 
 ## cleanup system
 ```bash
-sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && flatpak uninstall --unused -y && brew cleanup
+sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && brew cleanup && flatpak uninstall --unused -y
 ```
 
 ## apps
