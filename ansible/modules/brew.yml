@@ -72,7 +72,7 @@
   become: no
   when:
     - brew_version_check is succeeded
-    - extended_brew | default(false)
+    - extended_brew | default(false) | bool
 
 - name: Homebrew. Install optional packages
   command:
@@ -84,4 +84,4 @@
   become: no
   when:
     - brew_version_check is succeeded
-    - extended_brew | default(false)
+    - extended_brew | default(false) | bool
