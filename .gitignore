@@ -7,3 +7,7 @@
 # Ignore content in VSCodium, except settings.json
 .config/VSCodium/*
 !.config/VScodium/settings.json
+
+# Ignore content in zed, except settings.json
+.config/zed/*
+!.config/zed/settings.json
