@@ -6,12 +6,12 @@ Ansible playbook provides basic package installations via apt/pacman/dnf, many t
 
 ### Basic installation
 ```bash
-ansible-playbook ansible/desktop.yml -K
+ansible-playbook ansible/desktop.yml -i inventory.yml -K
 ```
 
 ### Extended brew installation
 ```bash
-ansible-playbook desktop.yml -K -e "extended_brew=true"
+ansible-playbook desktop.yml -i inventory.yml -K -e "extended_brew=true"
 ```
 
 ## Apply configs only via stow
