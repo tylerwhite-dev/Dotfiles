@@ -13,21 +13,20 @@ brew_packages:
     - neovim
     - btop
     - nvtop
-    - yt-dlp
     - opencode
     - lazygit
     - fastfetch
   optional:
+    - taproom
+    - superfile
     - go
     - nvm
     - rustup
     - uv
+    - yt-dlp
     - ffmpeg-full
-    - superfile
-    - tree
-    - mailsy
     - imagemagick-full
-    - gromgit/brewtils/taproom
+    - mailsy
   taps:
     - gromgit/brewtils
   fonts:
