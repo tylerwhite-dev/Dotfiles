@@ -12,12 +12,12 @@ yay -Syyu && brew upgrade && flatpak update -y
 sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && brew cleanup && flatpak uninstall --unused -y
 ```
 
-## apps
+## apps (flatpak)
 
-loupe (flatpak) - images;
+loupe - images;
 decibels - music;
-eartag (flatpak) - song tags;
-vlc (flatpak) - video;
+eartag - song tags;
+vlc - video;
 snapshot - camera.
 
 ### pacman
@@ -25,7 +25,7 @@ snapshot - camera.
 ``` 
 flatpak openssh cronie wl-clipboard fwupd wmctrl
 
-gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar decibels gnome-text-editor gnome-font-viewer baobab gcolor3
+gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3
 
 firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
 

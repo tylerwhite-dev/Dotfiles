@@ -10,12 +10,12 @@ sudo nala upgrade -y && brew upgrade && flatpak update -y
 sudo nala autoremove -y && sudo nala autoclean && brew cleanup && flatpak uninstall --unused -y
 ```
 
-## apps
+## apps (flatpak)
 
-loupe (flatpak) - images;
+loupe - images;
 decibels - music;
-eartag (flatpak) - song tags;
-vlc (flatpak) - video;
+eartag - song tags;
+vlc - video;
 snapshot - camera.
 
 ### apt

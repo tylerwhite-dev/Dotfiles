@@ -10,12 +10,12 @@ sudo dnf upgrade -y && brew upgrade && flatpak update -y
 sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y 
 ```
 
-## apps
+## apps (flatpak)
 
-loupe (flatpak) - images;
+loupe - images;
 decibels - music;
-eartag (flatpak) - song tags;
-vlc (flatpak) - video;
+eartag - song tags;
+vlc - video;
 snapshot - camera.
 
 ### apt
