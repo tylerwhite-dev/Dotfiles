@@ -11,7 +11,7 @@ ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K
 
 ### Extended brew installation
 ```bash
-ansible-playbook desktop.yml -i ansible/inventory.yml -K -e "extended_brew=true"
+ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended_brew=true"
 ```
 
 ## Apply configs only via stow
