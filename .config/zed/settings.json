@@ -1,51 +1,64 @@
 {
-    // UI
-    // "use_system_window_tabs": true,
-    "diff_view_style": "split",
-    "tabs": { "show_diagnostics": "errors" },
-    "gutter": { "min_line_number_digits": 0 },
-    "title_bar": { "show_sign_in": false },
-    "minimap": { "thumb": "always", "show": "always" },
-    "project_panel": { "dock": "left" },
-    "git_panel": { "dock": "left" },
+  // UI
+  "use_system_window_tabs": true,
+  "diff_view_style": "split",
+  "tabs": { "show_diagnostics": "errors" },
+  "gutter": { "min_line_number_digits": 0 },
+  "title_bar": { "show_sign_in": false },
+  "minimap": { "thumb": "always", "show": "always" },
+  "project_panel": { "dock": "left" },
+  "git_panel": { "dock": "left" },
+  "outline_panel": { "dock": "right" },
+  "collaboration_panel": { "dock": "right" },
 
-    "terminal": {
-        "font_family": "JetBrainsMono Nerd Font",
-        "default_height": 580,
+  "terminal": {
+    "font_family": "JetBrainsMono Nerd Font",
+    "default_height": 580,
+    "cursor_shape": "underline",
+    "option_as_meta": true,
+  },
+
+  // BEHAVIOR
+  "base_keymap": "VSCode",
+  "session": { "trust_all_worktrees": true },
+  "restore_on_startup": "last_workspace",
+  "show_completions_on_input": false,
+  "autosave": { "after_delay": { "milliseconds": 1000 } },
+  "git": { "inline_blame": { "enabled": false } },
+  "horizontal_scroll_margin": 3,
+  "vertical_scroll_margin": 3,
+  "format_on_save": "on",
+
+  // THEME
+  "icon_theme": "Base Charmed Icons",
+  "theme": "JetBrains Dark",
+
+  // FONT
+  // font is correct if you see ligatures and symbols: <=> 
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "buffer_line_height": { "custom": 1.6 },
+  "buffer_font_features": { "liga": true },
+
+  // LSP
+  "languages": {
+    "Go": {
+      "language_servers": ["gopls"],
+      "format_on_save": "on",
     },
-
-    "agent": {
-        "sidebar_side": "right",
-        "default_model": {
-            "provider": "openrouter",
-            "model": "openrouter/free",
-            "enable_thinking": true
+  },
+  "lsp": {
+    // golang
+    "gopls": {
+      "initialization_options": {
+        "usePlaceholders": true,
+        "completeUnimported": true,
+        "hoverKind": "FullDocumentation",
+        "analyses": {
+          "unusedparams": true,
+          "shadow": true,
         },
-        "dock": "right",
-        "favorite_models": [],
-        "model_parameters": [],
+        "staticcheck": true,
+      },
     },
-    
-    "outline_panel": { "dock": "right" },
-    "collaboration_panel": { "dock": "right" },
-
-    // BEHAVIOR
-    "base_keymap": "VSCode",
-    "session": { "trust_all_worktrees": true },
-    "restore_on_startup": "last_workspace",
-    "show_completions_on_input": false,
-    "autosave": { "after_delay": { "milliseconds": 1000 } },
-    "git": { "inline_blame": { "enabled": false } },
-    "horizontal_scroll_margin": 3,
-    "vertical_scroll_margin": 3,
-
-    // THEME
-    "icon_theme": "Base Charmed Icons",
-    "theme": "JetBrains Dark",
-
-    // FONT
-    "buffer_font_family": "JetBrainsMono Nerd Font",
-    "buffer_line_height": { "custom": 1.6 },
-    "buffer_font_features": { "liga": true },
-    // font is correct if you see ligatures and symbols: <=> 
+  },
 }
