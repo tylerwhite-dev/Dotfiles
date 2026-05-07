@@ -10,21 +10,34 @@ sudo nala upgrade -y && brew upgrade && flatpak update -y
 sudo nala autoremove -y && sudo nala autoclean && brew cleanup && flatpak uninstall --unused -y
 ```
 
-## apps (flatpak)
-
+## apps
+`
 loupe - images;
 decibels - music;
 eartag - song tags;
 vlc - video;
 snapshot - camera.
+`
 
 ### apt
 
+basic
 ```
-nala sudo git git-lfs curl flatpak ssh zsh stow build-essential wl-clipboard wmctrl
+nala sudo git git-lfs curl ssh zsh stow build-essential wl-clipboard wmctrl
+``` 
 
-nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gparted timeshift gnome-browser-connector gnome-tweaks gnome-control-center
+common
+```
+flatpak firefox-esr alacritty timeshift gparted 
+```
 
+gnome
+```
+nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
+```
+
+dev
+```
 qt6-base-dev qtcreator qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls
 ```
 

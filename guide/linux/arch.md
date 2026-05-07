@@ -12,24 +12,45 @@ yay -Syyu && brew upgrade && flatpak update -y
 sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && brew cleanup && flatpak uninstall --unused -y
 ```
 
-## apps (flatpak)
-
+## apps
+`
 loupe - images;
 decibels - music;
 eartag - song tags;
 vlc - video;
 snapshot - camera.
+`
 
 ### pacman
 
-``` 
-flatpak openssh cronie wl-clipboard fwupd wmctrl
+basic
+```
+openssh cronie wl-clipboard fwupd wmctrl
+```
 
+common
+```
+flatpak firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift zed
+```
+
+gnome
+```
 gnome-shell gdm gnome-console gnome-keyring nautilus sushi gnome-browser-connector gnome-tweaks gnome-control-center gnome-calculator gnome-clocks gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3
+```
 
-firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift
-
+dev
+```
 qtcreator qt6-base docker
+```
+
+system
+```
+dosfstools e2fsprogs btrfs-progs xfsprogs exfatprogs ntfs-3g 
+```
+
+dependencies
+```
+xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-cursor
 ```
 
 ### yay
