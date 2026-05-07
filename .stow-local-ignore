@@ -3,6 +3,7 @@
 .gitattributes
 .DS_Store
 .crush
+.vscode
 readme.md
 
 ansible
