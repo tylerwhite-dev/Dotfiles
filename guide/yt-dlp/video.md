@@ -9,7 +9,20 @@ Configure resolution by changing `height` parameter: 1080 / 1440 / 2160
 yt-dlp -f "bestvideo[height<=1080]+bestaudio" --merge-output-format mp4 -o "%(title)s.%(ext)s" ""
 ```
 
-## Playlist (local file)
+## Additional flags
+
+### Links from file
 ```bash
-yt-dlp -f "bestvideo[height<=1080]+bestaudio" --merge-output-format mp4 -o "%(title)s.%(ext)s" -a ""
+-a ""
+```
+
+### Subs
+
+```bash
+--write-auto-subs
+```
+
+### Cookies
+```bash
+--cookies-from-browser chrome
 ```

@@ -7,8 +7,7 @@ You need ffmpeg in order to convert audio formats
 yt-dlp -x --audio-format mp3 --embed-thumbnail --embed-metadata -o "%(title)s.%(ext)s" ""
 ```
 
-## Playlist (local file)
+## Additional flags
 ```bash
-yt-dlp -x --audio-format mp3 --embed-thumbnail --embed-metadata -o "%(title)s.%(ext)s" -a ""
+-a ""
 ```
-
