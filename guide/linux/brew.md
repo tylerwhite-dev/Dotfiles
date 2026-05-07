@@ -37,5 +37,5 @@ font-jetbrains-mono-nerd-font font-hack-nerd-font
 ```
 opencode charmbracelet/tap/crush qwen-code
 llvm cmake go nvm rustup uv zig bun 
-picocom ffmpeg-full superfile htop tree mailsy imagemagick-full gromgit/brewtils/taproom file-formula 
+tio ffmpeg-full superfile htop tree mailsy imagemagick-full gromgit/brewtils/taproom file-formula 
 ```

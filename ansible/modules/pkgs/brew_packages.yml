@@ -19,7 +19,7 @@ brew_packages:
   optional:
     - taproom
     - superfile
-    - picocom
+    - tio
     - go
     - nvm
     - rustup

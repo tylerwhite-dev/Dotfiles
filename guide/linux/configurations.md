@@ -21,7 +21,7 @@ sudo usermod -aG docker $USER
 sudo systemctl enable --now docker.service
 ```
 
-## picocom
+## tio
 ```bash
 sudo usermod -aG uucp $USER
 ```
