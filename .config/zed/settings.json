@@ -11,6 +11,17 @@
   "outline_panel": { "dock": "right" },
   "collaboration_panel": { "dock": "right" },
 
+  "agent": {
+    "sidebar_side": "right",
+    "dock": "right",
+
+    // "default_model": {
+    //     "provider": "openrouter",
+    //     "model": "openrouter/free",
+    //     "enable_thinking": true
+    // },
+  },
+
   "terminal": {
     "font_family": "JetBrainsMono Nerd Font",
     "default_height": 580,
