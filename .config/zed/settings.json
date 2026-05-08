@@ -6,23 +6,16 @@
   "gutter": { "min_line_number_digits": 0 },
   "title_bar": { "show_sign_in": false },
   "minimap": { "thumb": "always", "show": "always" },
+  
   "project_panel": { "dock": "left" },
   "git_panel": { "dock": "left" },
   "outline_panel": { "dock": "right" },
-  "collaboration_panel": { "dock": "right" },
-
-  "agent": {
-    "sidebar_side": "right",
-    "dock": "right",
-
-    // "default_model": {
-    //     "provider": "openrouter",
-    //     "model": "openrouter/free",
-    //     "enable_thinking": true
-    // },
-  },
-
+  "collaboration_panel": { "dock": "right", "button": false },
+  "agent": { "sidebar_side": "right", "dock": "right" },
+  
+  // TERMINAL
   "terminal": {
+    "font_features": { "calt": true },
     "font_family": "JetBrainsMono Nerd Font",
     "default_height": 580,
     "cursor_shape": "underline",
