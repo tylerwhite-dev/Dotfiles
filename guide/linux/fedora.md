@@ -10,6 +10,18 @@ sudo dnf upgrade -y && brew upgrade && flatpak update -y
 sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y 
 ```
 
+## disable repo
+
+show all repos:
+```bash
+sudo dnf repolist
+```
+
+disable repo with ID (fedora-cisco-openh264 for example)
+```bash
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0
+```
+
 ## apps
 `
 loupe - images;
