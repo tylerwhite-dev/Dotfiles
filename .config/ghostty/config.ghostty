@@ -1,0 +1,29 @@
+# theme
+theme = Xcode Dark
+
+cursor-style = underline
+
+# font
+font-family = JetBrainsMono Nerd Font
+
+# keybinds
+
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+
+keybind = alt+n=new_tab
+keybind = alt+w=close_surface
+
+keybind = alt+enter=toggle_fullscreen
+
+keybind = alt+]=next_tab
+keybind = alt+[=previous_tab
+
+keybind = alt+-=new_split:down
+keybind = alt+\=new_split:right
+
+keybind = alt+h=goto_split:left
+keybind = alt+l=goto_split:right
+keybind = alt+k=goto_split:up
+keybind = alt+j=goto_split:down
+
