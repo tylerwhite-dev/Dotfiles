@@ -21,7 +21,7 @@ visual-studio-code vscodium docker-desktop virtualbox android-studio
 
 ## utilities
 ```
-zsh-autosuggestions zsh-syntax-highlighting superfile yazi file-formula starship tmux fastfetch btop macmon tree git-lfs yt-dlp nvtop stow mailsy imagemagick-full gromgit/brewtils/taproom zoxide eza pfetch-rs ffmpeg-full lazygit neovim 
+zsh-autosuggestions zsh-syntax-highlighting superfile yazi file-formula starship tmux fastfetch btop macmon tree git-lfs yt-dlp nvtop stow mailsy imagemagick-full gromgit/brewtils/taproom zoxide eza pfetch-rs ffmpeg-full lazygit neovim zip
 ```
 
 ## developer

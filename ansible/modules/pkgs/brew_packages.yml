@@ -16,6 +16,7 @@ brew_packages:
     - opencode
     - lazygit
     - fastfetch
+    - zip
   optional:
     - taproom
     - superfile
