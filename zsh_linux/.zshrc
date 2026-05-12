@@ -74,8 +74,8 @@ npx() {
 export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
 
 # <-- sdkman -->
-export SDKMAN_DIR="$(brew --prefix sdkman-cli)/libexec"
-if [[ -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]]; then
+if [ -e /home/linuxbrew/.linuxbrew/opt/sdkman-cli/libexec/bin/sdkman-init.sh ]; then
+  export SDKMAN_DIR="/home/linuxbrew/.linuxbrew/opt/sdkman-cli/libexec"
   source "${SDKMAN_DIR}/bin/sdkman-init.sh"
 fi
 
