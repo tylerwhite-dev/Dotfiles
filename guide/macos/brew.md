@@ -7,6 +7,11 @@
 
 # packages
 
+## tap
+```
+oven-sh/bun sdkman/tap
+```
+
 ## casks
 ```
 --cask telegram obsidian google-chrome betterdisplay transmission qbittorrent balenaetcher steam iina mos playcover-community utm veracrypt macfuse appcleaner logi-options+ amneziavpn lm-studio 
@@ -16,12 +21,12 @@ visual-studio-code vscodium docker-desktop virtualbox android-studio
 
 ## utilities
 ```
-zsh-autosuggestions zsh-syntax-highlighting superfile yazi file-formula starship tmux fastfetch btop macmon tree git-lfs yt-dlp nvtop stow mailsy imagemagick-full gromgit/brewtils/taproom zoxide eza pfetch-rs ffmpeg
+zsh-autosuggestions zsh-syntax-highlighting superfile yazi file-formula starship tmux fastfetch btop macmon tree git-lfs yt-dlp nvtop stow mailsy imagemagick-full gromgit/brewtils/taproom zoxide eza pfetch-rs ffmpeg-full lazygit neovim 
 ```
 
 ## developer
 ```
-lazygit neovim rustup cmake nvm go uv qt-creator qt qwen-code charmbracelet/tap/crush anomalyco/tap/opencode
+rustup cmake nvm bun go uv sdkman-cli qt-creator qt qwen-code charmbracelet/tap/crush anomalyco/tap/opencode
 ```
 
 ## fonts

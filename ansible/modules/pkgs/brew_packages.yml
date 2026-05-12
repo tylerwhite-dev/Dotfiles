@@ -24,12 +24,14 @@ brew_packages:
     - nvm
     - rustup
     - uv
+    - sdkman-cli
     - yt-dlp
     - ffmpeg-full
     - imagemagick-full
     - mailsy
   taps:
     - gromgit/brewtils
+    - sdkman/tap
   fonts:
     - font-jetbrains-mono-nerd-font
     - font-hack-nerd-font

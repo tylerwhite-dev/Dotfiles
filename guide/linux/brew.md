@@ -25,7 +25,7 @@ zsh-autosuggestions zsh-syntax-highlighting yazi starship tmux neovim fastfetch 
 
 ## tap
 ```
-oven-sh/bun
+oven-sh/bun sdkman/tap
 ```
 
 ## fonts
@@ -36,6 +36,6 @@ font-jetbrains-mono-nerd-font font-hack-nerd-font
 ## optional
 ```
 opencode charmbracelet/tap/crush qwen-code
-llvm cmake go nvm rustup uv zig bun 
-tio ffmpeg-full superfile htop tree mailsy imagemagick-full gromgit/brewtils/taproom file-formula 
+llvm cmake go nvm rustup uv zig bun sdkman-cli
+tio ffmpeg-full superfile htop tree mailsy imagemagick-full taproom file-formula 
 ```
