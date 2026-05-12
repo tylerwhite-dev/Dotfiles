@@ -30,50 +30,50 @@ ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(forward-word)
 bindkey '^[[1;5C' forward-word
 
 # <-- homebrew -->
-eval "$(/opt/homebrew/bin/brew shellenv)"
+__HOMEBREW=/opt/homebrew
+eval "$($__HOMEBREW/bin/brew shellenv)"
 
 # <-- starship --> 
 eval "$(starship init zsh)"
 
 # <-- zsh plugins -->
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $__HOMEBREW/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $__HOMEBREW/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # <-- nvm -->
-# official way
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-# [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-# lazy nvm load on request
+# lazy nvm load on request installed by brew
 __nvmload() {
-  unset -f nvm node npm npx __nvmload
+  unset -f nvm node npm npx __nvmload 2>/dev/null
   export NVM_DIR="$HOME/.nvm"
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  source $__HOMEBREW/opt/nvm/nvm.sh 2>/dev/null || \
+    echo "Warning: nvm.sh not found"
 }
 
 # nvm placeholders
 nvm() {
-__nvmload()
+  __nvmload
   nvm "$@"
 }
 node() {
-__nvmload()
+  __nvmload
   node "$@"
 }
 npm() {
-__nvmload()
+  __nvmload
   npm "$@"
 }
 npx() {
-__nvmload()
+  __nvmload
   npx "$@"
 }
 
 # <-- rustup -->
-export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+export PATH="$__HOMEBREW/opt/rustup/bin:$PATH"
 
 # <-- sdkman -->
-# source "$HOME/.sdkman/bin/sdkman-init.sh"
+if [ -e $__HOMEBREW/opt/sdkman-cli/libexec/bin/sdkman-init.sh ]; then
+  export SDKMAN_DIR="$__HOMEBREW/opt/sdkman-cli/libexec"
+  source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+fi
 
 pfetch
