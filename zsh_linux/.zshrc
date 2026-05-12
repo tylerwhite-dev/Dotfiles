@@ -30,7 +30,8 @@ ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(forward-word)
 bindkey '^[[1;5C' forward-word
 
 # <-- homebrew -->
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+__HOMEBREW=/home/linuxbrew/.linuxbrew
+eval "$($__HOMEBREW/bin/brew shellenv)"
 
 # <-- nix -->
 if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
@@ -40,15 +41,15 @@ eval "$(starship init zsh)"
 
 # <-- zsh plugins -->
 # installed via brew
-source /home/linuxbrew/.linuxbrew/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /home/linuxbrew/.linuxbrew/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $__HOMEBREW/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $__HOMEBREW/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # <-- nvm -->
 # lazy nvm load on request installed by brew
 __nvmload() {
   unset -f nvm node npm npx __nvmload 2>/dev/null
   export NVM_DIR="$HOME/.nvm"
-  source /home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh 2>/dev/null || \
+  source $__HOMEBREW/opt/nvm/nvm.sh 2>/dev/null || \
     echo "Warning: nvm.sh not found"
 }
 
@@ -71,11 +72,11 @@ npx() {
 }
 
 # <-- rustup -->
-export PATH="/home/linuxbrew/.linuxbrew/opt/rustup/bin:$PATH"
+export PATH="$__HOMEBREW/opt/rustup/bin:$PATH"
 
 # <-- sdkman -->
-if [ -e /home/linuxbrew/.linuxbrew/opt/sdkman-cli/libexec/bin/sdkman-init.sh ]; then
-  export SDKMAN_DIR="/home/linuxbrew/.linuxbrew/opt/sdkman-cli/libexec"
+if [ -e $__HOMEBREW/opt/sdkman-cli/libexec/bin/sdkman-init.sh ]; then
+  export SDKMAN_DIR="$__HOMEBREW/opt/sdkman-cli/libexec"
   source "${SDKMAN_DIR}/bin/sdkman-init.sh"
 fi
 
