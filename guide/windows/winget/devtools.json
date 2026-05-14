@@ -42,6 +42,9 @@
         },
         {
           "PackageIdentifier": "SST.opencode"
+        },
+        {
+          "PackageIdentifier": "Starship.Starship"
         }
       ],
       "SourceDetails": {
