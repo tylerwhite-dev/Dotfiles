@@ -38,11 +38,10 @@
   include_vars: pkgs/brew_packages.yml
 
 - name: Homebrew. Install shell prompt extensions
-  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{
-    brew_packages.extensions | join(' ') }}"
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.extensions | join(' ') }}"
   register: brew_install_extensions_result
   changed_when: "'Installing' in brew_install_extensions_result.stdout"
-  failed_when: false
+  failed_when: "'error' in (brew_install_extensions_result.stdout | lower) or 'error' in (brew_install_extensions_result.stderr | lower)"
   become: no
   when: brew_version_check is succeeded
 
@@ -50,7 +49,7 @@
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.cli_tools | join(' ') }}"
   register: brew_install_CLI_result
   changed_when: "'Installing' in brew_install_CLI_result.stdout"
-  failed_when: false
+  failed_when: "'error' in (brew_install_CLI_result.stdout | lower) or 'error' in (brew_install_CLI_result.stderr | lower)"
   become: no
   when: brew_version_check is succeeded
 
@@ -58,7 +57,7 @@
   command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.fonts | join(' ') }}"
   register: brew_install_fonts_result
   changed_when: "'Installing' in brew_install_fonts_result.stdout"
-  failed_when: false
+  failed_when: "'error' in (brew_install_fonts_result.stdout | lower) or 'error' in (brew_install_fonts_result.stderr | lower)"
   become: no
   when:
     - brew_version_check is succeeded
@@ -68,19 +67,17 @@
   loop: "{{ brew_packages.taps }}"
   register: brew_tap_result
   changed_when: "'Tapping' in brew_tap_result.stdout"
-  failed_when: false
+  failed_when: "'error' in (brew_tap_result.stdout | lower) or 'error' in (brew_tap_result.stderr | lower)"
   become: no
   when:
     - brew_version_check is succeeded
     - extended_brew | default(false) | bool
 
 - name: Homebrew. Install optional packages
-  command:
-    "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional
-    | join(' ') }}"
+  command: "/home/linuxbrew/.linuxbrew/bin/brew install {{ brew_packages.optional | join(' ') }}"
   register: brew_install_optional_result
   changed_when: "'Installing' in brew_install_optional_result.stdout"
-  failed_when: false
+  failed_when: "'error' in (brew_install_optional_result.stdout | lower) or 'error' in (brew_install_optional_result.stderr | lower)"
   become: no
   when:
     - brew_version_check is succeeded
