@@ -9,7 +9,7 @@
   set_fact:
     stow_packages: >-
       {{
-        ['.', 'wallpaper'] + (['zsh_linux'] if ansible_facts.os_family != "Darwin" else ['zsh_mac'])
+        ['.', 'zsh_common', 'wallpaper'] + (['zsh_linux'] if ansible_facts.os_family != "Darwin" else ['zsh_mac'])
       }}
 
 - name: Dotfiles. Apply with GNU Stow

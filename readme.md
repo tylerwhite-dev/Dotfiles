@@ -18,12 +18,17 @@ ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended_br
 
 ### ZSH
 
-for mac or linux
+common part
 ```
-stow zsh-mac
+stow zsh_common
+```
+
+mac or linux part
+```
+stow zsh_mac
 ```
 ```
-stow zsh-linux
+stow zsh_linux
 ```
 
 ### The rest of configurations
