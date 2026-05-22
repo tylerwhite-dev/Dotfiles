@@ -30,7 +30,7 @@ openssh cronie wl-clipboard fwupd wmctrl
 
 common
 ```
-flatpak firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms timeshift zed
+flatpak firefox alacritty ghostty gparted veracrypt virtualbox virtualbox-host-dkms linux-headers timeshift zed
 ```
 
 gnome

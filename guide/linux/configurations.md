@@ -7,7 +7,7 @@ make ZSH default shell
 chsh -s $(/bin/zsh)
 ```
 
-# services
+# services and groups
 
 ## timeshift
 if scheduled snapshots not working
@@ -24,6 +24,11 @@ sudo systemctl enable --now docker.service
 ## tio
 ```bash
 sudo usermod -aG uucp $USER
+```
+
+## virtualbox
+```bash
+sudo usermod -aG vboxusers $USER
 ```
 
 reboot system
