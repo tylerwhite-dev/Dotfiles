@@ -1,5 +1,10 @@
 # theme
-theme = Xcode Dark
+theme = Xcode Dark hc
+# Xcode Dark hc
+# Starlight
+# One Dark Two
+# Monokai Pro Spectrum
+
 
 cursor-style = underline
 
@@ -31,4 +36,3 @@ keybind = alt+h=goto_split:left
 keybind = alt+l=goto_split:right
 keybind = alt+k=goto_split:up
 keybind = alt+j=goto_split:down
-
