@@ -1,36 +1,35 @@
 {
-    "telemetry.telemetryLevel": "off",
-    
+    // UI
     // "window.zoomLevel": 1,
     "window.menuBarVisibility": "toggle",
     "window.controlsStyle": "custom",
-
-    "files.autoSave": "afterDelay",
-
     "workbench.startupEditor": "none",
     "workbench.editor.enablePreview": true,
-    "workbench.tree.indent": 16,
+    "workbench.tree.indent": 12,
+    "workbench.browser.showInTitleBar": false,
+    "chat.titleBar.signIn.enabled": false,
+    "scm.graph.pageSize": 75,
 
-    "editor.minimap.showSlider": "always",
-    "editor.fontSize": 14,
-    "editor.fontFamily": "'JetBrainsMono Nerd Font'", 
-    "editor.fontLigatures": true,
-    // font is correct if you see ligatures and symbols: <=>  
-
-    "terminal.integrated.fontSize": 14,
-    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
-
+    // BEHAVIOR
+    "telemetry.telemetryLevel": "off",
     "git.autofetch": true,
     "git.replaceTagsWhenPull": true,
     "git.suggestSmartCommit": true,
     "git.enableSmartCommit": true,
     "git.confirmSync": false,
-
     "diffEditor.ignoreTrimWhitespace": false,
+    "files.autoSave": "afterDelay",
 
-    "scm.graph.pageSize": 75,
-    "scm.inputFontSize": 14,
+    // TERMINAL
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
 
+    // FONT
+    "editor.minimap.showSlider": "always",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font'", 
+    "editor.fontLigatures": true,
+    // font is correct if you see ligatures and symbols: <=>  
+
+    // EXTENSIONS
     "todo-tree.filtering.includeHiddenFiles": true,
     "todo-tree.tree.showCountsInTree": true,
     "todo-tree.filtering.excludeGlobs": [
