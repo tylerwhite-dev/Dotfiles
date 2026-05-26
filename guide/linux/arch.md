@@ -9,7 +9,7 @@ yay -Syyu && brew upgrade && flatpak update -y
 
 ## cleanup system
 ```bash
-sudo pacman -Sc && sudo pacman -Qdtq | sudo pacman -Rns - ; yay -Yc && brew cleanup && flatpak uninstall --unused -y
+yay -Scc && brew cleanup && flatpak uninstall --unused -y
 ```
 
 ## apps
