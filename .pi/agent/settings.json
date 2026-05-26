@@ -1,0 +1,17 @@
+{
+  "defaultProvider": "lmstudio",
+  "defaultModel": "omnicoder-9b",
+  "theme": "dark",
+  "quietStartup": true,
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 16384,
+    "keepRecentTokens": 20000
+  },
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "baseDelayMs": 2000
+  },
+  "lastChangelogVersion": "0.75.5"
+}

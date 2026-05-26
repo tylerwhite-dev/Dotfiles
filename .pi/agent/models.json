@@ -1,0 +1,16 @@
+{
+  "providers": {
+    "lmstudio": {
+      "baseUrl": "http://localhost:1234/v1",
+      "api": "openai-completions",
+      "apiKey": "not-needed",
+      "models": [
+        {
+          "id": "omnicoder-9b",
+          "name": "Omnicoder 9b",
+          "contextWindow": 32000
+        }
+      ]
+    }
+  }
+}
