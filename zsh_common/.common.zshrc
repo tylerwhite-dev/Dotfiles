@@ -32,6 +32,8 @@ bindkey '^[[1;5C' forward-word
 # <-- homebrew -->
 eval "$($__HOMEBREW/bin/brew shellenv)"
 
+HOMEBREW_NO_ENV_HINTS=1
+
 # <-- starship -->
 eval "$(starship init zsh)"
 
