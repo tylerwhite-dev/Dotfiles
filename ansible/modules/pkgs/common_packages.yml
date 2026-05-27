@@ -34,3 +34,4 @@ common_packages:
     - stow
     - file
     - wl-clipboard
+    - gcc # sdkman
