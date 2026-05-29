@@ -51,5 +51,25 @@ flatpak gparted timeshift
 gnome
 
 ```
-nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
+nautilus gnome-keyring gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
+```
+
+repos
+
+```
+ghostty zed codium virtualbox akmod-VirtualBox
+```
+
+### rpm fusion
+
+```bash
+sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+```
+
+### terra
+
+```bash
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release terra-gpg-keys
+sudo dnf --refresh upgrade
+sudo dnf install terra-release
 ```
