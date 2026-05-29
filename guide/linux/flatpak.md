@@ -6,8 +6,26 @@ add repository
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 ```
 
-```
-org.telegram.desktop md.obsidian.Obsidian com.bitwarden.desktop org.qbittorrent.qBittorrent org.videolan.VLC io.bassi.Amberol org.gnome.Decibels org.gnome.Loupe org.gnome.Snapshot com.belmoussaoui.Authenticator com.github.johnfactotum.Foliate app.drey.EarTag 
-
-com.jgraph.drawio.desktop com.mattermost.Desktop org.inkscape.Inkscape me.iepure.devtoolbox 
+```bash
+flatpak install \
+org.telegram.desktop \
+md.obsidian.Obsidian \
+com.bitwarden.desktop \
+org.qbittorrent.qBittorrent \
+org.videolan.VLC \
+io.bassi.Amberol \
+org.gnome.Snapshot \
+com.belmoussaoui.Authenticator \
+com.github.johnfactotum.Foliate \
+app.drey.EarTag \
+it.mijorus.gearlever \
+ai.lmstudio.lm-studio \
+\
+com.jgraph.drawio.desktop \
+org.inkscape.Inkscape \
+com.mattermost.Desktop \
+me.iepure.devtoolbox \
+\
+org.gnome.Decibels \
+org.gnome.Loupe \
 ```
