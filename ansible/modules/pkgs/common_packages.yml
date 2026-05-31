@@ -23,6 +23,7 @@ common_packages:
     - stow
     - file
     - wl-clipboard
+    - build-essential
   fedora:
     - sudo
     - git
