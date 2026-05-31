@@ -32,25 +32,3 @@ sudo usermod -aG vboxusers $USER
 ```
 
 reboot system
-
-
-# toolchains
-
-## nvm
-```bash
-nvm install --lts
-nvm use node --lts
-
-nvm --version
-node -v
-npm -v
-```
-
-## rustup
-```bash
-rustup default stable
-
-rustc -V
-cargo -V
-rustup show
-```
