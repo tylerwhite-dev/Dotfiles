@@ -15,6 +15,7 @@ window-height = 40
 
 # font
 font-family = JetBrainsMono Nerd Font
+font-feature = -calt
 
 # keybinds
 
