@@ -2,6 +2,7 @@
 
 # Images
 *.svg filter=lfs diff=lfs merge=lfs
+wallpaper/Pictures/Wallpapers/*.png filter=lfs diff=lfs merge=lfs
 # Archives
 *.7z filter=lfs diff=lfs merge=lfs
 *.br filter=lfs diff=lfs merge=lfs
