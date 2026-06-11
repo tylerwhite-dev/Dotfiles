@@ -13,7 +13,7 @@
       }}
 
 - name: Dotfiles. Apply with GNU Stow
-  command: stow --target={{ ansible_facts.env.HOME }} {{ item }}
+  command: stow --no-folding --target={{ ansible_facts.env.HOME }} {{ item }}
   loop: "{{ stow_packages }}"
   register: stow_result
   changed_when: stow_result.stderr is search('LINK')
