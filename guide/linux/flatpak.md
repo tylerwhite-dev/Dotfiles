@@ -20,6 +20,7 @@ com.github.johnfactotum.Foliate \
 app.drey.EarTag \
 it.mijorus.gearlever \
 ai.lmstudio.lm-studio \
+com.mattjakeman.ExtensionManager \
 \
 com.jgraph.drawio.desktop \
 org.inkscape.Inkscape \

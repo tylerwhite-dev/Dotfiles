@@ -16,7 +16,9 @@ gsettings set org.gnome.desktop.wm.preferences focus-new-windows 'smart'
 
 ## shell extensions
 ```
-gnome-shell-extension-dash-to-panel gnome-shell-extension-rounded-window-corners-reborn
+blur my shell
+rounded window corners reborn
+dash to panel
 ```
 
 ## theme for qt apps

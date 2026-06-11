@@ -60,6 +60,13 @@ repos
 ghostty zed codium virtualbox akmod-VirtualBox
 ```
 
+### copr
+
+```bash
+sudo dnf copr enable scottames/ghostty
+sudo dnf install ghostty
+```
+
 ### rpm fusion
 
 ```bash
