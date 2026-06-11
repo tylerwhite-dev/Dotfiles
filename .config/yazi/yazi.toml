@@ -1,3 +1,6 @@
+[mgr]
+ratio = [4, 8, 12]
+
 [open]
 prepend_rules = [
   { mime = "text/*", use = "edit" },
