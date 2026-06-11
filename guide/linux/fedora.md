@@ -34,7 +34,7 @@ eartag - song tags;
 vlc - video;
 snapshot - camera.`
 
-### dnf
+## dnf
 
 basic
 
@@ -54,16 +54,13 @@ gnome
 nautilus gnome-keyring gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
 ```
 
-repos
-
-```
-ghostty zed codium virtualbox akmod-VirtualBox
-```
-
 ### copr
 
 ```bash
 sudo dnf copr enable scottames/ghostty
+```
+
+```bash
 sudo dnf install ghostty
 ```
 
@@ -71,6 +68,10 @@ sudo dnf install ghostty
 
 ```bash
 sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+```
+
+```bash
+sudo dnf install virtualbox akmod-VirtualBox
 ```
 
 ### terra
