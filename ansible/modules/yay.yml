@@ -1,6 +1,14 @@
 ---
+- name: Yay. Check if already installed
+  stat:
+    path: /usr/bin/yay
+  register: yay_bin
+  tags: [yay]
+
 - name: Yay. Install prerequisites
-  when: ansible_facts.os_family == "Archlinux"
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
   become: true
   pacman:
     name:
@@ -9,15 +17,14 @@
       - go
     state: present
     update_cache: true
+  tags: [yay]
 
 - name: Yay. Clone source
-  when: ansible_facts.os_family == "Archlinux"
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
   ansible.builtin.git:
     repo: https://aur.archlinux.org/yay.git
     dest: "{{ ansible_facts.env.HOME }}/yay"
     update: true
-
-- name: Yay. Show installation step
-  when: ansible_facts.os_family == "Archlinux"
-  debug:
-    msg: "cd ~/yay && makepkg -sfi --noconfirm"
+  tags: [yay]

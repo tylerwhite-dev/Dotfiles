@@ -1,6 +1,7 @@
 ---
 - name: Common. Load packages
   include_vars: pkgs/common_packages.yml
+  tags: [common]
 
 - name: Common. Install packages (Arch Linux)
   become: true
@@ -8,6 +9,7 @@
   pacman:
     name: "{{ common_packages.arch }}"
     state: present
+  tags: [common]
 
 - name: Common. Install packages (Debian/Ubuntu)
   become: true
@@ -15,6 +17,7 @@
   apt:
     name: "{{ common_packages.debian }}"
     state: present
+  tags: [common]
 
 - name: Common. Install packages (Fedora)
   become: true
@@ -22,3 +25,4 @@
   dnf:
     name: "{{ common_packages.fedora }}"
     state: present
+  tags: [common]

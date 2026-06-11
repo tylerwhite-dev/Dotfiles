@@ -1,10 +1,14 @@
 ---
+- name: Homebrew. Define brew path
+  set_fact:
+    brew_bin: /home/linuxbrew/.linuxbrew/bin/brew
+  tags: [brew]
+
 - name: Homebrew. Check existing installation
-  command: /home/linuxbrew/.linuxbrew/bin/brew --version
-  register: brew_installation_check
-  ignore_errors: yes
-  changed_when: false
-  become: no
+  stat:
+    path: "{{ brew_bin }}"
+  register: brew_bin_stat
+  tags: [brew]
 
 - name: Homebrew. Configure /home/linuxbrew directory
   file:
@@ -14,71 +18,68 @@
     group: "{{ ansible_facts.user_id }}"
     mode: "0755"
   become: true
-  when: brew_installation_check is failed
+  when: not brew_bin_stat.stat.exists
+  tags: [brew]
 
 - name: Homebrew. Run installation script
   shell: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   environment:
     HOMEBREW_NO_ANALYTICS: 1
     HOMEBREW_NO_AUTO_UPDATE: 1
-  become: no
-  when: brew_installation_check is failed
-
-- name: Homebrew. Version check
-  command: /home/linuxbrew/.linuxbrew/bin/brew --version
-  register: brew_version_check
-  changed_when: false
-  become: no
+  when: not brew_bin_stat.stat.exists
+  tags: [brew]
 
 - name: Homebrew. Show version
+  command: "{{ brew_bin }} --version"
+  register: brew_version_check
+  changed_when: false
+  tags: [brew]
+
+- name: Homebrew. Version info
   debug:
     msg: "Linuxbrew version: {{ brew_version_check.stdout }}"
+  tags: [brew]
 
 - name: Homebrew. Load packages list
   include_vars: pkgs/brew_packages.yml
+  tags: [brew]
 
 - name: Homebrew. Install shell prompt extensions
   community.general.homebrew:
     name: "{{ brew_packages.extensions }}"
     state: present
-  register: brew_install_extensions_result
-  become: no
-  when: brew_version_check is succeeded
+  when: brew_bin_stat.stat.exists
+  tags: [brew]
 
 - name: Homebrew. Install CLI tools
   community.general.homebrew:
     name: "{{ brew_packages.cli_tools }}"
     state: present
-  register: brew_install_CLI_result
-  become: no
-  when: brew_version_check is succeeded
+  when: brew_bin_stat.stat.exists
+  tags: [brew]
 
 - name: Homebrew. Install fonts
   community.general.homebrew:
     name: "{{ brew_packages.fonts }}"
     state: present
-  register: brew_install_fonts_result
-  become: no
-  when:
-    - brew_version_check is succeeded
+  when: brew_bin_stat.stat.exists
+  tags: [brew]
 
 - name: Homebrew. Tap additional repositories
   community.general.homebrew_tap:
     name: "{{ item }}"
     state: present
   loop: "{{ brew_packages.taps }}"
-  register: brew_tap_result
-  become: no
   when:
-    - brew_version_check is succeeded
-    - extended_brew | default(false) | bool
+    - brew_bin_stat.stat.exists
+    - extended_brew | bool
+  tags: [brew]
 
 - name: Homebrew. Install optional packages
   community.general.homebrew:
     name: "{{ brew_packages.optional }}"
     state: present
-  register: brew_install_optional_result
-  become: no
   when:
-    - brew_version_check is succeeded
-    - extended_brew | default(false) | bool
+    - brew_bin_stat.stat.exists
+    - extended_brew | bool
+  tags: [brew]

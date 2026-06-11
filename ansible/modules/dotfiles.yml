@@ -4,6 +4,7 @@
     path: "{{ ansible_facts.env.HOME }}/.config"
     state: directory
     mode: "0755"
+  tags: [dotfiles]
 
 - name: Dotfiles. Define needed
   set_fact:
@@ -11,6 +12,7 @@
       {{
         ['.', 'zsh_common', 'wallpaper'] + (['zsh_linux'] if ansible_facts.os_family != "Darwin" else ['zsh_mac'])
       }}
+  tags: [dotfiles]
 
 - name: Dotfiles. Apply with GNU Stow
   command: stow --no-folding --target={{ ansible_facts.env.HOME }} {{ item }}
@@ -22,3 +24,4 @@
     chdir: "{{ ansible_facts.env.HOME }}/Dotfiles"
   environment:
     HOME: "{{ ansible_facts.env.HOME }}"
+  tags: [dotfiles]
