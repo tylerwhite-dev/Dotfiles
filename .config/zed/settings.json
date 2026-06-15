@@ -15,7 +15,6 @@
 
   // TERMINAL
   "terminal": {
-    "font_features": { "calt": true },
     "font_family": "JetBrainsMono Nerd Font",
     "default_height": 580,
     "cursor_shape": "underline",

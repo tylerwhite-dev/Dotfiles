@@ -33,5 +33,5 @@ stow zsh_linux
 
 ### The rest of configurations
 ```
-stow .
+stow --no-folding .
 ```
