@@ -1,56 +1,45 @@
 # installation
 
 [brew](https://brew.sh)
+
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
 # packages
 
-## tap
-```
-oven-sh/bun sdkman/tap
-```
-
 ## casks
-```
---cask telegram obsidian google-chrome betterdisplay transmission qbittorrent balenaetcher steam iina mos playcover-community utm veracrypt macfuse appcleaner logi-options+ amneziavpn lm-studio 
 
-visual-studio-code vscodium docker-desktop virtualbox android-studio 
+```bash
+brew install --cask amneziavpn appcleaner balenaetcher betterdisplay bitwarden coconutbattery docker-desktop firefox ghostty google-chrome iina libreoffice lm-studio macfuse mos obsidian playcover-community qbittorrent raspberry-pi-imager raycast steam telegram utm veracrypt zed
 ```
 
 ## utilities
-```
-zsh-autosuggestions zsh-syntax-highlighting superfile yazi file-formula starship tmux fastfetch btop macmon tree git-lfs yt-dlp nvtop stow mailsy imagemagick-full gromgit/brewtils/taproom zoxide eza pfetch-rs ffmpeg-full lazygit neovim zip
+
+```bash
+brew install bash-completion btop cbonsai eza fastfetch ffmpeg-full fzf git-lfs htop imagemagick-full jq lazygit macmon mailsy neovim nvtop pfetch-rs starship stow superfile tio tmux tree yazi yt-dlp zip zoxide zsh-autosuggestions zsh-syntax-highlighting
 ```
 
 ## developer
-```
-rustup cmake nvm bun go uv sdkman-cli qt-creator qt qwen-code charmbracelet/tap/crush anomalyco/tap/opencode
+
+```bash
+brew install android-studio cmake go intellij-idea-ce nvm qt qt-creator vscodium opencode rustup uv zig
 ```
 
 ## fonts
-```
-font-jetbrains-mono-nerd-font font-hack-nerd-font 
+
+```bash
+brew install font-hack-nerd-font font-jetbrains-mono-nerd-font
 ```
 
 # configurations
 
 ## starship
+
 ( contained in [`zshrc macos`](../../zsh_mac/.zshrc) )
 
 add to file ~/.zshrc (contained in `.zshrc macos`)
+
 ```bash
 eval "$(starship init bash)"
-```
-
-## rustup
-```
-rustup install stable
-
-rustup default stable
-
-rustc -V
-cargo -V
-rustup show
 ```
