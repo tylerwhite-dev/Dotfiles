@@ -12,7 +12,7 @@ sudo dnf upgrade -y && brew upgrade && flatpak update -y
 sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y
 ```
 
-## disable repo
+## disable dnf repo
 
 show all repos:
 
@@ -24,6 +24,16 @@ disable repo with ID (fedora-cisco-openh264 for example)
 
 ```bash
 sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0
+```
+
+## disable fedora flatpak repo
+
+```bash
+flatpak remotes
+```
+
+```bash
+flatpak remote-delete fedora
 ```
 
 ## apps
