@@ -7,21 +7,17 @@
 // Find the full list of options on the wiki:
 // https://yalter.github.io/niri/Configuration:-Input
 
-// environment {
-//     GTK_THEME "Adwaita-dark"
-// }
-
 xwayland-satellite {
     on
     path "xwayland-satellite"
 }
 
-// hotkey-overlay {
-//    skip-at-startup
-//}
+environment {
+    QT_AUTO_SCREEN_SCALE_FACTOR "1"
+}
 
 window-rule {
-    geometry-corner-radius 16
+    geometry-corner-radius 8
     clip-to-geometry true
 }
 
@@ -85,7 +81,7 @@ input {
 
     // Focus windows and outputs automatically when moving the mouse into them.
     // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
-    // focus-follows-mouse max-scroll-amount="0%"
+    focus-follows-mouse max-scroll-amount="0%"
 }
 
 // You can configure outputs by their name, which you can find
@@ -94,7 +90,7 @@ input {
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
-output "HDMI-A-1" {
+output "DP-1" {
     // Uncomment this line to disable this output.
     // off
 
@@ -104,7 +100,7 @@ output "HDMI-A-1" {
     // for the resolution.
     // If the mode is omitted altogether or is invalid, niri will pick one automatically.
     // Run `niri msg outputs` while inside a niri instance to list all outputs and their modes.
-    mode "2560x1440@143.981"
+    mode "2560x1440@119.998"
 
     // You can use integer or fractional scale, for example use 1.5 for 150% scale.
     scale 1.25
@@ -123,6 +119,13 @@ output "HDMI-A-1" {
     // If the position is unset or results in an overlap, the output is instead placed
     // automatically.
     position x=0 y=0
+}
+
+output "eDP-1" {
+    mode "2880x1620@120.002"
+    scale 2
+    transform "normal"
+    position x=2048 y=0
 }
 
 // Settings that influence how windows are positioned and sized.
@@ -287,14 +290,15 @@ layout {
 // See the binds section below for more spawn examples.
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
-spawn-at-startup "waybar"
+spawn-at-startup "/usr/bin/waybar" "-c" "/home/arseny/.config/waybar/config-simple" "-s" "/home/arseny/.config/waybar/style-simple.css"
+
+spawn-at-startup "swaybg" "-i" "/home/arseny/Pictures/Wallpapers/tahoe dark.png" "-m" "fill"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
 hotkey-overlay {
-    // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
-    // skip-at-startup
+    skip-at-startup
 }
 
 // Uncomment this line to ask the clients to omit their client-side decorations if possible.
@@ -302,7 +306,7 @@ hotkey-overlay {
 // Additionally, clients will be informed that they are tiled, removing some client-side rounded corners.
 // This option will also fix border/focus ring drawing behind some semitransparent windows.
 // After enabling or disabling this, you need to restart the apps for this to take effect.
-// prefer-no-csd
+prefer-no-csd
 
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
@@ -365,6 +369,24 @@ window-rule {
     clip-to-geometry true
 }
 
+window-rule {
+    match app-id=r#"^jetbrains-"#
+    open-maximized true
+
+    focus-ring { off; }
+    border { off; }
+}
+
+window-rule {
+    match app-id=r#"^AmneziaVPN$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^io.bassi.Amberol$"#
+    open-floating true
+}
+
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -378,10 +400,10 @@ binds {
 
     // Mod-Shift-/, which is usually the same as Mod-?,
     // shows a list of important hotkeys.
-    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
+    Mod+Backslash hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
     Alt+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
 
@@ -475,6 +497,8 @@ binds {
     Mod+Page_Up        { focus-workspace-up; }
     Mod+U              { focus-workspace-down; }
     Mod+I              { focus-workspace-up; }
+    Mod+Ctrl+Right     { focus-workspace-down; }
+    Mod+Ctrl+Left      { focus-workspace-up; }
     Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
     Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
     Mod+Ctrl+U         { move-column-to-workspace-down; }
@@ -497,8 +521,8 @@ binds {
     // You can set a cooldown on any bind, but it's most useful for the wheel.
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
-    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
-    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
 
     Mod+WheelScrollRight      { focus-column-right; }
     Mod+WheelScrollLeft       { focus-column-left; }
