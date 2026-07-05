@@ -34,6 +34,19 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 
 HOMEBREW_NO_ENV_HINTS=1
 
+# <-- tmux on startup -->
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+  if tmux has-session -t "main" 2>/dev/null; then
+    if [ -z "$(tmux list-clients -t "main" 2>/dev/null)" ]; then
+      tmux attach-session -t "main"
+    else
+      tmux new-session
+    fi
+  else
+    tmux new-session -s "main"
+  fi
+fi
+
 # <-- starship -->
 eval "$(starship init zsh)"
 
