@@ -1,8 +1,27 @@
-# alias
+# <-- homebrew -->
+eval "$($__HOMEBREW/bin/brew shellenv)"
+
+HOMEBREW_NO_ENV_HINTS=1
+
+# <-- tmux on startup -->
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+  if tmux has-session -t "main" 2>/dev/null; then
+    if [ -z "$(tmux list-clients -t "main" 2>/dev/null)" ]; then
+      exec tmux attach-session -t "main"
+    else
+      exec tmux new-session
+    fi  
+  else
+    exec tmux new-session -s "main"
+  fi
+fi
+
+# <-- alias -->
 alias ll='eza -a --tree --level=1 --icons'
 alias la='eza -la --header --icons --group-directories-first'
 alias ld='eza --tree --level=2 --icons --git'
 
+#  <-- settings -->
 # enable history
 setopt APPEND_HISTORY
 
@@ -28,24 +47,6 @@ zstyle ':completion:*' menu select
 # by-word autosuggest accept using ctrl + arrow right
 ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS+=(forward-word)
 bindkey '^[[1;5C' forward-word
-
-# <-- homebrew -->
-eval "$($__HOMEBREW/bin/brew shellenv)"
-
-HOMEBREW_NO_ENV_HINTS=1
-
-# <-- tmux on startup -->
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-  if tmux has-session -t "main" 2>/dev/null; then
-    if [ -z "$(tmux list-clients -t "main" 2>/dev/null)" ]; then
-      tmux attach-session -t "main"
-    else
-      tmux new-session
-    fi
-  else
-    tmux new-session -s "main"
-  fi
-fi
 
 # <-- starship -->
 eval "$(starship init zsh)"
