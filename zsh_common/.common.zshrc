@@ -7,12 +7,12 @@ HOMEBREW_NO_ENV_HINTS=1
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
   if tmux has-session -t "main" 2>/dev/null; then
     if [ -z "$(tmux list-clients -t "main" 2>/dev/null)" ]; then
-      exec tmux attach-session -t "main"
+      tmux attach-session -t "main"
     else
-      exec tmux new-session
-    fi  
+      tmux new-session
+    fi
   else
-    exec tmux new-session -s "main"
+    tmux new-session -s "main"
   fi
 fi
 
