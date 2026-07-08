@@ -5,6 +5,12 @@ theme = XcodeCustom
 # One Dark Two
 # Monokai Pro Spectrum
 
+# behaviour
+
+macos-option-as-alt = true
+confirm-close-surface = false
+
+# style
 
 cursor-style = underline
 
