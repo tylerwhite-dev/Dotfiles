@@ -3,7 +3,7 @@
   connection: local
   gather_facts: yes
   vars:
-    extended_brew: false
+    extended: false
   tasks:
     - import_tasks: modules/common.yml
       tags: [common]
@@ -15,3 +15,5 @@
       tags: [brew]
     - import_tasks: modules/yay.yml
       tags: [yay]
+    - import_tasks: modules/apps.yml
+      tags: [apps]

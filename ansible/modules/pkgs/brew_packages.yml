@@ -31,7 +31,6 @@ brew_packages:
     - imagemagick-full
     - mailsy
   taps:
-    - gromgit/brewtils
     - sdkman/tap
   fonts:
     - font-jetbrains-mono-nerd-font

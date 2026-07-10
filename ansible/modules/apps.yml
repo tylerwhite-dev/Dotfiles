@@ -1,0 +1,11 @@
+---
+- name: Apps. Check Zed installation
+  stat:
+    path: ~/.local/bin/zed
+  register: zed_stat
+  tags: [apps]
+
+- name: Apps. Install Zed
+  shell: curl -f https://zed.dev/install.sh | sh
+  when: not zed_stat.stat.exists
+  tags: [apps]

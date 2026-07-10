@@ -72,7 +72,15 @@
   loop: "{{ brew_packages.taps }}"
   when:
     - brew_bin_stat.stat.exists
-    - extended_brew | bool
+    - extended | bool
+  tags: [brew]
+
+- name: Homebrew. Trust taps
+  shell: "{{ brew_bin }} trust {{ item }}"
+  loop: "{{ brew_packages.taps }}"
+  when:
+    - brew_bin_stat.stat.exists
+    - extended | bool
   tags: [brew]
 
 - name: Homebrew. Install optional packages
@@ -81,5 +89,5 @@
     state: present
   when:
     - brew_bin_stat.stat.exists
-    - extended_brew | bool
+    - extended | bool
   tags: [brew]

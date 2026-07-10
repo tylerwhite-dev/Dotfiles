@@ -11,7 +11,12 @@ ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K
 
 ### Extended brew installation
 ```bash
-ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended_brew=true"
+ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended=true"
+```
+
+### Run tasks with specific tag
+```bash
+ansible-playbook ansible/desktop.yml --tags apps
 ```
 
 ## Apply configs only via stow
