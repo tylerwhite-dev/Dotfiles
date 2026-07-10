@@ -64,6 +64,20 @@ gnome
 nautilus gnome-keyring gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
 ```
 
+### docker
+
+add repo
+
+```bash
+sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
+```
+
+install docker
+
+```bash
+sudo dnf install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
 ### copr
 
 ```bash
