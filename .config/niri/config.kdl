@@ -90,20 +90,11 @@ input {
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
-output "eDP-1" {
-    // Логический размер: 1440×810
-    mode "2880x1620@120.002"
-    scale 2
-    transform "normal"
-    position x=0 y=0
-}
-
-output "DP-1" {
-    // Логический размер: 2048×1152
-    mode "2560x1440@119.998"
+output "Xiaomi Corporation Mi monitor 5392700025142" {
+    mode "2560x1440@143.981"
     scale 1.25
     transform "normal"
-    position x=-2048 y=0
+    position x=0 y=0
 }
 
 // Settings that influence how windows are positioned and sized.
@@ -270,7 +261,7 @@ layout {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 spawn-at-startup "/usr/bin/waybar" "-c" "/home/arseny/.config/waybar/config-simple" "-s" "/home/arseny/.config/waybar/style-simple.css"
 
-spawn-at-startup "swaybg" "-i" "/home/arseny/Pictures/Wallpapers/tahoe dark.png" "-m" "fill"
+spawn-at-startup "swaybg" "-i" "/home/arseny/Pictures/Wallpapers/11.png" "-m" "fill"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
