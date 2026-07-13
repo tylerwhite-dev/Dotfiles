@@ -21,6 +21,7 @@ app.drey.EarTag \
 it.mijorus.gearlever \
 ai.lmstudio.lm-studio \
 com.mattjakeman.ExtensionManager \
+com.github.tchx84.Flatseal \
 \
 com.jgraph.drawio.desktop \
 org.inkscape.Inkscape \
