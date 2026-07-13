@@ -5,11 +5,11 @@ HOMEBREW_NO_ENV_HINTS=1
 
 # <-- tmux on startup -->
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-  if tmux has-session -t "〇" 2>/dev/null; then
-      if [ -z "$(tmux list-clients -t "〇" 2>/dev/null)" ]; then
-          tmux attach-session -t "〇"
+  if tmux has-session -t "⌥" 2>/dev/null; then
+      if [ -z "$(tmux list-clients -t "⌥" 2>/dev/null)" ]; then
+          tmux attach-session -t "⌥"
     fi
-  else tmux new-session -s "〇"
+  else tmux new-session -s "⌥"
   fi
 fi
 
