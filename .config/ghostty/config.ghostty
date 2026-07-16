@@ -9,13 +9,16 @@ theme = XcodeCustom
 
 macos-option-as-alt = true
 confirm-close-surface = false
+quit-after-last-window-closed = false
+quit-after-last-window-closed-delay = 1h
 
 # style
 
 cursor-style = underline
 
-window-padding-x = 4
-window-padding-y = 4
+window-padding-y = 0,4
+window-padding-x = 4,0
+
 window-width = 132
 window-height = 40
 
