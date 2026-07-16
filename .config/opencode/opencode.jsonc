@@ -3,12 +3,9 @@
 
   "autoupdate": false,
 
-  "permission": {
-    "bash": { "*": "ask" },
-    "edit": { "*": "allow" },
-  },
-
   "model": "opencode/big-pickle",
+
+  "compaction": { "auto": true },
 
   "provider": {
     "lmstudio": {
@@ -20,11 +17,58 @@
       "models": {
         "omnicoder-9b": {
           "name": "Omnicoder 9b",
+          "limit": {
+            "context": 24000,
+            "output": 6000,
+          },
         },
         "gemma-4-e2b-it": {
           "name": "Gemma 4 e2b",
+          "limit": {
+            "context": 24000,
+            "output": 6000,
+          },
+        },
+        "qwen3.6-35b-a3b-uncensored-hauhaucs-aggressive": {
+          "name": "Qwen3.6 35b uncensored",
+          "limit": {
+            "context": 24000,
+            "output": 6000,
+          },
         },
       },
     },
+  },
+
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "ls*": "allow",
+      "cat*": "allow",
+      "grep*": "allow",
+      "find*": "allow",
+      "pwd*": "allow",
+      "head*": "allow",
+      "tail*": "allow",
+      "wc*": "allow",
+      "echo*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "git branch*": "allow",
+      "git remote*": "allow",
+      "git *": "allow",
+      "git commit*": "ask",
+      "git push*": "ask",
+      "git reset*": "ask",
+      "rm*": "ask",
+      "mv*": "ask",
+      "sudo*": "ask",
+    },
+    "edit": { "*": "allow" },
+    "read": { "*": "allow" },
+    "glob": { "*": "allow" },
+    "grep": { "*": "allow" },
   },
 }
