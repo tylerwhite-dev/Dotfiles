@@ -52,6 +52,9 @@ eval "$(starship init zsh)"
 source $__HOMEBREW/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $__HOMEBREW/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+# <-- zoxide -->
+eval "$(zoxide init zsh)"
+
 # <-- nvm -->
 # lazy nvm load on request installed by brew
 __nvmload() {

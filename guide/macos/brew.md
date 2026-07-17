@@ -17,7 +17,7 @@ brew install --cask amneziavpn appcleaner balenaetcher betterdisplay bitwarden c
 ## utilities
 
 ```bash
-brew install bash-completion btop cbonsai eza fastfetch ffmpeg-full fzf git-lfs htop imagemagick-full jq lazygit macmon mailsy neovim nvtop pfetch-rs starship stow superfile tio tmux tree yazi yt-dlp zip zoxide zsh-autosuggestions zsh-syntax-highlighting
+brew install bash-completion btop cbonsai eza fastfetch ffmpeg-full git-lfs htop imagemagick-full jq lazygit macmon mailsy neovim nvtop pfetch-rs starship stow superfile tio tmux tree yazi yt-dlp zip zoxide fzf zsh-autosuggestions zsh-syntax-highlighting
 ```
 
 ## developer

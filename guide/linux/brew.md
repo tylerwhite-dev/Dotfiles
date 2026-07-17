@@ -20,7 +20,7 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 
 ## main
 ```
-zsh-autosuggestions zsh-syntax-highlighting yazi starship tmux neovim fastfetch pfetch-rs btop yt-dlp nvtop zoxide eza lazygit zip
+zsh-autosuggestions zsh-syntax-highlighting yazi starship tmux neovim fastfetch pfetch-rs btop yt-dlp nvtop zoxide fzf eza lazygit zip
 ```
 
 ## tap
