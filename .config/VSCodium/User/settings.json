@@ -1,41 +1,50 @@
 {
-    // UI
-    // "window.zoomLevel": 1,
-    "window.menuBarVisibility": "toggle",
-    "window.controlsStyle": "custom",
-    "workbench.startupEditor": "none",
-    "workbench.editor.enablePreview": true,
-    "workbench.tree.indent": 12,
-    "workbench.browser.showInTitleBar": false,
-    "chat.titleBar.signIn.enabled": false,
-    "scm.graph.pageSize": 75,
+  // UI
+  // "window.zoomLevel": 0.3,
+  "window.menuBarVisibility": "toggle",
+  "window.controlsStyle": "custom",
+  "workbench.startupEditor": "none",
+  "workbench.editor.enablePreview": true,
+  "workbench.tree.indent": 12,
+  "workbench.browser.showInTitleBar": false,
+  "chat.titleBar.signIn.enabled": false,
+  "scm.graph.pageSize": 75,
+  // BEHAVIOR
+  "telemetry.telemetryLevel": "off",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "git.autofetch": true,
+  "git.replaceTagsWhenPull": true,
+  "git.suggestSmartCommit": true,
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "files.autoSave": "afterDelay",
+  // TERMINAL
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
 
-    // BEHAVIOR
-    "telemetry.telemetryLevel": "off",
-    "git.autofetch": true,
-    "git.replaceTagsWhenPull": true,
-    "git.suggestSmartCommit": true,
-    "git.enableSmartCommit": true,
-    "git.confirmSync": false,
-    "diffEditor.ignoreTrimWhitespace": false,
-    "files.autoSave": "afterDelay",
-
-    // TERMINAL
-    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
-
-    // FONT
-    "editor.minimap.showSlider": "always",
-    "editor.fontFamily": "'JetBrainsMono Nerd Font'", 
-    "editor.fontLigatures": true,
-    // font is correct if you see ligatures and symbols: <=>  
-
-    // EXTENSIONS
-    "todo-tree.filtering.includeHiddenFiles": true,
-    "todo-tree.tree.showCountsInTree": true,
-    "todo-tree.filtering.excludeGlobs": [
-        "**/node_modules",
-        "**/.git"
-    ],
-    
-    "cSpell.language": "en,ru"
+  // flatpak vscode fix
+  "terminal.integrated.defaultProfile.linux": "Host Zsh",
+  "terminal.integrated.profiles.linux": {
+    "Host Zsh": {
+      "path": "flatpak-spawn",
+      "args": [
+        "--host",
+        "--env=TERM=xterm-256color",
+        "--env=COLORTERM=truecolor",
+        "zsh",
+        "-l"
+      ]
+    }
+  },
+  // FONT
+  "editor.minimap.showSlider": "always",
+  "editor.fontFamily": "'JetBrainsMono Nerd Font'",
+  "editor.fontLigatures": true,
+  // font is correct if you see ligatures and symbols: <=> 
+  // EXTENSIONS
+  "todo-tree.filtering.includeHiddenFiles": true,
+  "todo-tree.tree.showCountsInTree": true,
+  "todo-tree.filtering.excludeGlobs": ["**/node_modules", "**/.git"],
+  "cSpell.language": "en,ru"
 }
