@@ -4,7 +4,7 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 HOMEBREW_NO_ENV_HINTS=1
 
 # <-- tmux on startup -->
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [[ "$TERM_PROGRAM" == "ghostty" ]]; then
   if tmux has-session -t "⌥" 2>/dev/null; then
       if [ -z "$(tmux list-clients -t "⌥" 2>/dev/null)" ]; then
           tmux attach-session -t "⌥"
@@ -60,8 +60,7 @@ eval "$(zoxide init zsh)"
 __nvmload() {
   unset -f nvm node npm npx __nvmload 2>/dev/null
   export NVM_DIR="$HOME/.nvm"
-  source $__HOMEBREW/opt/nvm/nvm.sh 2>/dev/null || \
-    echo "Warning: nvm.sh not found"
+  source $__HOMEBREW/opt/nvm/nvm.sh 2>/dev/null || echo "Warning: nvm.sh not found"
 }
 
 # nvm placeholders
