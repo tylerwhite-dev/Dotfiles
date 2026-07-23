@@ -1,5 +1,7 @@
 ---
 - name: Yay. Check if already installed
+  when:
+    - ansible_facts.os_family == "Archlinux"
   stat:
     path: /usr/bin/yay
   register: yay_bin
@@ -27,4 +29,10 @@
     repo: https://aur.archlinux.org/yay.git
     dest: "{{ ansible_facts.env.HOME }}/yay"
     update: true
+  tags: [yay]
+
+- name: Yay. Show installation step
+  when: ansible_facts.os_family == "Archlinux"
+  debug:
+    msg: "cd ~/yay && makepkg -sfi --noconfirm"
   tags: [yay]
