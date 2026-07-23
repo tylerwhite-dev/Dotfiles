@@ -4,12 +4,9 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 HOMEBREW_NO_ENV_HINTS=1
 
 # <-- tmux on startup -->
-if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [[ "$TERM_PROGRAM" == "ghostty" ]]; then
-  if tmux has-session -t "⌥" 2>/dev/null; then
-      if [ -z "$(tmux list-clients -t "⌥" 2>/dev/null)" ]; then
-          tmux attach-session -t "⌥"
-    fi
-  else tmux new-session -s "⌥"
+if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+  if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
+    tmux new-session -A -s "⌥"
   fi
 fi
 
