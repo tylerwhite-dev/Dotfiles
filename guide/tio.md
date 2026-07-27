@@ -3,11 +3,7 @@
 tio [options] /dev/tty[x]
 ```
 
-# permissions
-add user to group
-```bash
-sudo usermod -aG uucp $USER
-```
+[configuration](linux/configurations.md)
 
 # example command
 tio /dev/ttyUSB0 -b 921600
