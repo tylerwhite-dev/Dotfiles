@@ -11,8 +11,11 @@ if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
 fi
 
 # <-- alias -->
-alias ll='eza -a --tree --level=1 --icons'
+# directory view
+alias ll=' eza -xA --icons --group-directories-first'
+# details view
 alias la='eza -la --header --icons --group-directories-first'
+# tree view
 alias ld='eza --tree --level=2 --icons --git'
 
 #  <-- settings -->
