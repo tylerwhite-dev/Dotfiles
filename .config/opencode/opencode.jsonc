@@ -25,8 +25,8 @@
         "qwen/qwen3.6-35b-a3b": {
           "name": "Qwen3.6 35b moe",
           "limit": {
-            "context": 32000,
-            "output": 8000,
+            "context": 48000,
+            "output": 12000,
           },
         },
       },
