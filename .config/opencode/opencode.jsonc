@@ -15,17 +15,24 @@
         "baseURL": "http://localhost:1234/v1",
       },
       "models": {
+        "google/gemma-4-e4b": {
+          "name": "Gemma 4 E4B",
+          "limit": {
+            "context": 36000,
+            "output": 12000,
+          },
+        },
         "omnicoder-9b": {
           "name": "Omnicoder 9b",
           "limit": {
-            "context": 24000,
-            "output": 6000,
+            "context": 36000,
+            "output": 12000,
           },
         },
         "qwen3.6-35b-a3b": {
           "name": "Qwen3.6 35b MoE",
           "limit": {
-            "context": 48000,
+            "context": 60000,
             "output": 12000,
           },
         },
