@@ -1,18 +1,41 @@
 ---
-- hosts: localhost
+- name: Configure desktop
+  hosts: localhost
   connection: local
-  gather_facts: yes
+  gather_facts: true
   vars:
     extended: false
+    dotfiles_repo_dir: "{{ playbook_dir | dirname }}"
+    network_retries: 4
+    network_retry_delay: 15
+  pre_tasks:
+    - name: Preflight. Validate supported platform
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.os_family in ['Archlinux', 'Debian', 'RedHat', 'Darwin']
+        fail_msg: "Unsupported OS family: {{ ansible_facts.os_family }}"
+      tags: [always]
+
+    - name: Preflight. Validate repository path
+      ansible.builtin.stat:
+        path: "{{ dotfiles_repo_dir }}/.stow-local-ignore"
+      register: dotfiles_repo
+      tags: [always]
+
+    - name: Preflight. Require the Dotfiles repository root
+      ansible.builtin.assert:
+        that: dotfiles_repo.stat.isreg | default(false)
+        fail_msg: "dotfiles_repo_dir does not point to the Dotfiles repository: {{ dotfiles_repo_dir }}"
+      tags: [always]
   tasks:
     - import_tasks: modules/common.yml
       tags: [common]
+    - import_tasks: modules/brew.yml
+      tags: [brew]
     - import_tasks: modules/shell.yml
       tags: [shell]
     - import_tasks: modules/dotfiles.yml
       tags: [dotfiles]
-    - import_tasks: modules/brew.yml
-      tags: [brew]
     - import_tasks: modules/yay.yml
       tags: [yay]
     - import_tasks: modules/apps.yml

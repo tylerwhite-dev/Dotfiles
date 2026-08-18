@@ -1,11 +1,40 @@
 ---
 - name: Apps. Check Zed installation
-  stat:
-    path: ~/.local/bin/zed
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.local/bin/zed"
   register: zed_stat
   tags: [apps]
 
-- name: Apps. Install Zed
-  shell: curl -f https://zed.dev/install.sh | sh
+- name: Apps. Download Zed installer
+  ansible.builtin.get_url:
+    url: https://zed.dev/install.sh
+    dest: /tmp/zed-install.sh
+    mode: "0755"
+    force: true
+  register: zed_installer_download
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: zed_installer_download is succeeded
   when: not zed_stat.stat.exists
+  tags: [apps]
+
+- name: Apps. Install Zed
+  ansible.builtin.command: /bin/sh /tmp/zed-install.sh
+  register: zed_install_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: zed_install_result is succeeded
+  when: not zed_stat.stat.exists
+  tags: [apps]
+
+- name: Apps. Refresh Zed installation state
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.local/bin/zed"
+  register: zed_stat
+  tags: [apps]
+
+- name: Apps. Require successful Zed installation
+  ansible.builtin.assert:
+    that: zed_stat.stat.exists | default(false)
+    fail_msg: "Zed installer completed without creating ~/.local/bin/zed"
   tags: [apps]

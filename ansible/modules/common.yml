@@ -1,28 +1,46 @@
 ---
 - name: Common. Load packages
-  include_vars: pkgs/common_packages.yml
+  ansible.builtin.include_vars: pkgs/common_packages.yml
   tags: [common]
 
 - name: Common. Install packages (Arch Linux)
   become: true
   when: ansible_facts.os_family == "Archlinux"
-  pacman:
+  community.general.pacman:
     name: "{{ common_packages.arch }}"
     state: present
+    update_cache: true
+  register: common_arch_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: common_arch_result is succeeded
   tags: [common]
 
 - name: Common. Install packages (Debian/Ubuntu)
   become: true
   when: ansible_facts.os_family == "Debian"
-  apt:
+  ansible.builtin.apt:
     name: "{{ common_packages.debian }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 300
+  register: common_debian_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: common_debian_result is succeeded
   tags: [common]
 
 - name: Common. Install packages (Fedora)
   become: true
   when: ansible_facts.os_family == "RedHat"
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ common_packages.fedora }}"
     state: present
+    update_cache: true
+    lock_timeout: 300
+  register: common_fedora_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: common_fedora_result is succeeded
   tags: [common]

@@ -1,38 +1,94 @@
 ---
 - name: Yay. Check if already installed
-  when:
-    - ansible_facts.os_family == "Archlinux"
-  stat:
+  ansible.builtin.stat:
     path: /usr/bin/yay
   register: yay_bin
+  when: ansible_facts.os_family == "Archlinux"
   tags: [yay]
 
-- name: Yay. Install prerequisites
-  when:
-    - ansible_facts.os_family == "Archlinux"
-    - not yay_bin.stat.exists
-  become: true
-  pacman:
+- name: Yay. Install build prerequisites
+  community.general.pacman:
     name:
       - base-devel
       - git
       - go
     state: present
     update_cache: true
-  tags: [yay]
-
-- name: Yay. Clone source
+  become: true
+  register: yay_prerequisites
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: yay_prerequisites is succeeded
   when:
     - ansible_facts.os_family == "Archlinux"
     - not yay_bin.stat.exists
-  ansible.builtin.git:
-    repo: https://aur.archlinux.org/yay.git
-    dest: "{{ ansible_facts.env.HOME }}/yay"
-    update: true
   tags: [yay]
 
-- name: Yay. Show installation step
+- name: Yay. Clone source
+  ansible.builtin.git:
+    repo: https://aur.archlinux.org/yay.git
+    dest: "{{ ansible_facts.env.HOME }}/.cache/yay-build"
+    version: master
+    update: true
+  register: yay_clone_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: yay_clone_result is succeeded
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
+  tags: [yay]
+
+- name: Yay. Build package
+  ansible.builtin.command: makepkg --clean --cleanbuild --noconfirm
+  args:
+    chdir: "{{ ansible_facts.env.HOME }}/.cache/yay-build"
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
+  tags: [yay]
+
+- name: Yay. Find built package
+  ansible.builtin.find:
+    paths: "{{ ansible_facts.env.HOME }}/.cache/yay-build"
+    patterns: '^yay-[0-9].*\.pkg\.tar\.(zst|xz)$'
+    use_regex: true
+    file_type: file
+  register: yay_packages
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
+  tags: [yay]
+
+- name: Yay. Require built package
+  ansible.builtin.assert:
+    that: yay_packages.matched > 0
+    fail_msg: "Yay build did not produce an installable package"
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
+  tags: [yay]
+
+- name: Yay. Install built package
+  community.general.pacman:
+    name: "{{ (yay_packages.files | sort(attribute='mtime', reverse=true) | first).path }}"
+    state: present
+  become: true
+  when:
+    - ansible_facts.os_family == "Archlinux"
+    - not yay_bin.stat.exists
+  tags: [yay]
+
+- name: Yay. Verify installation
+  ansible.builtin.stat:
+    path: /usr/bin/yay
+  register: yay_bin_after
   when: ansible_facts.os_family == "Archlinux"
-  debug:
-    msg: "cd ~/yay && makepkg -sfi --noconfirm"
+  tags: [yay]
+
+- name: Yay. Require successful installation
+  ansible.builtin.assert:
+    that: yay_bin_after.stat.isreg | default(false)
+    fail_msg: "Yay installation did not create /usr/bin/yay"
+  when: ansible_facts.os_family == "Archlinux"
   tags: [yay]

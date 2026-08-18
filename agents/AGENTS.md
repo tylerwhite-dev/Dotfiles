@@ -2,7 +2,7 @@
 
 ## Setup Commands
 
-- Full setup: `ansible-playbook ansible/desktop.yml --ask-become-pass`
+- Full setup: `bash ansible/bootstrap.sh`
 - Apply configs only: `stow .`
 - Apply ZSH configs: `stow zsh-linux` (Linux) or `stow zsh-mac` (macOS)
 
@@ -10,7 +10,7 @@
 
 - Uses Ansible for package management and dotfiles deployment
 - Uses GNU Stow for dotfiles symlinking
-- Supports both Linux (apt) and macOS (brew) systems
+- Supports Arch, Debian/Ubuntu, Fedora, and macOS
 - ZSH configuration files are platform-specific (zsh_linux/ zsh_mac/)
 - Homebrew used for most CLI tools and extensions on Linux
 

@@ -1,93 +1,257 @@
 ---
-- name: Homebrew. Define brew path
-  set_fact:
-    brew_bin: /home/linuxbrew/.linuxbrew/bin/brew
+- name: Homebrew. Define installation paths
+  ansible.builtin.set_fact:
+    brew_prefix: >-
+      {{
+        '/opt/homebrew'
+        if ansible_facts.os_family == 'Darwin' and ansible_facts.architecture in ['arm64', 'aarch64']
+        else '/usr/local'
+        if ansible_facts.os_family == 'Darwin'
+        else '/home/linuxbrew/.linuxbrew'
+      }}
+  tags: [brew]
+
+- name: Homebrew. Define executable paths
+  ansible.builtin.set_fact:
+    brew_bin: "{{ brew_prefix }}/bin/brew"
+    brew_path: "{{ brew_prefix }}/bin"
+  tags: [brew]
+
+- name: Homebrew. Load packages list
+  ansible.builtin.include_vars: pkgs/brew_packages.yml
   tags: [brew]
 
 - name: Homebrew. Check existing installation
-  stat:
+  ansible.builtin.stat:
     path: "{{ brew_bin }}"
   register: brew_bin_stat
   tags: [brew]
 
-- name: Homebrew. Configure /home/linuxbrew directory
-  file:
-    path: "/home/linuxbrew"
+- name: Homebrew. Configure Linux installation directory
+  ansible.builtin.file:
+    path: /home/linuxbrew
     state: directory
     owner: "{{ ansible_facts.user_id }}"
-    group: "{{ ansible_facts.user_id }}"
+    group: "{{ ansible_facts.user_gid }}"
     mode: "0755"
   become: true
+  when:
+    - ansible_facts.os_family != "Darwin"
+    - not brew_bin_stat.stat.exists
+  tags: [brew]
+
+- name: Homebrew. Download installation script
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+    dest: /tmp/homebrew-install.sh
+    mode: "0755"
+    force: true
+  register: brew_installer_download
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_installer_download is succeeded
   when: not brew_bin_stat.stat.exists
+  tags: [brew]
+
+- name: Homebrew. Configure bounded curl retries
+  ansible.builtin.copy:
+    dest: /tmp/homebrew-curlrc
+    mode: "0644"
+    content: |
+      connect-timeout = 20
+      retry = 3
+      retry-all-errors
+      retry-delay = 5
   tags: [brew]
 
 - name: Homebrew. Run installation script
-  shell: NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  environment:
-    HOMEBREW_NO_ANALYTICS: 1
-    HOMEBREW_NO_AUTO_UPDATE: 1
+  ansible.builtin.command: /bin/bash /tmp/homebrew-install.sh
+  environment: &brew_environment
+    NONINTERACTIVE: "1"
+    HOMEBREW_NO_ANALYTICS: "1"
+    HOMEBREW_NO_AUTO_UPDATE: "1"
+    HOMEBREW_CURLRC: /tmp/homebrew-curlrc
+    HOMEBREW_CURL_RETRIES: "3"
+  register: brew_install_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_install_result is succeeded
   when: not brew_bin_stat.stat.exists
   tags: [brew]
 
+- name: Homebrew. Refresh installation state
+  ansible.builtin.stat:
+    path: "{{ brew_bin }}"
+  register: brew_bin_stat
+  tags: [brew]
+
+- name: Homebrew. Require successful installation
+  ansible.builtin.assert:
+    that: brew_bin_stat.stat.exists | default(false)
+    fail_msg: "Homebrew was not installed at {{ brew_bin }}"
+  tags: [brew]
+
 - name: Homebrew. Show version
-  command: "{{ brew_bin }} --version"
+  ansible.builtin.command: "{{ brew_bin }} --version"
   register: brew_version_check
   changed_when: false
   tags: [brew]
 
 - name: Homebrew. Version info
-  debug:
-    msg: "Linuxbrew version: {{ brew_version_check.stdout }}"
+  ansible.builtin.debug:
+    msg: "Homebrew version: {{ brew_version_check.stdout_lines | first }}"
   tags: [brew]
 
-- name: Homebrew. Load packages list
-  include_vars: pkgs/brew_packages.yml
+- name: Homebrew. Install macOS bootstrap packages
+  community.general.homebrew:
+    name: "{{ item }}"
+    path: "{{ brew_path }}"
+    state: present
+  loop: "{{ brew_packages.bootstrap }}"
+  register: brew_bootstrap_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_bootstrap_result is succeeded
+  when: ansible_facts.os_family == "Darwin"
+  environment: *brew_environment
   tags: [brew]
 
 - name: Homebrew. Install shell prompt extensions
   community.general.homebrew:
-    name: "{{ brew_packages.extensions }}"
+    name: "{{ item }}"
+    path: "{{ brew_path }}"
     state: present
-  when: brew_bin_stat.stat.exists
+  loop: "{{ brew_packages.extensions }}"
+  register: brew_extensions_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_extensions_result is succeeded
+  environment: *brew_environment
   tags: [brew]
 
 - name: Homebrew. Install CLI tools
   community.general.homebrew:
-    name: "{{ brew_packages.cli_tools }}"
+    name: "{{ item }}"
+    path: "{{ brew_path }}"
     state: present
-  when: brew_bin_stat.stat.exists
+  loop: "{{ brew_packages.cli_tools }}"
+  register: brew_cli_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_cli_result is succeeded
+  environment: *brew_environment
   tags: [brew]
 
-- name: Homebrew. Install fonts
-  community.general.homebrew:
-    name: "{{ brew_packages.fonts }}"
+- name: Homebrew. Configure Linux font directories
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/fonts/{{ item.name }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ linux_nerd_fonts }}"
+  when: ansible_facts.os_family != "Darwin"
+  tags: [brew]
+
+- name: Homebrew. Check Linux font installation markers
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/fonts/{{ item.name }}/.nerd-fonts-3.4.0"
+  loop: "{{ linux_nerd_fonts }}"
+  register: linux_font_markers
+  when: ansible_facts.os_family != "Darwin"
+  tags: [brew]
+
+- name: Homebrew. Download Linux Nerd Fonts
+  ansible.builtin.get_url:
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/{{ item.item.archive }}"
+    dest: "/tmp/{{ item.item.archive }}"
+    mode: "0644"
+    force: false
+  loop: "{{ linux_font_markers.results }}"
+  register: linux_font_download
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: linux_font_download is succeeded
+  when:
+    - ansible_facts.os_family != "Darwin"
+    - not item.stat.exists
+  tags: [brew]
+
+- name: Homebrew. Extract Linux Nerd Fonts
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ item.item.archive }}"
+    dest: "{{ ansible_facts.env.HOME }}/.local/share/fonts/{{ item.item.name }}"
+    remote_src: true
+  loop: "{{ linux_font_markers.results }}"
+  when:
+    - ansible_facts.os_family != "Darwin"
+    - not item.stat.exists
+  register: linux_font_extract
+  tags: [brew]
+
+- name: Homebrew. Record Linux Nerd Font versions
+  ansible.builtin.file:
+    path: "{{ ansible_facts.env.HOME }}/.local/share/fonts/{{ item.item.name }}/.nerd-fonts-3.4.0"
+    state: touch
+    mode: "0644"
+  loop: "{{ linux_font_markers.results }}"
+  when:
+    - ansible_facts.os_family != "Darwin"
+    - not item.stat.exists
+  changed_when: false
+  tags: [brew]
+
+- name: Homebrew. Refresh Linux font cache
+  ansible.builtin.command: fc-cache -f
+  when:
+    - ansible_facts.os_family != "Darwin"
+    - linux_font_extract is defined
+    - linux_font_extract is changed
+  tags: [brew]
+
+- name: Homebrew. Install macOS fonts as casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    path: "{{ brew_path }}"
     state: present
-  when: brew_bin_stat.stat.exists
+  loop: "{{ brew_packages.fonts }}"
+  register: brew_fonts_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_fonts_result is succeeded
+  when: ansible_facts.os_family == "Darwin"
+  environment: *brew_environment
   tags: [brew]
 
 - name: Homebrew. Tap additional repositories
   community.general.homebrew_tap:
     name: "{{ item }}"
+    path: "{{ brew_path }}"
     state: present
   loop: "{{ brew_packages.taps }}"
-  when:
-    - brew_bin_stat.stat.exists
-    - extended | bool
+  register: brew_tap_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_tap_result is succeeded
+  when: extended | bool
+  environment: *brew_environment
   tags: [brew]
 
-- name: Homebrew. Trust taps
-  shell: "{{ brew_bin }} trust {{ item }}"
+- name: Homebrew. Trust additional taps
+  ansible.builtin.command: "{{ brew_bin }} trust --tap {{ item }}"
   loop: "{{ brew_packages.taps }}"
-  when:
-    - brew_bin_stat.stat.exists
-    - extended | bool
+  changed_when: false
+  when: extended | bool
   tags: [brew]
 
 - name: Homebrew. Install optional packages
   community.general.homebrew:
-    name: "{{ brew_packages.optional }}"
+    name: "{{ item }}"
+    path: "{{ brew_path }}"
     state: present
-  when:
-    - brew_bin_stat.stat.exists
-    - extended | bool
+  loop: "{{ brew_packages.optional }}"
+  register: brew_optional_result
+  retries: "{{ network_retries }}"
+  delay: "{{ network_retry_delay }}"
+  until: brew_optional_result is succeeded
+  when: extended | bool
+  environment: *brew_environment
   tags: [brew]

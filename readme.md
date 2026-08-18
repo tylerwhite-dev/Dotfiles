@@ -6,17 +6,21 @@ Ansible playbook provides basic package installations via apt/pacman/dnf, many t
 
 ### Basic installation
 ```bash
-ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K
+bash ansible/bootstrap.sh
 ```
 
 ### Extended brew installation
 ```bash
-ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended=true"
+bash ansible/bootstrap.sh -e "extended=true"
 ```
+
+The bootstrap script installs the pinned Ansible collection dependencies before
+running the playbook. The repository can be cloned into any directory; the
+playbook derives the Stow source path from its own location.
 
 ### Run tasks with specific tag
 ```bash
-ansible-playbook ansible/desktop.yml --tags apps
+bash ansible/bootstrap.sh --tags apps
 ```
 
 ## Apply configs only via stow
