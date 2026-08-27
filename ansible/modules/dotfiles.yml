@@ -14,6 +14,39 @@
       }}
   tags: [dotfiles]
 
+- name: Dotfiles. Find root package config files
+  ansible.builtin.find:
+    paths: "{{ dotfiles_repo_dir }}/.config"
+    recurse: true
+    file_type: file
+    get_checksum: true
+  register: dotfiles_config_source
+  tags: [dotfiles]
+
+- name: Dotfiles. Check existing config targets
+  ansible.builtin.stat:
+    path: "{{ ansible_facts.env.HOME }}/.config/{{ item.path | replace(dotfiles_repo_dir + '/.config/', '') }}"
+    follow: false
+  loop: "{{ dotfiles_config_source.files }}"
+  register: dotfiles_config_targets
+  loop_control:
+    label: "{{ item.path | replace(dotfiles_repo_dir + '/.config/', '') }}"
+  tags: [dotfiles]
+
+- name: Dotfiles. Remove identical unmanaged config files
+  ansible.builtin.file:
+    path: "{{ item.stat.path }}"
+    state: absent
+  loop: "{{ dotfiles_config_targets.results }}"
+  loop_control:
+    label: "{{ item.item.path | replace(dotfiles_repo_dir + '/.config/', '') }}"
+  when:
+    - item.stat.exists
+    - item.stat.isreg
+    - not item.stat.islnk
+    - item.stat.checksum == item.item.checksum
+  tags: [dotfiles]
+
 - name: Dotfiles. Apply with GNU Stow
   ansible.builtin.command:
     argv:
