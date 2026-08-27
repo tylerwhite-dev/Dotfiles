@@ -1,5 +1,15 @@
 onboarding = false
 
+[theme]
+name = "kanagawa"
+auto_switch = false
+
+[ui]
+status_indicators = "symbols"
+
+[ui.toast]
+delivery = "herdr"
+
 [keys]
 
 # Pane navigation
