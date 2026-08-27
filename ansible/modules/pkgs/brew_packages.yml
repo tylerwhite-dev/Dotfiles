@@ -39,9 +39,3 @@ brew_packages:
   fonts:
     - font-jetbrains-mono-nerd-font
     - font-hack-nerd-font
-
-linux_nerd_fonts:
-  - name: JetBrainsMono
-    archive: JetBrainsMono.tar.xz
-  - name: Hack
-    archive: Hack.tar.xz

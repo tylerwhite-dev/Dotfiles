@@ -11,8 +11,6 @@ common_packages:
     - stow
     - file
     - wl-clipboard
-    - fontconfig
-    - xz
   debian:
     - sudo
     - git
@@ -26,8 +24,6 @@ common_packages:
     - file
     - wl-clipboard
     - build-essential
-    - fontconfig
-    - xz-utils
   fedora:
     - sudo
     - git
@@ -40,5 +36,3 @@ common_packages:
     - file
     - wl-clipboard
     - gcc # sdkman
-    - fontconfig
-    - xz
