@@ -3,10 +3,10 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 
 HOMEBREW_NO_ENV_HINTS=1
 
-# <-- tmux on startup -->
-if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-  if [[ "$TERM_PROGRAM" == "ghostty" ]]; then
-    tmux new-session -A -s "⌥"
+# <-- herdr on startup -->
+if [[ "$TERM_PROGRAM" == "ghostty" && "$SHLVL" -eq 1 ]]; then
+  if command -v herdr &> /dev/null && [ -z "$HERDR_CLIENT" ]; then
+    herdr
   fi
 fi
 
