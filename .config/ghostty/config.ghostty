@@ -19,8 +19,8 @@ cursor-style = underline
 window-padding-y = 0,4
 window-padding-x = 4,0
 
-window-width = 132
-window-height = 40
+window-width = 138
+window-height = 42
 
 # font
 font-family = JetBrainsMono Nerd Font
