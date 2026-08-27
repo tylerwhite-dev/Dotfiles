@@ -1,11 +1,6 @@
 onboarding = false
-# herdr configuration — migrated from tmux
-
-[theme]
-name = "catppuccin"
 
 [keys]
-prefix = "ctrl+b"
 
 # Pane navigation
 focus_pane_left = "alt+h"
@@ -13,31 +8,17 @@ focus_pane_down = "alt+j"
 focus_pane_up = "alt+k"
 focus_pane_right = "alt+l"
 
-# Close pane
+# Pane lifecycle and layout
 close_pane = "alt+w"
-
-# Split panes
 split_vertical = "alt+5"
 split_horizontal = "alt+6"
 
-# Tab/window management
+# Tabs and session navigation
+goto = "alt+e"
 new_tab = "alt+n"
 close_tab = "alt+q"
-workspace_picker = "alt+e"
 previous_tab = "alt+9"
 next_tab = "alt+0"
-# Indexed tab switching uses default (ctrl+b + 1..9) to avoid conflicts with alt+5/6 splits
 
-# Session management
-new_workspace = "alt+N"
-detach = "alt+d"
-
-[ui]
-pane_borders = true
-pane_gaps = true
-mouse_capture = true
-copy_on_select = true
-accent = "#a6e3a1"
-
-[ui.toast]
-delivery = "off"
+# Workspace and client session
+new_workspace = "alt+shift+n"
