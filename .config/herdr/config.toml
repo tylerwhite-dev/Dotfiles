@@ -5,10 +5,21 @@ name = "kanagawa"
 auto_switch = false
 
 [ui]
+# Possible values: "dots", "symbols"
 status_indicators = "symbols"
 sidebar_start_collapsed = true
+# Possible values: "compact", "hidden"
+sidebar_collapsed_mode = "hidden"
+prompt_new_tab_name = false
+sidebar_width = 28
+sidebar_min_width = 16
+sidebar_max_width = 40
+pane_gaps = false
+# Possible values: "top", "bottom"
+tab_bar_position = "bottom"
 
 [ui.toast]
+# Possible values: "off", "herdr", "terminal", "system"
 delivery = "herdr"
 
 [keys]
