@@ -6,6 +6,7 @@ auto_switch = false
 
 [ui]
 status_indicators = "symbols"
+sidebar_start_collapsed = true
 
 [ui.toast]
 delivery = "herdr"
@@ -22,6 +23,7 @@ focus_pane_right = "alt+l"
 close_pane = "alt+w"
 split_vertical = "alt+5"
 split_horizontal = "alt+6"
+toggle_sidebar = "alt+s"
 
 # Tabs and session navigation
 goto = "alt+e"
