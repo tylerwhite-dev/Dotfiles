@@ -1,3 +1,5 @@
+/.gitattributes text eol=lf
+
 # Files to store in git-lfs
 
 # Images
@@ -43,3 +45,9 @@
 *.exe	filter=lfs	diff=lfs	merge=lfs
 *.msi	filter=lfs	diff=lfs	merge=lfs
 *.dll	filter=lfs	diff=lfs	merge=lfs
+
+# Shell scripts must keep Unix line endings.
+*.sh	text eol=lf
+
+# GNU Stow reads this file as line-based regular expressions.
+/.stow-local-ignore text eol=lf
