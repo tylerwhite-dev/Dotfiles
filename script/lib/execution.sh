@@ -131,7 +131,8 @@ execution_load_step_implementations() {
   done
 }
 
-execution_spinner_frames=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+execution_spinner_frames=('◌' '○' '◎' '◉' '●' '◉' '◎' '○')
+execution_spinner_frame_microseconds=180000
 EXECUTION_RENDERED_LABEL=""
 EXECUTION_TIMER_LABEL=""
 EXECUTION_DURATION_LABEL=""
@@ -205,7 +206,7 @@ execution_print_active_step() {
   local total="$2"
   local label="$3"
   local elapsed_seconds="$4"
-  local frame="$5"
+  local marker="${5:-◉}"
   local redraw="${6:-yes}"
 
   execution_truncate_step_label "$label"
@@ -215,10 +216,9 @@ execution_print_active_step() {
     printf '\r\033[2K'
   fi
 
-  printf '%s◉%s  %s%02d / %02d%s  %s%s%s  %s  %s%s%s' \
-    "$ui_color_comment" "$ui_color_reset" \
+  printf '%s%s%s  %s%02d / %02d%s  %s  %s%s%s' \
+    "$ui_color_comment" "$marker" "$ui_color_reset" \
     "$ui_color_execution_heading" "$current" "$total" "$ui_color_reset" \
-    "$ui_color_comment" "$frame" "$ui_color_reset" \
     "$EXECUTION_RENDERED_LABEL" \
     "$ui_color_hint" "$EXECUTION_TIMER_LABEL" "$ui_color_reset"
 }
@@ -274,7 +274,11 @@ execution_run_step_animated() {
   local started_at="$SECONDS"
   local frame_index=0
   local frame_count="${#execution_spinner_frames[@]}"
+  local frame_started_at="${EPOCHREALTIME/./}"
   local frame
+  local frame_elapsed_microseconds
+  local frame_advance
+  local now_microseconds
   local line=""
   local read_status
   local process_pid
@@ -287,10 +291,17 @@ execution_run_step_animated() {
   exec {output_fd}<&"${execution_step_process[0]}"
 
   while true; do
+    now_microseconds="${EPOCHREALTIME/./}"
+    frame_elapsed_microseconds=$((now_microseconds - frame_started_at))
+    if ((frame_elapsed_microseconds >= execution_spinner_frame_microseconds)); then
+      frame_advance=$((frame_elapsed_microseconds / execution_spinner_frame_microseconds))
+      ((frame_index += frame_advance))
+      ((frame_started_at += frame_advance * execution_spinner_frame_microseconds))
+    fi
+
     frame="${execution_spinner_frames[frame_index % frame_count]}"
     execution_print_active_step \
       "$current" "$total" "$label" "$((SECONDS - started_at))" "$frame"
-    ((frame_index += 1))
 
     line=""
     if IFS= read -r -t 0.08 -u "$output_fd" line 2>/dev/null; then
