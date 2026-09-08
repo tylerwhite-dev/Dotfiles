@@ -10,11 +10,11 @@ but prints commands without changing the system.
 Run the script from any directory:
 
 ```bash
-bash /path/to/Dotfiles/script/setup.sh
+bash /path/to/Dotfiles/script/dotfiles-deploy.sh
 ```
 
-`setup.sh` resolves the script and repository roots, loads `logic/load.sh`, and
-calls `setup_run`.
+`dotfiles-deploy.sh` resolves the script and repository roots, loads
+`logic/load.sh`, and calls `setup_run`.
 
 The application flow is:
 
@@ -37,7 +37,7 @@ The application flow is:
 
 | Path | Responsibility |
 | --- | --- |
-| `setup.sh` | Thin executable entry point. |
+| `dotfiles-deploy.sh` | Thin executable entry point. |
 | `config/settings.sh` | Retry counts, retry delay, and the Homebrew path. |
 | `config/messages.sh` | All user-facing message templates, labels, and stage text. |
 | `config/packages.sh` | Named package groups for native package managers and Homebrew. |
@@ -190,6 +190,6 @@ bash script/tests/execution_dry_run.sh debian
 bash script/tests/execution_dry_run.sh arch
 ```
 
-Use `bash -n` for syntax-only checks. Do not run `setup.sh` without an explicit
+Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit
 choice and confirmation. Real actions can install packages, change the login
 shell, download Homebrew, build `yay`, or create Stow links.

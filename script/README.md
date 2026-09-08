@@ -3,7 +3,7 @@
 Run the interactive setup from any directory:
 
 ```bash
-bash /path/to/Dotfiles/script/setup.sh
+bash /path/to/Dotfiles/script/dotfiles-deploy.sh
 ```
 
 The setup has two phases. The questionnaire records choices without changing the
@@ -13,7 +13,7 @@ action.
 
 ## Layout
 
-- `setup.sh` loads the application and calls `setup_run`.
+- `dotfiles-deploy.sh` loads the application and calls `setup_run`.
 - `config/` contains settings, messages, package groups, and procedure
   declarations. It does not render UI or execute system commands.
 - `ui/` renders menus, stages, messages, commands, and the execution timeline.
@@ -75,7 +75,7 @@ user-facing text in an action. Use `executor_run`, `executor_run_as_root`,
 Set `SETUP_DRY_RUN=1` to print selected commands without executing them:
 
 ```bash
-SETUP_DRY_RUN=1 bash script/setup.sh
+SETUP_DRY_RUN=1 bash script/dotfiles-deploy.sh
 ```
 
 Dry-run mode still shows the questionnaire and requires summary confirmation.

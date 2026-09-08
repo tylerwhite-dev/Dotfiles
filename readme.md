@@ -1,46 +1,49 @@
 # Dotfiles
 
-## Apply dotfiles and packages via Ansible
+## Set up a Linux environment
 
-Ansible playbook provides basic package installations via apt/pacman/dnf, many tools via brew, set ZSH as default shell, apply dotfiles
+The interactive setup script installs the selected native and Homebrew
+packages, can set Zsh as the default shell, and applies the repository
+configuration with GNU Stow. It supports Arch, Debian/Ubuntu, and Fedora.
 
-### Basic installation
+### Full setup
 ```bash
-bash ansible/bootstrap.sh
+bash script/dotfiles-deploy.sh
 ```
 
-### Extended brew installation
+The questionnaire collects all choices before making changes. The final menu
+opens on `Start execution` and also provides restart and exit options.
+
+### Dry run
 ```bash
-bash ansible/bootstrap.sh -e "extended=true"
+SETUP_DRY_RUN=1 bash script/dotfiles-deploy.sh
 ```
 
-The bootstrap script installs the pinned Ansible collection dependencies before
-running the playbook. The repository can be cloned into any directory; the
-playbook derives the Stow source path from its own location.
+Dry-run mode shows the commands that would be executed without installing
+packages or changing system files.
 
-### Run tasks with specific tag
+For the procedure list, package groups, architecture, and tests, see
+[`script/README.md`](script/README.md) and [`script/AGENTS.MD`](script/AGENTS.MD).
+
+## Apply configs only with Stow
+
+Run these commands from the repository root.
+
+### Common Zsh configuration
+
 ```bash
-bash ansible/bootstrap.sh --tags apps
+stow --no-folding zsh_common
 ```
 
-## Apply configs only via stow
+### Platform-specific Zsh configuration
 
-### ZSH
-
-common part
-```
-stow zsh_common
+```bash
+stow --no-folding zsh_linux  # Linux
+stow --no-folding zsh_mac    # macOS
 ```
 
-mac or linux part
-```
-stow zsh_mac
-```
-```
-stow zsh_linux
-```
+### Other configurations
 
-### The rest of configurations
-```
+```bash
 stow --no-folding .
 ```
