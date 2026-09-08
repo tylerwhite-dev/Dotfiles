@@ -132,7 +132,7 @@ execution_load_step_implementations() {
 }
 
 execution_spinner_frames=('◌' '○' '◎' '◉' '●' '◉' '◎' '○')
-execution_spinner_frame_microseconds=180000
+execution_spinner_frame_microseconds=150000
 EXECUTION_RENDERED_LABEL=""
 EXECUTION_TIMER_LABEL=""
 EXECUTION_DURATION_LABEL=""
