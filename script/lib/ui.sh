@@ -10,6 +10,7 @@ ui_color_error=""
 ui_color_hint=""
 ui_color_comment=""
 ui_color_selected=""
+ui_color_package=""
 
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   ui_color_reset=$'\033[0m'
@@ -21,11 +22,12 @@ if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   ui_color_error=$'\033[1;31m'
   ui_color_hint=$'\033[2m'
   ui_color_comment=$'\033[0;33m'
-  ui_color_selected=$'\033[1;30;46m'
+  ui_color_selected=$'\033[1;36m'
+  ui_color_package=$'\033[90m'
 fi
 
 UI_SELECTED_INDEX=0
-ui_menu_help_shown="no"
+ui_menu_style="default"
 
 ui_is_interactive() {
   [[ -t 0 && -t 1 ]]
@@ -74,7 +76,7 @@ ui_draw_menu_options() {
     printf '\r\033[2K'
 
     if ((index == selected_index)); then
-      printf '%s  > %s  %s\n' \
+      printf '    %s› %s%s\n' \
         "$ui_color_selected" "${options[index]}" "$ui_color_reset"
     else
       printf '    %s\n' "${options[index]}"
@@ -98,17 +100,15 @@ ui_select() {
     return 2
   fi
 
-  ui_print_separator
+  if [[ "$ui_menu_style" == "minimal" ]]; then
+    printf '\n'
+  else
+    ui_print_separator
+  fi
   printf '%s%s%s\n' "$ui_color_question" "$prompt" "$ui_color_reset"
 
   if [[ -n "$comment" ]]; then
     printf '%s%s%s\n' "$ui_color_comment" "$comment" "$ui_color_reset"
-  fi
-
-  if [[ "$ui_menu_help_shown" == "no" ]]; then
-    printf '%sUse Up and Down to move. Press Enter to confirm.%s\n' \
-      "$ui_color_hint" "$ui_color_reset"
-    ui_menu_help_shown="yes"
   fi
 
   printf '\n'

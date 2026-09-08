@@ -102,6 +102,13 @@ step \
 step_packages native_packages native @distribution
 
 step \
+  zsh_default \
+  "Set Zsh as the default shell?" \
+  "The current user's login shell will be changed to /bin/zsh." \
+  execution_set_zsh_default \
+  "arch debian fedora"
+
+step \
   homebrew \
   "Install Homebrew, core CLI tools, and fonts?" \
   "Homebrew will be installed, followed by these packages:" \
@@ -126,16 +133,9 @@ step_packages homebrew_extended \
   brew optional
 
 step \
-  zsh_default \
-  "Set Zsh as the default shell?" \
-  "The current user's login shell will be changed to /bin/zsh." \
-  execution_set_zsh_default \
-  "arch debian fedora"
-
-step \
   dotfiles \
   "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?" \
-  "GNU Stow will apply ., zsh_common, wallpaper, and zsh_linux with --no-folding from the Dotfiles directory." \
+  "Stow will apply .configs, zsh_common, wallpaper, and zsh_linux from the Dotfiles directory." \
   execution_apply_dotfiles \
   "arch debian fedora"
 

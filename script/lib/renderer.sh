@@ -21,8 +21,6 @@ renderer_run() {
     exit 1
   fi
 
-  ui_print_heading "System setup"
-
   if ! steps_validate; then
     ui_print_error "Could not load the setup steps."
     exit 1
