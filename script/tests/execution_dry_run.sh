@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 test_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 script_root="$(cd -- "${test_dir}/.." && pwd)"
-distribution_family="${1:-}"
+platform="${1:-}"
 
-case "$distribution_family" in
+case "$platform" in
   arch | debian | fedora)
     ;;
   *)
@@ -16,23 +16,18 @@ esac
 
 export SETUP_DRY_RUN=1
 
-# shellcheck source=../lib/ui.sh
-source "${script_root}/lib/ui.sh"
-# shellcheck source=../lib/steps.sh
-source "${script_root}/lib/steps.sh"
-# shellcheck source=../config/steps.sh
-source "${script_root}/config/steps.sh"
-# shellcheck source=../lib/execution.sh
-source "${script_root}/lib/execution.sh"
+# shellcheck source=../logic/load.sh
+source "${script_root}/logic/load.sh"
 
-distribution_name="Dry-run ${distribution_family}"
+catalog_validate
+workflow_reset
 
-steps_validate
-
-for step_id in "${STEP_IDS[@]}"; do
-  if steps_is_available "$step_id" "$distribution_family"; then
-    STEP_SELECTED["$step_id"]="yes"
+declare -a procedure_ids=()
+catalog_procedure_ids procedure_ids
+for procedure_id in "${procedure_ids[@]}"; do
+  if catalog_is_available "$procedure_id" "$platform"; then
+    workflow_select "$procedure_id" yes
   fi
 done
 
-execution_run_selected
+runner_run "$platform" "Dry-run ${platform}" "$SETUP_REPOSITORY_ROOT"

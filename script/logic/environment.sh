@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-distribution_family=""
-distribution_name=""
+# Detects a supported Linux family and returns its display name by reference.
+environment_detect() {
+  local family_result_name="$1"
+  local name_result_name="$2"
 
-distribution_detect() {
   if [[ "${OSTYPE:-}" != linux* || ! -r /etc/os-release ]]; then
     return 1
   fi
@@ -11,32 +12,23 @@ distribution_detect() {
   local ID=""
   local ID_LIKE=""
   local PRETTY_NAME=""
+  local family=""
 
   # /etc/os-release contains shell-compatible variable assignments.
   # shellcheck disable=SC1091
   source /etc/os-release
 
   local identifiers=" ${ID,,} ${ID_LIKE,,} "
-
   if [[ "$identifiers" == *" arch "* ]]; then
-    distribution_family="arch"
+    family="arch"
   elif [[ "$identifiers" == *" debian "* || "$identifiers" == *" ubuntu "* ]]; then
-    distribution_family="debian"
+    family="debian"
   elif [[ "$identifiers" == *" fedora "* ]]; then
-    distribution_family="fedora"
+    family="fedora"
   else
     return 1
   fi
 
-  distribution_name="${PRETTY_NAME:-$ID}"
-}
-
-distribution_require_supported() {
-  if ! distribution_detect; then
-    ui_print_error "The distribution could not be detected or is not supported."
-    printf 'Supported distributions: Arch Linux, Debian, Ubuntu, and Fedora.\n'
-    return 1
-  fi
-
-  ui_print_success "Detected distribution: ${distribution_name}"
+  printf -v "$family_result_name" '%s' "$family"
+  printf -v "$name_result_name" '%s' "${PRETTY_NAME:-$ID}"
 }

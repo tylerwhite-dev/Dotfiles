@@ -8,35 +8,67 @@ bash /path/to/Dotfiles/script/setup.sh
 
 The setup has two phases. The questionnaire records choices without changing the
 system. Execution starts only after the user confirms the summary.
+The final menu opens on `Start execution`; use the arrow keys to choose another
+action.
 
 ## Layout
 
-- `setup.sh` is the entry point.
-- `config/steps.sh` declares questions, package groups, supported distributions,
-  dependencies, and the execution function for each step.
-- `lib/questionnaire.sh` collects and summarizes answers.
-- `lib/execution.sh` runs selected steps and provides shared command, retry,
-  download, privilege, and Homebrew helpers.
-- `steps/*.sh` contains the implementation of each setup step.
+- `setup.sh` loads the application and calls `setup_run`.
+- `config/` contains settings, messages, package groups, and procedure
+  declarations. It does not render UI or execute system commands.
+- `ui/` renders menus, stages, messages, commands, and the execution timeline.
+  UI functions receive their text from callers and do not know about procedures.
+- `logic/` controls the questionnaire, dependencies, execution order, processes,
+  errors, and environment detection.
+- `logic/actions/` contains the system changes for each procedure.
+- `logic/executors/` contains the real and dry-run command adapters.
 
-## Changing a step
+The main dependency direction is `config -> declaration interfaces`,
+`logic -> config interfaces and UI`, and `actions -> catalog and executor`.
+Files under `ui/` never read configuration or call actions.
 
-Edit its question or package groups in `config/steps.sh`. Edit its system changes
-in the matching file under `steps/`. The execution function takes no arguments,
-returns zero on success, and returns nonzero on failure. It can read
-`distribution_family` and load declared packages with:
+## Adding a procedure
+
+Add a block to `config/procedures.sh`:
 
 ```bash
-steps_load_step_packages step_id "$distribution_family" package_source
+procedure_define example
+procedure_handler example action_run_example
+procedure_platforms example arch debian fedora
+procedure_requires_root example
+procedure_packages example native example_packages
+message_define procedure.example.question "Run the example?"
+message_define procedure.example.label "Run the example"
+message_define procedure.example.description "These packages will be installed:"
 ```
 
-Use `execution_run`, `execution_run_as_root`, `execution_retry`, or
-`execution_retry_as_root` for commands that change the system. These helpers make
-the command visible before it runs and support dry runs.
+Only `procedure_define`, `procedure_handler`, and `procedure_platforms` are
+required. Use `procedure_requires`, `procedure_requires_root`, and
+`procedure_packages` when the procedure needs them. Put package groups in
+`config/packages.sh`.
 
-To add a step, declare it in `config/steps.sh` and add a function with the declared
-name to any file under `steps/`. The runner loads every `*.sh` file in that
-directory and validates that each declared function exists before asking questions.
+Add the action to a file under `logic/actions/`:
+
+```bash
+action_run_example() {
+  local platform="$1"
+  local repository_dir="$2"
+  local -a packages=()
+
+  catalog_packages packages example "$platform" native || return
+  executor_run_as_root example-package-manager install "${packages[@]}"
+}
+```
+
+Actions receive the platform and repository directory, return zero on success,
+and use the executor functions for commands. The loader discovers every `*.sh`
+file under `logic/actions/`. The catalog validates handlers, messages,
+dependencies, platforms, and package references before the questionnaire starts.
+
+Use `error_report` with a key from `config/messages.sh` instead of putting
+user-facing text in an action. Use `executor_run`, `executor_run_as_root`,
+`executor_retry`, `executor_retry_as_root`, `executor_download`, and
+`executor_brew` so commands remain visible and work in dry-run mode.
 
 ## Dry run
 
@@ -54,4 +86,13 @@ For a non-interactive execution check, run:
 bash script/tests/execution_dry_run.sh fedora
 bash script/tests/execution_dry_run.sh arch
 bash script/tests/execution_dry_run.sh debian
+```
+
+Validate declarations and dependency behavior with:
+
+```bash
+bash script/tests/config_validation.sh
+bash script/tests/workflow.sh
+bash script/tests/ui.sh
+bash script/tests/layer_dependencies.sh
 ```
