@@ -2,17 +2,24 @@
 
 ## Setup Commands
 
-- Full setup: `ansible-playbook ansible/desktop.yml --ask-become-pass`
-- Apply configs only: `stow .`
-- Apply ZSH configs: `stow zsh-linux` (Linux) or `stow zsh-mac` (macOS)
+- Full Linux setup: `bash dotfiles-deploy.sh`
+- Dry run: `bash dotfiles-deploy.sh --dry-run`
+- Automated (no prompts): `bash dotfiles-deploy.sh --yolo`
+- Apply configs only: `stow --no-folding .`
+- Apply common Zsh config: `stow --no-folding zsh_common`
+- Apply platform Zsh config: `stow --no-folding zsh_linux` or
+  `stow --no-folding zsh_mac`
 
 ## Key Architecture Facts
 
-- Uses Ansible for package management and dotfiles deployment
-- Uses GNU Stow for dotfiles symlinking
-- Supports both Linux (apt) and macOS (brew) systems
-- ZSH configuration files are platform-specific (zsh_linux/ zsh_mac/)
-- Homebrew used for most CLI tools and extensions on Linux
+- The setup implementation lives under `script/` and is organized into
+  configuration, UI, business logic, actions, and execution adapters.
+- Package and procedure declarations are separate from the code that applies
+  them.
+- GNU Stow creates symlinks for dotfiles and platform-specific Zsh settings.
+- The setup script supports Arch, Debian/Ubuntu, and Fedora Linux.
+- Homebrew provides most CLI tools and extensions on Linux.
+- Detailed script interfaces and entities are documented in `script/AGENTS.MD`.
 
 ## Important Commands
 
@@ -23,6 +30,6 @@
 ## Repo Conventions
 
 - Dotfiles organized by system type (Linux/macOS)
-- Ansible playbooks in `ansible/` directory
+- Setup code and tests live in `script/`
 - Configuration guides in `guide/` directory
 - Platform-specific ZSH configs in `zsh_linux/` and `zsh_mac/`

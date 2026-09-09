@@ -1,7 +1,0 @@
----
-- name: Shell. Set ZSH as default
-  become: true
-  user:
-    name: "{{ ansible_facts.user_id }}"
-    shell: /bin/zsh
-  tags: [shell]

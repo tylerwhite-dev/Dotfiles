@@ -1,42 +1,38 @@
 # Dotfiles
 
-## Apply dotfiles and packages via Ansible
+## Set up a Linux environment
 
-Ansible playbook provides basic package installations via apt/pacman/dnf, many tools via brew, set ZSH as default shell, apply dotfiles
+The interactive setup script installs the selected native and Homebrew
+packages, can set Zsh as the default shell, and applies the repository
+configuration with GNU Stow. It supports Arch, Debian/Ubuntu, and Fedora.
 
-### Basic installation
+### Setup
 ```bash
-ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K
+bash dotfiles-deploy.sh
 ```
 
-### Extended brew installation
+There are also additional flags (e.g. `--yolo`, `--dry-run`, `--help`). See
+[`script/README.md`](script/README.md).
+
+## Apply configs only with Stow
+
+Run these commands from the repository root.
+
+### Common Zsh configuration
+
 ```bash
-ansible-playbook ansible/desktop.yml -i ansible/inventory.yml -K -e "extended=true"
+stow --no-folding zsh_common
 ```
 
-### Run tasks with specific tag
+### Platform-specific Zsh configuration
+
 ```bash
-ansible-playbook ansible/desktop.yml --tags apps
+stow --no-folding zsh_linux  # Linux
+stow --no-folding zsh_mac    # macOS
 ```
 
-## Apply configs only via stow
+### Other configurations
 
-### ZSH
-
-common part
-```
-stow zsh_common
-```
-
-mac or linux part
-```
-stow zsh_mac
-```
-```
-stow zsh_linux
-```
-
-### The rest of configurations
-```
+```bash
 stow --no-folding .
 ```
