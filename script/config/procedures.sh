@@ -40,15 +40,15 @@ procedure_define homebrew_extended
 procedure_handler homebrew_extended action_install_homebrew_extended
 procedure_platforms homebrew_extended arch debian fedora
 procedure_requires homebrew_extended homebrew
+procedure_selectable homebrew_extended
 procedure_packages homebrew_extended \
-  brew_tap optional \
   brew optional
 message_define procedure.homebrew_extended.question \
-  "Install the extended Homebrew package set?"
+  "Select the extended Homebrew packages to install?"
 message_define procedure.homebrew_extended.label \
   "Install the extended Homebrew package set"
 message_define procedure.homebrew_extended.description \
-  "An additional tap will be added, followed by these packages:"
+  "An additional tap will be added when needed. Select the packages to install:"
 
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles

@@ -41,6 +41,12 @@ message_define status.exited \
   "Exited without changes."
 message_define status.no_selection \
   "No procedures were selected. Nothing to do."
+message_define status.selected_count \
+  "%d selected"
+message_define status.all_packages_selected \
+  "all"
+message_define status.no_packages_selected \
+  "no packages selected"
 message_define status.dry_run_complete \
   "Dry run completed. No changes were made."
 message_define status.setup_complete \

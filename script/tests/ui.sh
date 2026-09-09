@@ -42,4 +42,18 @@ ui_select selection "Prompt" "" 0 default one two three \
   <<< $'\n' >"$menu_output"
 grep -Fq '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' "$menu_output"
 
+saved_success_color="$ui_color_success"
+saved_hint_color="$ui_color_hint"
+saved_reset_color="$ui_color_reset"
+ui_color_success='<success>'
+ui_color_hint='<hint>'
+ui_color_reset='</reset>'
+packages_output="$(ui_summary_item_packages 'Extended set' 5 '5 selected')"
+[[ "$packages_output" == '<success>●</reset>  Extended set  <success>5 selected</reset>' ]]
+empty_packages_output="$(ui_summary_item_packages 'Extended set' 0 'no packages selected')"
+[[ "$empty_packages_output" == '<hint>○</reset>  Extended set  no packages selected' ]]
+ui_color_success="$saved_success_color"
+ui_color_hint="$saved_hint_color"
+ui_color_reset="$saved_reset_color"
+
 printf 'UI interface validation passed.\n'

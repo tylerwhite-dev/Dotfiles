@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 declare -Ag _WORKFLOW_SELECTIONS=()
+declare -Ag _WORKFLOW_PACKAGE_SELECTIONS=()
 
 # Resets every declared procedure to an unselected state.
 workflow_reset() {
@@ -10,6 +11,7 @@ workflow_reset() {
   catalog_procedure_ids procedure_ids
   for procedure_id in "${procedure_ids[@]}"; do
     _WORKFLOW_SELECTIONS["$procedure_id"]="no"
+    _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]=""
   done
 }
 
@@ -71,4 +73,36 @@ workflow_selected() {
       result_ref+=("$procedure_id")
     fi
   done
+}
+
+# Stores the chosen packages for a selectable procedure.
+workflow_select_packages() {
+  local procedure_id="$1"
+  shift
+
+  _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]="$*"
+}
+
+# Reads a procedure's chosen packages into a caller-owned array.
+workflow_selected_packages() {
+  local -n result_ref="$1"
+  local procedure_id="$2"
+
+  result_ref=()
+  if [[ -n "${_WORKFLOW_PACKAGE_SELECTIONS[$procedure_id]:-}" ]]; then
+    read -r -a result_ref <<< "${_WORKFLOW_PACKAGE_SELECTIONS[$procedure_id]}"
+  fi
+}
+
+# Selects every available brew package for a selectable procedure (YOLO mode).
+workflow_select_packages_all() {
+  local procedure_id="$1"
+  local platform="$2"
+  local -a packages=()
+  local -a all=()
+
+  catalog_packages packages "$procedure_id" "$platform" brew || return
+  all=("${packages[@]}")
+  _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]="${all[*]}"
+  _WORKFLOW_SELECTIONS["$procedure_id"]="yes"
 }

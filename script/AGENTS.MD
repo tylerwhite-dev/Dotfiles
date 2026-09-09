@@ -29,7 +29,9 @@ The application flow is:
 4. `environment_detect` maps `/etc/os-release` to `arch`, `debian`, or `fedora`.
 5. `questionnaire_collect` resets selections and asks one question per available
    procedure. It does not execute commands. In `--yolo` mode every available
-   procedure is selected without prompting.
+   procedure is selected without prompting. A procedure marked with
+   `procedure_selectable` shows a checkbox list instead of a plain yes/no
+   question, and records the chosen packages with `workflow_select_packages`.
 6. `questionnaire_confirm` renders the selected procedures and waits for
    `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
    `--yolo` mode this step is skipped and execution starts immediately.
@@ -119,6 +121,14 @@ resets it before each pass. `workflow_available` filters by platform, while
 `workflow_selected` also requires a positive selection and a selected procedure
 requirement.
 
+A procedure marked with `procedure_selectable` records its per-package choices
+in `_WORKFLOW_PACKAGE_SELECTIONS`. `workflow_select_packages` stores them,
+`workflow_selected_packages` reads them back into an array, and
+`workflow_select_packages_all` selects every available package for the
+non-interactive `--yolo` path. An action for a selectable procedure must call
+`workflow_selected_packages` instead of `catalog_packages` to install only the
+chosen packages.
+
 ### Executor adapter
 
 `executor_run` is the command seam. The selected adapter dispatches to
@@ -161,22 +171,25 @@ interfaces are grouped below for quick navigation.
 
 - Catalog: `package_group`, `procedure_define`, `procedure_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
-  `procedure_packages`, `catalog_procedure_ids`, `catalog_handler`,
-  `catalog_requirement`, `catalog_requires_root`, `catalog_is_available`,
-  `catalog_packages`, and `catalog_validate`.
+  `procedure_selectable`, `procedure_packages`, `catalog_procedure_ids`,
+  `catalog_handler`, `catalog_requirement`, `catalog_requires_root`,
+  `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`, and
+  `catalog_validate`.
 - Messages: `message_define`, `message_format`, `message_exists`.
 - Flags: `flags_parse`.
 - Workflow: `workflow_reset`, `workflow_select`, `workflow_selection`,
-  `workflow_requirement_is_selected`, `workflow_available`, and
-  `workflow_selected`.
+  `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
+  `workflow_select_packages`, `workflow_selected_packages`, and
+  `workflow_select_packages_all`.
 - Questionnaire and application: `questionnaire_collect`,
   `questionnaire_confirm`, `runner_run`, `process_run`, and `setup_run`.
 - Execution: `executor_initialize`, `executor_is_dry_run`, `executor_run`,
   `executor_require`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, and `executor_brew`.
-- UI: `ui_select`, `ui_stage`, `ui_summary_item`, `ui_detail`, `ui_command`,
-  `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
+- UI: `ui_select`, `ui_multiselect`, `ui_stage`, `ui_summary_item`,
+  `ui_summary_item_packages`, `ui_detail`,
+  `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
   `action_install_homebrew_extended`, `action_set_zsh_default`,

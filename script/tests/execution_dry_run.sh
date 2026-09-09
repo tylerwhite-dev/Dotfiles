@@ -26,7 +26,13 @@ declare -a procedure_ids=()
 catalog_procedure_ids procedure_ids
 for procedure_id in "${procedure_ids[@]}"; do
   if catalog_is_available "$procedure_id" "$platform"; then
-    workflow_select "$procedure_id" yes
+    is_selectable=""
+    catalog_is_selectable is_selectable "$procedure_id"
+    if [[ "$is_selectable" == "yes" ]]; then
+      workflow_select_packages_all "$procedure_id" "$platform"
+    else
+      workflow_select "$procedure_id" yes
+    fi
   fi
 done
 

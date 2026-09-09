@@ -9,6 +9,36 @@ _questionnaire_procedure_text() {
   message_format "$result_name" "procedure.${procedure_id}.${text_kind}"
 }
 
+# Collects the package selections for a selectable procedure via checkboxes.
+_questionnaire_read_selectable_packages() {
+  local procedure_id="$1"
+  local platform="$2"
+  local current="$3"
+  local total="$4"
+  local question
+  local description
+  local prompt
+  local -a packages=()
+  local -a selected=()
+
+  _questionnaire_procedure_text question "$procedure_id" question
+  _questionnaire_procedure_text description "$procedure_id" description
+  message_format prompt question.progress "$current" "$total" "$question"
+  catalog_packages packages "$procedure_id" "$platform" brew || return
+
+  if ! ui_multiselect selected "$prompt" "${packages[@]}"; then
+    error_report error.input_interrupted
+    return 1
+  fi
+
+  workflow_select_packages "$procedure_id" "${selected[@]}"
+  if ((${#selected[@]} > 0)); then
+    workflow_select "$procedure_id" yes
+  else
+    workflow_select "$procedure_id" no
+  fi
+}
+
 # Renders and records one procedure's yes/no answer.
 _questionnaire_read_procedure() {
   local procedure_id="$1"
@@ -22,7 +52,15 @@ _questionnaire_read_procedure() {
   local yes_option
   local no_option
   local selected_index
+  local is_selectable
   local -a packages=()
+
+  catalog_is_selectable is_selectable "$procedure_id"
+  if [[ "$is_selectable" == "yes" ]]; then
+    _questionnaire_read_selectable_packages \
+      "$procedure_id" "$platform" "$current" "$total" || return
+    return 0
+  fi
 
   _questionnaire_procedure_text question "$procedure_id" question
   _questionnaire_procedure_text description "$procedure_id" description
@@ -95,8 +133,27 @@ _questionnaire_show_summary() {
 
   for procedure_id in "${available[@]}"; do
     _questionnaire_procedure_text label "$procedure_id" label
-    workflow_selection selection "$procedure_id"
-    ui_summary_item "$label" "$selection" "$yes_label" "$no_label"
+
+    local is_selectable
+    catalog_is_selectable is_selectable "$procedure_id"
+    if [[ "$is_selectable" == "yes" ]]; then
+      local -a packages=()
+      local -a all_packages=()
+      local status
+      workflow_selected_packages packages "$procedure_id"
+      catalog_packages all_packages "$procedure_id" "$platform" brew
+      if ((${#packages[@]} == ${#all_packages[@]})) && ((${#packages[@]} > 0)); then
+        message_format status status.all_packages_selected
+      elif ((${#packages[@]} > 0)); then
+        message_format status status.selected_count "${#packages[@]}"
+      else
+        message_format status status.no_packages_selected
+      fi
+      ui_summary_item_packages "$label" "${#packages[@]}" "$status"
+    else
+      workflow_selection selection "$procedure_id"
+      ui_summary_item "$label" "$selection" "$yes_label" "$no_label"
+    fi
   done
 }
 

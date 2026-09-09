@@ -5,6 +5,7 @@ declare -Ag _CATALOG_PROCEDURE_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_PLATFORMS=()
 declare -Ag _CATALOG_PROCEDURE_REQUIREMENT=()
 declare -Ag _CATALOG_PROCEDURE_REQUIRES_ROOT=()
+declare -Ag _CATALOG_PROCEDURE_SELECTABLE=()
 declare -Ag _CATALOG_PROCEDURE_PACKAGE_REFS=()
 declare -Ag _CATALOG_PACKAGE_GROUPS=()
 
@@ -38,6 +39,7 @@ procedure_define() {
   _CATALOG_PROCEDURE_PLATFORMS["$id"]=""
   _CATALOG_PROCEDURE_REQUIREMENT["$id"]=""
   _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]="no"
+  _CATALOG_PROCEDURE_SELECTABLE["$id"]="no"
   _CATALOG_PROCEDURE_PACKAGE_REFS["$id"]=""
 }
 
@@ -76,6 +78,12 @@ procedure_requires() {
 procedure_requires_root() {
   _catalog_require_procedure "$1" || return
   _CATALOG_PROCEDURE_REQUIRES_ROOT["$1"]="yes"
+}
+
+# Marks a procedure as offering a package-by-package checkbox selection.
+procedure_selectable() {
+  _catalog_require_procedure "$1" || return
+  _CATALOG_PROCEDURE_SELECTABLE["$1"]="yes"
 }
 
 # Attaches one or more source and package-group references to a procedure.
@@ -122,6 +130,11 @@ catalog_requirement() {
 # Returns whether a procedure was marked as requiring root privileges.
 catalog_requires_root() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$2]}"
+}
+
+# Copies a procedure's selectable flag into the caller-provided variable.
+catalog_is_selectable() {
+  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_SELECTABLE[$2]:-no}"
 }
 
 # Checks whether a procedure supports the requested platform family.
@@ -265,6 +278,11 @@ catalog_validate() {
     if [[ "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$id]}" != "yes" && \
       "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$id]}" != "no" ]]; then
       printf 'Procedure %s has an invalid root requirement.\n' "$id" >&2
+      return 1
+    fi
+    if [[ "${_CATALOG_PROCEDURE_SELECTABLE[$id]}" != "yes" && \
+      "${_CATALOG_PROCEDURE_SELECTABLE[$id]}" != "no" ]]; then
+      printf 'Procedure %s has an invalid selectable flag.\n' "$id" >&2
       return 1
     fi
 

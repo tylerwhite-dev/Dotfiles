@@ -44,18 +44,20 @@ action_install_homebrew() {
   executor_brew install --cask "${packages[@]}"
 }
 
-# Adds the optional tap and installs the extended Homebrew package group.
+# Installs the user-selected extended Homebrew packages.
 action_install_homebrew_extended() {
   local platform="$1"
-  local tap
-  local -a packages=()
+  local -a selected=()
 
-  catalog_packages packages homebrew_extended "$platform" brew_tap || return
-  for tap in "${packages[@]}"; do
-    executor_brew tap "$tap" || return
-    executor_brew trust --tap "$tap" || return
-  done
+  workflow_selected_packages selected homebrew_extended || return
+  if ((${#selected[@]} == 0)); then
+    return 0
+  fi
 
-  catalog_packages packages homebrew_extended "$platform" brew || return
-  executor_brew install "${packages[@]}"
+  if [[ " ${selected[*]} " == *" sdkman-cli "* ]]; then
+    executor_brew tap sdkman/tap || return
+    executor_brew trust --tap sdkman/tap || return
+  fi
+
+  executor_brew install "${selected[@]}"
 }

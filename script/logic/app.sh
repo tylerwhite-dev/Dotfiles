@@ -51,7 +51,13 @@ setup_run() {
     workflow_reset
     workflow_available yolo_available "$distribution_family"
     for procedure_id in "${yolo_available[@]}"; do
-      workflow_select "$procedure_id" yes
+      local is_selectable
+      catalog_is_selectable is_selectable "$procedure_id"
+      if [[ "$is_selectable" == "yes" ]]; then
+        workflow_select_packages_all "$procedure_id" "$distribution_family" || return
+      else
+        workflow_select "$procedure_id" yes
+      fi
     done
     action="start"
   else

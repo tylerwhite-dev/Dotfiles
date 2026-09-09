@@ -24,6 +24,3 @@ package_group brew_cask fonts \
 package_group brew optional \
   taproom superfile tio go nvm rustup uv sdkman-cli yt-dlp ffmpeg-full \
   imagemagick-full mailsy
-
-package_group brew_tap optional \
-  sdkman/tap

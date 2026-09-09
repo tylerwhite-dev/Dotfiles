@@ -36,3 +36,24 @@ ui_summary_item() {
   printf '%s%s%s  %s  %s\n' \
     "$symbol_color" "$symbol" "$ui_color_reset" "$label" "$answer"
 }
+
+# Prints a review row for a package-select procedure with a count status.
+ui_summary_item_packages() {
+  local label="$1"
+  local count="$2"
+  local status="$3"
+  local symbol
+  local symbol_color
+
+  if ((count > 0)); then
+    symbol='●'
+    symbol_color="$ui_color_success"
+    status="${ui_color_success}${status}${ui_color_reset}"
+  else
+    symbol='○'
+    symbol_color="$ui_color_hint"
+  fi
+
+  printf '%s%s%s  %s  %s\n' \
+    "$symbol_color" "$symbol" "$ui_color_reset" "$label" "$status"
+}

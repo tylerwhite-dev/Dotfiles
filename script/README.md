@@ -64,7 +64,8 @@ message_define procedure.example.description "These packages will be installed:"
 Only `procedure_define`, `procedure_handler`, and `procedure_platforms` are
 required. Use `procedure_requires`, `procedure_requires_root`, and
 `procedure_packages` when the procedure needs them. Put package groups in
-`config/packages.sh`.
+`config/packages.sh`. Mark a procedure with `procedure_selectable` to present
+its packages as a checkbox list and install only the chosen items.
 
 Add the action to a file under `logic/actions/`:
 
