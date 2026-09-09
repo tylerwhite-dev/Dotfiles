@@ -6,24 +6,13 @@ The interactive setup script installs the selected native and Homebrew
 packages, can set Zsh as the default shell, and applies the repository
 configuration with GNU Stow. It supports Arch, Debian/Ubuntu, and Fedora.
 
-### Full setup
+### Setup
 ```bash
-bash script/dotfiles-deploy.sh
+bash dotfiles-deploy.sh
 ```
 
-The questionnaire collects all choices before making changes. The final menu
-opens on `Start execution` and also provides restart and exit options.
-
-### Dry run
-```bash
-SETUP_DRY_RUN=1 bash script/dotfiles-deploy.sh
-```
-
-Dry-run mode shows the commands that would be executed without installing
-packages or changing system files.
-
-For the procedure list, package groups, architecture, and tests, see
-[`script/README.md`](script/README.md) and [`script/AGENTS.MD`](script/AGENTS.MD).
+There are also additional flags (e.g. `--yolo`, `--dry-run`, `--help`). See
+[`script/README.md`](script/README.md).
 
 ## Apply configs only with Stow
 

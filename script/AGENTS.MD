@@ -3,41 +3,48 @@
 This directory contains the interactive Linux setup program for the Dotfiles
 repository. The program asks for all choices first, shows a review screen, and
 only then runs the selected procedures. `SETUP_DRY_RUN=1` keeps the same flow
-but prints commands without changing the system.
+but prints commands without changing the system. The `--yolo` flag answers
+`yes` to every question and skips the review screen, so all available
+procedures run without confirmation.
 
 ## Entry point and runtime flow
 
 Run the script from any directory:
 
 ```bash
-bash /path/to/Dotfiles/script/dotfiles-deploy.sh
+bash /path/to/Dotfiles/dotfiles-deploy.sh
 ```
 
-`dotfiles-deploy.sh` resolves the script and repository roots, loads
-`logic/load.sh`, and calls `setup_run`.
+The executable entry point at the repository root resolves to this `script/`
+directory, `dotfiles-deploy.sh` loads `logic/load.sh`, parses CLI flags with
+`flags_parse`, and calls `setup_run`.
 
 The application flow is:
 
-1. `ui_is_interactive` rejects non-interactive input and output.
-2. `catalog_validate` checks the declarations, handlers, dependencies, messages,
+1. `flags_parse` records CLI flags such as `--yolo` and `--dry-run`.
+2. `ui_is_interactive` rejects non-interactive input and output unless `--yolo`
+   is given, which skips the interactive requirement.
+3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
    platforms, and package references.
-3. `environment_detect` maps `/etc/os-release` to `arch`, `debian`, or `fedora`.
-4. `questionnaire_collect` resets selections and asks one question per available
-   procedure. It does not execute commands.
-5. `questionnaire_confirm` renders the selected procedures and waits for
-   `Start execution`, `Restart questionnaire`, or `Exit without changes`.
-6. `runner_run` initializes the real or dry-run executor, filters selected
+4. `environment_detect` maps `/etc/os-release` to `arch`, `debian`, or `fedora`.
+5. `questionnaire_collect` resets selections and asks one question per available
+   procedure. It does not execute commands. In `--yolo` mode every available
+   procedure is selected without prompting.
+6. `questionnaire_confirm` renders the selected procedures and waits for
+   `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
+   `--yolo` mode this step is skipped and execution starts immediately.
+7. `runner_run` initializes the real or dry-run executor, filters selected
    procedures, and runs them in declaration order.
-7. `process_run` adds privilege preparation, timeline rendering, output capture,
+8. `process_run` adds privilege preparation, timeline rendering, output capture,
    and final status handling around each action.
-8. `_app_print_elapsed_time` reports the duration measured from the execution
+9. `_app_print_elapsed_time` reports the duration measured from the execution
    confirmation, not from script startup.
 
 ## Directory layout
 
 | Path | Responsibility |
 | --- | --- |
-| `dotfiles-deploy.sh` | Thin executable entry point. |
+| `dotfiles-deploy.sh` | Thin executable entry point at the repository root. |
 | `config/settings.sh` | Retry counts, retry delay, and the Homebrew path. |
 | `config/messages.sh` | All user-facing message templates, labels, and stage text. |
 | `config/packages.sh` | Named package groups for native package managers and Homebrew. |
@@ -45,6 +52,7 @@ The application flow is:
 | `logic/load.sh` | Loads interfaces, implementations, declarations, actions, and the application in dependency order. |
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
+| `logic/flags.sh` | CLI flag parsing for `--yolo`, `--dry-run`, and `--help`. |
 | `logic/environment.sh` | Linux distribution detection. |
 | `logic/workflow.sh` | In-memory yes/no selections and dependency filtering. |
 | `logic/questionnaire.sh` | Business flow for questions, summary, and final action choice. |
@@ -157,6 +165,7 @@ interfaces are grouped below for quick navigation.
   `catalog_requirement`, `catalog_requires_root`, `catalog_is_available`,
   `catalog_packages`, and `catalog_validate`.
 - Messages: `message_define`, `message_format`, `message_exists`.
+- Flags: `flags_parse`.
 - Workflow: `workflow_reset`, `workflow_select`, `workflow_selection`,
   `workflow_requirement_is_selected`, `workflow_available`, and
   `workflow_selected`.

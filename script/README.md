@@ -3,17 +3,36 @@
 Run the interactive setup from any directory:
 
 ```bash
-bash /path/to/Dotfiles/script/dotfiles-deploy.sh
+bash /path/to/Dotfiles/dotfiles-deploy.sh
 ```
+
+The executable entry point lives at the repository root and loads this
+`script/` directory for its logic, configuration, and UI.
 
 The setup has two phases. The questionnaire records choices without changing the
 system. Execution starts only after the user confirms the summary.
 The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
 
+## Flags
+
+```bash
+bash dotfiles-deploy.sh --yolo
+bash dotfiles-deploy.sh --yolo --dry-run
+```
+
+- `--yolo` answers `yes` to every question and starts execution without the
+  confirmation summary. All available procedures run automatically.
+- `--dry-run` is the CLI equivalent of `SETUP_DRY_RUN=1`: it prints commands
+  without changing the system.
+- `-h, --help` prints usage.
+
+Any other flag exits with status 2 and an `Unknown flag` error.
+
 ## Layout
 
-- `dotfiles-deploy.sh` loads the application and calls `setup_run`.
+- `dotfiles-deploy.sh` (at the repository root) loads the application logic and
+  calls `setup_run`. It parses CLI flags first.
 - `config/` contains settings, messages, package groups, and procedure
   declarations. It does not render UI or execute system commands.
 - `ui/` renders menus, stages, messages, commands, and the execution timeline.
@@ -75,10 +94,11 @@ user-facing text in an action. Use `executor_run`, `executor_run_as_root`,
 Set `SETUP_DRY_RUN=1` to print selected commands without executing them:
 
 ```bash
-SETUP_DRY_RUN=1 bash script/dotfiles-deploy.sh
+SETUP_DRY_RUN=1 bash dotfiles-deploy.sh
 ```
 
-Dry-run mode still shows the questionnaire and requires summary confirmation.
+Dry-run mode still shows the questionnaire and requires summary confirmation
+unless `--yolo` is also given.
 
 For a non-interactive execution check, run:
 

@@ -2,8 +2,9 @@
 
 ## Setup Commands
 
-- Full Linux setup: `bash script/dotfiles-deploy.sh`
-- Dry run: `SETUP_DRY_RUN=1 bash script/dotfiles-deploy.sh`
+- Full Linux setup: `bash dotfiles-deploy.sh`
+- Dry run: `bash dotfiles-deploy.sh --dry-run`
+- Automated (no prompts): `bash dotfiles-deploy.sh --yolo`
 - Apply configs only: `stow --no-folding .`
 - Apply common Zsh config: `stow --no-folding zsh_common`
 - Apply platform Zsh config: `stow --no-folding zsh_linux` or
