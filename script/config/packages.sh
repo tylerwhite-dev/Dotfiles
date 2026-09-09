@@ -10,17 +10,17 @@ package_group native fedora \
   sudo git git-lfs curl openssh-clients zsh nano stow file wl-clipboard gcc
 
 package_group native yay_prerequisites \
-  base-devel git go
+  base-devel go
 
 package_group brew extensions \
-  starship zsh-autosuggestions zsh-syntax-highlighting tmux pfetch-rs zoxide fzf eza
+  starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs
 
 package_group brew cli_tools \
-  yazi neovim btop nvtop opencode lazygit fastfetch zip
+  herdr superfile neovim btop opencode lazygit fastfetch zip zoxide fzf eza
 
 package_group brew_cask fonts \
   font-jetbrains-mono-nerd-font font-hack-nerd-font
 
 package_group brew optional \
-  taproom superfile tio go nvm rustup uv sdkman-cli yt-dlp ffmpeg-full \
-  imagemagick-full mailsy
+  go nvm rustup uv sdkman-cli lazydocker nvtop yt-dlp tmux yazi tio ffmpeg-full \
+  imagemagick-full mailsy taproom
