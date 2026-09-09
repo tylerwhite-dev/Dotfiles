@@ -7,14 +7,13 @@
 readme.md
 script
 
-ansible
 guide
 agents
-
 nix
 
 wallpaper
 
+dotfiles-deploy.sh 
 zsh_linux
 zsh_mac
 zsh_common
