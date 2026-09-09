@@ -13,6 +13,10 @@ source "${SETUP_SCRIPT_ROOT}/logic/catalog.sh"
 # shellcheck source=../ui/ui.sh
 source "${SETUP_SCRIPT_ROOT}/ui/ui.sh"
 
+# CLI flag definitions. Loaded after UI so flags can render errors and help.
+# shellcheck source=flags.sh
+source "${SETUP_SCRIPT_ROOT}/logic/flags.sh"
+
 # Business modules.
 # shellcheck source=errors.sh
 source "${SETUP_SCRIPT_ROOT}/logic/errors.sh"

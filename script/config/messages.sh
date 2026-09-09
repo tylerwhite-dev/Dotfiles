@@ -8,6 +8,8 @@ message_define error.distribution_unsupported \
   $'The distribution could not be detected or is not supported.\nSupported distributions: Arch Linux, Debian, Ubuntu, and Fedora.'
 message_define error.dry_run_invalid \
   "SETUP_DRY_RUN must be 0 or 1."
+message_define error.unknown_flag \
+  "Unknown flag: %s"
 message_define error.root_execution \
   "Run this setup as a regular user. It will request sudo when needed."
 message_define error.command_missing \
@@ -33,6 +35,8 @@ message_define status.distribution_detected \
   "Detected distribution: %s"
 message_define status.settings_confirmed \
   "Settings confirmed."
+message_define status.yolo_mode \
+  "YOLO mode enabled: all procedures will be executed without confirmation."
 message_define status.exited \
   "Exited without changes."
 message_define status.no_selection \
@@ -66,3 +70,5 @@ message_define option.exit "Exit without changes"
 message_define label.yes "yes"
 message_define label.no "no"
 message_define prompt.action "Choose an action:"
+
+message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo       Execute all procedures without confirmation.\n  --dry-run    Print commands without changing the system.\n  -h, --help   Show this help message.'

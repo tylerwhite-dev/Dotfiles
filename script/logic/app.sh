@@ -25,8 +25,10 @@ setup_run() {
   local distribution_name
   local status_message
   local action
+  local -a yolo_available=()
+  local procedure_id
 
-  if ! ui_is_interactive; then
+  if [[ "${SETUP_YOLO:-0}" != "1" ]] && ! ui_is_interactive; then
     error_report error.interactive_required
     return 1
   fi
@@ -43,20 +45,31 @@ setup_run() {
   ui_success "$status_message"
   ui_ansi_palette
 
-  while true; do
-    questionnaire_collect "$distribution_family" "$distribution_name" || return
-    questionnaire_confirm action "$distribution_family" "$distribution_name" || return
+  if [[ "${SETUP_YOLO:-0}" == "1" ]]; then
+    message_format status_message status.yolo_mode
+    ui_notice "$status_message"
+    workflow_reset
+    workflow_available yolo_available "$distribution_family"
+    for procedure_id in "${yolo_available[@]}"; do
+      workflow_select "$procedure_id" yes
+    done
+    action="start"
+  else
+    while true; do
+      questionnaire_collect "$distribution_family" "$distribution_name" || return
+      questionnaire_confirm action "$distribution_family" "$distribution_name" || return
 
-    case "$action" in
-      start) break ;;
-      restart) continue ;;
-      exit)
-        message_format status_message status.exited
-        ui_success "$status_message"
-        return 0
-        ;;
-    esac
-  done
+      case "$action" in
+        start) break ;;
+        restart) continue ;;
+        exit)
+          message_format status_message status.exited
+          ui_success "$status_message"
+          return 0
+          ;;
+      esac
+    done
+  fi
 
   started_at="$SECONDS"
   message_format status_message status.settings_confirmed
