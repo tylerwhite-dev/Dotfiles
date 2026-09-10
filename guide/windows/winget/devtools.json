@@ -5,7 +5,13 @@
     {
       "Packages": [
         {
+          "PackageIdentifier": "Microsoft.WSL"
+        },
+        {
           "PackageIdentifier": "Microsoft.VisualStudioCode"
+        },
+        {
+          "PackageIdentifier": "ZedIndustries.Zed"
         },
         {
           "PackageIdentifier": "Mozilla.Firefox"
@@ -14,31 +20,19 @@
           "PackageIdentifier": "Git.Git"
         },
         {
+          "PackageIdentifier": "GitHub.GitLFS"
+        },
+        {
           "PackageIdentifier": "Docker.DockerDesktop"
         },
         {
           "PackageIdentifier": "AmneziaVPN.AmneziaVPN"
         },
         {
-          "PackageIdentifier": "Microsoft.VisualStudio.2022.Community"
-        },
-        {
-          "PackageIdentifier": "Microsoft.WSL"
-        },
-        {
           "PackageIdentifier": "JGraph.Draw"
         },
         {
-          "PackageIdentifier": "Inkscape.Inkscape"
-        },
-        {
-          "PackageIdentifier": "WerWolv.ImHex"
-        },
-        {
           "PackageIdentifier": "WiresharkFoundation.Wireshark"
-        },
-        {
-          "PackageIdentifier": "Mattermost.MattermostDesktop"
         },
         {
           "PackageIdentifier": "SST.opencode"

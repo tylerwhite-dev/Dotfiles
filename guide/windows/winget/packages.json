@@ -54,6 +54,12 @@
         },
         {
           "PackageIdentifier": "DEVCOM.JetBrainsMonoNerdFont"
+        },
+        {
+          "PackageIdentifier": "CPUID.HWMonitor"
+        },
+        {
+          "PackageIdentifier": "Valve.Steam"
         }
       ],
       "SourceDetails": {
