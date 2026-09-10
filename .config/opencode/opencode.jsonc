@@ -15,25 +15,39 @@
         "baseURL": "http://localhost:1234/v1",
       },
       "models": {
-        "google/gemma-4-e4b": {
-          "name": "Gemma 4 E4B",
+        "google/gemma-4-26b-a4b-qat": {
+          "name": "Gemma4 26b MoE",
           "limit": {
-            "context": 36000,
+            "context": 48000,
             "output": 12000,
           },
         },
-        "omnicoder-9b": {
-          "name": "Omnicoder 9b",
+        "qwen3.8-27b": {
+          "name": "Qwen3.8 27b",
           "limit": {
-            "context": 36000,
-            "output": 12000,
+            "context": 14000,
+            "output": 4096,
           },
         },
-        "qwen3.6-35b-a3b": {
-          "name": "Qwen3.6 35b MoE",
+        "google/gemma-4-12b": {
+          "name": "Gemma 4 12B",
           "limit": {
-            "context": 60000,
-            "output": 12000,
+            "context": 32768,
+            "output": 4096,
+          },
+        },
+        "ornith-1.5-35b-a3b": {
+          "name": "Ornith 1.5 35B",
+          "limit": {
+            "context": 32768,
+            "output": 4096,
+          },
+        },
+        "ornith-1.5-9b": {
+          "name": "Ornith 1.5 9B",
+          "limit": {
+            "context": 32768,
+            "output": 4096,
           },
         },
       },
