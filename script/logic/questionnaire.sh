@@ -111,6 +111,39 @@ questionnaire_collect() {
   done
 }
 
+# Collects only the package choices for the first selectable procedure
+# (used by --add-optionals).
+questionnaire_collect_optionals() {
+  local platform="$1"
+  local distribution_name="$2"
+  local title
+  local metadata
+  local procedure_id
+  local is_selectable
+  local current=0
+  local -a available=()
+
+  workflow_reset
+  workflow_available available "$platform"
+
+  for procedure_id in "${available[@]}"; do
+    ((current += 1))
+    catalog_is_selectable is_selectable "$procedure_id"
+    if [[ "$is_selectable" == "yes" ]]; then
+      message_format title stage.questionnaire.title
+      message_format metadata stage.questionnaire.meta \
+        "$distribution_name" "${#available[@]}"
+      ui_stage "$title" "$metadata"
+      _questionnaire_read_selectable_packages \
+        "$procedure_id" "$platform" "$current" "${#available[@]}" || return
+      return 0
+    fi
+  done
+
+  status_report status.optionals_none
+  return 0
+}
+
 # Displays the review rows for all procedures available on the platform.
 _questionnaire_show_summary() {
   local platform="$1"

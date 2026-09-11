@@ -30,6 +30,10 @@ message_define error.home_unknown \
   "Could not determine the user's home directory."
 message_define error.yay_missing \
   "The yay build completed, but yay was not found in PATH."
+message_define error.brew_not_installed \
+  "Homebrew is required for --add-optionals but was not installed."
+message_define error.flags_conflict \
+  "Conflicting flags: --yolo and --add-optionals cannot be used together."
 
 message_define status.distribution_detected \
   "Detected distribution: %s"
@@ -41,6 +45,8 @@ message_define status.exited \
   "Exited without changes."
 message_define status.no_selection \
   "No procedures were selected. Nothing to do."
+message_define status.optionals_none \
+  "No optional packages were selected. Nothing to do."
 message_define status.selected_count \
   "%d selected"
 message_define status.all_packages_selected \
@@ -76,5 +82,6 @@ message_define option.exit "Exit without changes"
 message_define label.yes "yes"
 message_define label.no "no"
 message_define prompt.action "Choose an action:"
+message_define prompt.brew_install "Homebrew is not installed. Install it?"
 
-message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo       Execute all procedures without confirmation.\n  --dry-run    Print commands without changing the system.\n  -h, --help   Show this help message.'
+message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo            Execute all procedures without confirmation.\n  --add-optionals   Install only optional brew packages.\n  --dry-run         Print commands without changing the system.\n  -h, --help        Show this help message.\n\nNote: --yolo and --add-optionals cannot be combined. Both accept --dry-run.'
