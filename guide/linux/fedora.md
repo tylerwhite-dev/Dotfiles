@@ -12,6 +12,18 @@ sudo dnf upgrade -y && brew upgrade && flatpak update -y
 sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y
 ```
 
+## WSL fast setup
+```bash
+sudo passwd $USER
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0
+sudo dnf upgrade -y
+sudo dnf install git -y
+git clone https://github.com/tylerwhite-dev/Dotfiles
+cd Dotfiles
+chmod +x ./dotfiles-deploy.sh
+./dotfiles-deploy.sh
+```
+
 ## disable dnf repo
 
 show all repos:

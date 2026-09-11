@@ -10,6 +10,16 @@ sudo nala upgrade -y && brew upgrade && flatpak update -y
 sudo nala autoremove -y && sudo nala autoclean && brew cleanup && flatpak uninstall --unused -y
 ```
 
+## WSL fast setup
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install git -y
+git clone https://github.com/tylerwhite-dev/Dotfiles
+cd Dotfiles
+chmod +x /dotfiles-deploy.sh
+./dotfiles-deploy.sh
+```
+
 ## apps
 `
 loupe - images;
