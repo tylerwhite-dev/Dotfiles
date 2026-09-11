@@ -18,7 +18,7 @@ npm -v
 install latest stable rust+cargo
 
 ```bash
-rustup default stable
+rustup toolchain install stable
 
 rustc -V
 cargo -V
