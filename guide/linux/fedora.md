@@ -19,9 +19,8 @@ sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0
 sudo dnf upgrade -y
 sudo dnf install git -y
 git clone https://github.com/tylerwhite-dev/Dotfiles
-cd Dotfiles
-chmod +x ./dotfiles-deploy.sh
-./dotfiles-deploy.sh
+chmod +x ~/Dotfiles/dotfiles-deploy.sh
+bash ~/Dotfiles/dotfiles-deploy.sh
 ```
 
 ## disable dnf repo

@@ -15,9 +15,8 @@ sudo nala autoremove -y && sudo nala autoclean && brew cleanup && flatpak uninst
 sudo apt update && sudo apt upgrade -y
 sudo apt install git -y
 git clone https://github.com/tylerwhite-dev/Dotfiles
-cd Dotfiles
-chmod +x /dotfiles-deploy.sh
-./dotfiles-deploy.sh
+chmod +x ~/Dotfiles/dotfiles-deploy.sh
+bash ~/Dotfiles/dotfiles-deploy.sh
 ```
 
 ## apps
