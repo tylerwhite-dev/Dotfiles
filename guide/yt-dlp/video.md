@@ -16,6 +16,11 @@ yt-dlp -f "bestvideo[height<=1080]+bestaudio" --merge-output-format mp4 -o "%(ti
 -a ""
 ```
 
+### Certificates bypass
+```
+--no-check-certificates
+```
+
 ### Subs
 
 ```bash
