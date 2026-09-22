@@ -8,7 +8,7 @@ ui_stage() {
   printf '\n%s%s%s\n' "$ui_color_heading" "$title" "$ui_color_reset"
   printf '%s%s%s\n' \
     "$ui_color_heading" \
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
     "$ui_color_reset"
   printf '%s%s%s\n\n' "$ui_color_hint" "$metadata" "$ui_color_reset"
 }

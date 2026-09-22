@@ -24,7 +24,7 @@ _series_begin() {
   _case_descriptions=()
   printf '\n\n'
   printf '%s%s%s\n' "$ui_color_test" \
-    '──────────────────────────────────────────────' \
+    '────────────────────────────────────────────────' \
     "$ui_color_reset"
   printf '\n'
   _test_msg "TEST: ${name}"
@@ -37,7 +37,7 @@ _series_end() {
   local summary_line
 
   printf '\n'
-  _test_msg "── Summary: ${_series_name} ─────────────────────────────"
+  _test_msg "── Summary: ${_series_name} ───────────────────────────────────"
   for i in "${!_case_statuses[@]}"; do
     case "${_case_statuses[$i]}" in
       PASS) status_color="$ui_color_success"; ((pass = pass + 1)) ;;
@@ -68,7 +68,7 @@ _final_summary() {
   local line
   local summary_line
 
-  _test_msg "═══════════ FINAL SUMMARY ═══════════"
+  _test_msg "─────────── FINAL SUMMARY ───────────"
   for line in "${_all_summaries[@]:-}"; do
     printf '  %s\n' "$line"
   done
@@ -96,6 +96,12 @@ _case() {
     return 0
   fi
 
+  if ((${#_case_statuses[@]} > 0)); then
+    printf '\n\n\n'
+    printf '%s%s%s\n' "$ui_color_test" \
+      '────────────────────────────────────────────────' \
+      "$ui_color_reset"
+  fi
   printf '\n'
   _test_msg "▶ ${description}"
   "$@" || render_status=$?
@@ -118,16 +124,19 @@ _case() {
       y|Y|yes|Yes|"")
         _case_statuses+=('PASS')
         _case_descriptions+=("$description")
+        printf '\n'
         return 0
         ;;
       n|N|no|No)
         _case_statuses+=('FAIL')
         _case_descriptions+=("$description")
+        printf '\n'
         return 0
         ;;
       s|S|skip|Skip)
         _case_statuses+=('SKIP')
         _case_descriptions+=("$description")
+        printf '\n'
         return 0
         ;;
       q|Q|quit|exit)

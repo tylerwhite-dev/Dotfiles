@@ -40,7 +40,7 @@ ui_color_reset="$saved_reset_color"
 
 ui_select selection "Prompt" "" 0 default one two three \
   <<< $'\n' >"$menu_output"
-grep -Fq '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' "$menu_output"
+grep -Fq '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' "$menu_output"
 
 saved_success_color="$ui_color_success"
 saved_hint_color="$ui_color_hint"

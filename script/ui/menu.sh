@@ -86,7 +86,7 @@ ui_select() {
   else
     printf '\n%s%s%s\n' \
       "$ui_color_heading" \
-      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
+      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
       "$ui_color_reset"
   fi
 
@@ -240,7 +240,7 @@ ui_multiselect() {
 
   printf '\n%s%s%s\n' \
     "$ui_color_heading" \
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
     "$ui_color_reset"
   printf '%s%s%s\n' "$ui_color_question" "$prompt" "$ui_color_reset"
   printf '%s  ↓ move  ·  Space toggle  ·  Enter confirm%s\n' \
