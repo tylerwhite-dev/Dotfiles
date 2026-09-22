@@ -22,5 +22,8 @@ package_group brew_cask fonts \
   font-jetbrains-mono-nerd-font font-hack-nerd-font
 
 package_group brew optional \
-  go nvm rustup uv sdkman-cli lazydocker nvtop yt-dlp tmux yazi tio ffmpeg-full \
-  imagemagick-full mailsy taproom
+  go nvm rustup uv sdkman-cli \
+  lazydocker nvtop tio \
+  yt-dlp ffmpeg ffmpeg-full \
+  imagemagick imagemagick-full \
+  taproom tmux yazi mailsy
