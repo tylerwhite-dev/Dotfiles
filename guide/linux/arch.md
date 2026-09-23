@@ -4,7 +4,7 @@
 
 ## full upgrade
 ```bash
-yay -Syyu && brew upgrade && flatpak update -y
+yay -Syyu && brew upgrade -y && flatpak update -y
 ```
 
 ## cleanup system

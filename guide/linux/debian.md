@@ -2,7 +2,7 @@
 
 ## full upgrade
 ```bash
-sudo nala upgrade -y && brew upgrade && flatpak update -y
+sudo nala upgrade -y && brew upgrade -y && flatpak update -y
 ```
 
 ## cleanup system

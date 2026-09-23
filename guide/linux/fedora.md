@@ -3,7 +3,7 @@
 ## full upgrade
 
 ```bash
-sudo dnf upgrade -y && brew upgrade && flatpak update -y
+sudo dnf upgrade -y && brew upgrade -y && flatpak update -y
 ```
 
 ## cleanup system
