@@ -12,6 +12,16 @@ message_define procedure.native_packages.label "Install base system packages"
 message_define procedure.native_packages.description \
   "The following packages will be installed from the native repository:"
 
+procedure_define yay
+procedure_handler yay action_install_yay
+procedure_platforms yay arch
+procedure_requires_root yay
+procedure_packages yay native yay_prerequisites
+message_define procedure.yay.question "Install yay?"
+message_define procedure.yay.label "Install yay"
+message_define procedure.yay.description \
+  "The build dependencies will be installed first. Then yay will be built from the AUR and installed:"
+
 procedure_define zsh_default
 procedure_handler zsh_default action_set_zsh_default
 procedure_platforms zsh_default arch debian fedora
@@ -20,6 +30,16 @@ message_define procedure.zsh_default.question "Set zsh as the default shell?"
 message_define procedure.zsh_default.label "Set zsh as the default shell"
 message_define procedure.zsh_default.description \
   "The current user's login shell will be changed to /bin/zsh."
+
+procedure_define dotfiles
+procedure_handler dotfiles action_apply_dotfiles
+procedure_platforms dotfiles arch debian fedora
+message_define procedure.dotfiles.question \
+  "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
+message_define procedure.dotfiles.label \
+  "Apply dotfiles, Zsh config and wallpapers"
+message_define procedure.dotfiles.description \
+  "Stow will apply .configs, zsh_common, wallpaper, and zsh_linux from the Dotfiles directory."
 
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
@@ -49,23 +69,3 @@ message_define procedure.homebrew_extended.label \
   "Install the extended Homebrew package set"
 message_define procedure.homebrew_extended.description \
   "An additional tap will be added when needed. Select the packages to install:"
-
-procedure_define dotfiles
-procedure_handler dotfiles action_apply_dotfiles
-procedure_platforms dotfiles arch debian fedora
-message_define procedure.dotfiles.question \
-  "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
-message_define procedure.dotfiles.label \
-  "Apply dotfiles, Zsh config and wallpapers"
-message_define procedure.dotfiles.description \
-  "Stow will apply .configs, zsh_common, wallpaper, and zsh_linux from the Dotfiles directory."
-
-procedure_define yay
-procedure_handler yay action_install_yay
-procedure_platforms yay arch
-procedure_requires_root yay
-procedure_packages yay native yay_prerequisites
-message_define procedure.yay.question "Install yay?"
-message_define procedure.yay.label "Install yay"
-message_define procedure.yay.description \
-  "The build dependencies will be installed first. Then yay will be built from the AUR and installed:"
