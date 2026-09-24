@@ -31,16 +31,6 @@ message_define procedure.zsh_default.label "Set zsh as the default shell"
 message_define procedure.zsh_default.description \
   "The current user's login shell will be changed to /bin/zsh."
 
-procedure_define dotfiles
-procedure_handler dotfiles action_apply_dotfiles
-procedure_platforms dotfiles arch debian fedora macos
-message_define procedure.dotfiles.question \
-  "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
-message_define procedure.dotfiles.label \
-  "Apply dotfiles, Zsh config and wallpapers"
-message_define procedure.dotfiles.description \
-  "Stow will apply .configs, zsh_common, wallpaper, and the platform-specific zsh configuration from the Dotfiles directory."
-
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
 procedure_platforms homebrew arch debian fedora macos
@@ -69,3 +59,13 @@ message_define procedure.homebrew_extended.label \
   "Install the extended Homebrew package set"
 message_define procedure.homebrew_extended.description \
   "An additional tap will be added when needed. Select the packages to install:"
+
+procedure_define dotfiles
+procedure_handler dotfiles action_apply_dotfiles
+procedure_platforms dotfiles arch debian fedora macos
+message_define procedure.dotfiles.question \
+  "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
+message_define procedure.dotfiles.label \
+  "Apply dotfiles, Zsh config and wallpapers"
+message_define procedure.dotfiles.description \
+  "Stow will apply .configs, zsh_common, wallpaper, and the platform-specific zsh configuration from the Dotfiles directory."
