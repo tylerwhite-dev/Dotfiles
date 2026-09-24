@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
 package_group native arch \
-  sudo git git-lfs curl openssh zsh nano stow file wl-clipboard
+  sudo git git-lfs curl openssh zsh file wl-clipboard base-devel
 
 package_group native debian \
-  sudo git git-lfs curl ssh zsh nala nano stow file wl-clipboard build-essential
+  sudo git git-lfs curl ssh zsh nala file wl-clipboard build-essential
 
 package_group native fedora \
-  sudo git git-lfs curl openssh-clients zsh nano stow file wl-clipboard gcc
+  sudo git git-lfs curl openssh-clients zsh file wl-clipboard gcc
 
 package_group native yay_prerequisites \
-  base-devel go
+  go
 
 package_group brew extensions \
   starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs
