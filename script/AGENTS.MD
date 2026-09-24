@@ -1,11 +1,16 @@
 # Script setup guide
 
-This directory contains the interactive Linux setup program for the Dotfiles
-repository. The program asks for all choices first, shows a review screen, and
-only then runs the selected procedures. `SETUP_DRY_RUN=1` keeps the same flow
-but prints commands without changing the system. The `--yolo` flag answers
-`yes` to every question and skips the review screen, so all available
+This directory contains the interactive Linux and macOS setup program for the
+Dotfiles repository. The program asks for all choices first, shows a review
+screen, and only then runs the selected procedures. `SETUP_DRY_RUN=1` keeps the
+same flow but prints commands without changing the system. The `--yolo` flag
+answers `yes` to every question and skips the review screen, so all available
 procedures run without confirmation.
+
+The script requires bash 5 or newer. macOS ships bash 3.2 in `/bin/bash`, so run
+it on macOS with a Homebrew bash, for example
+`/opt/homebrew/bin/bash dotfiles-deploy.sh`; the entry point prints this
+instruction when an older bash is used.
 
 ## Entry point and runtime flow
 
@@ -26,7 +31,8 @@ The application flow is:
    is given, which skips the interactive requirement.
 3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
    platforms, and package references.
-4. `environment_detect` maps `/etc/os-release` to `arch`, `debian`, or `fedora`.
+4. `environment_detect` maps `/etc/os-release` or `sw_vers` to `arch`,
+   `debian`, `fedora`, or `macos`.
 5. `questionnaire_collect` resets selections and asks one question per available
    procedure. It does not execute commands. In `--yolo` mode every available
    procedure is selected without prompting. A procedure marked with
@@ -55,7 +61,7 @@ The application flow is:
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
 | `logic/flags.sh` | CLI flag parsing for `--yolo`, `--dry-run`, and `--help`. |
-| `logic/environment.sh` | Linux distribution detection. |
+| `logic/environment.sh` | Linux and macOS system detection. |
 | `logic/workflow.sh` | In-memory yes/no selections and dependency filtering. |
 | `logic/questionnaire.sh` | Business flow for questions, summary, and final action choice. |
 | `logic/process.sh` | Runs one action with plain or animated output and records its status. |
@@ -90,15 +96,17 @@ Declare procedures in `config/procedures.sh` with this order:
 ```bash
 procedure_define example
 procedure_handler example action_run_example
-procedure_platforms example arch debian fedora
+procedure_platforms example arch debian fedora macos
 procedure_requires example other_procedure
-procedure_requires_root example
+procedure_requires_root example arch debian fedora
 procedure_packages example native example_packages
 ```
 
 Only the first three declarations are required. The procedure ID must be a
 lowercase identifier. A requirement must refer to a procedure declared earlier;
 when it is not selected, the dependent procedure is omitted from execution.
+`procedure_requires_root` lists the platforms that need root privileges; a
+procedure whose platforms are not listed runs without sudo.
 
 ### Package group
 
@@ -186,7 +194,7 @@ interfaces are grouped below for quick navigation.
 - Execution: `executor_initialize`, `executor_is_dry_run`, `executor_run`,
   `executor_require`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
-  `executor_temp_file`, and `executor_brew`.
+  `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
 - UI: `ui_select`, `ui_multiselect`, `ui_stage`, `ui_summary_item`,
   `ui_summary_item_packages`, `ui_detail`,
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
@@ -200,7 +208,9 @@ stable interface is intentionally introduced.
 
 ## Validation
 
-Run these checks from the repository root in a Linux shell or WSL:
+The suite requires bash 5 and runs from the repository root. On macOS install
+Homebrew bash first (`brew install bash`) and run it with
+`/opt/homebrew/bin/bash`:
 
 ```bash
 bash script/tests/config_validation.sh
@@ -210,6 +220,7 @@ bash script/tests/layer_dependencies.sh
 bash script/tests/execution_dry_run.sh fedora
 bash script/tests/execution_dry_run.sh debian
 bash script/tests/execution_dry_run.sh arch
+bash script/tests/execution_dry_run.sh macos
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit

@@ -5,7 +5,7 @@
 procedure_define native_packages
 procedure_handler native_packages action_install_native_packages
 procedure_platforms native_packages arch debian fedora
-procedure_requires_root native_packages
+procedure_requires_root native_packages arch debian fedora
 procedure_packages native_packages native @distribution
 message_define procedure.native_packages.question "Install base system packages?"
 message_define procedure.native_packages.label "Install base system packages"
@@ -15,7 +15,7 @@ message_define procedure.native_packages.description \
 procedure_define yay
 procedure_handler yay action_install_yay
 procedure_platforms yay arch
-procedure_requires_root yay
+procedure_requires_root yay arch
 procedure_packages yay native yay_prerequisites
 message_define procedure.yay.question "Install yay?"
 message_define procedure.yay.label "Install yay"
@@ -25,7 +25,7 @@ message_define procedure.yay.description \
 procedure_define zsh_default
 procedure_handler zsh_default action_set_zsh_default
 procedure_platforms zsh_default arch debian fedora
-procedure_requires_root zsh_default
+procedure_requires_root zsh_default arch debian fedora
 message_define procedure.zsh_default.question "Set zsh as the default shell?"
 message_define procedure.zsh_default.label "Set zsh as the default shell"
 message_define procedure.zsh_default.description \
@@ -33,18 +33,18 @@ message_define procedure.zsh_default.description \
 
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles
-procedure_platforms dotfiles arch debian fedora
+procedure_platforms dotfiles arch debian fedora macos
 message_define procedure.dotfiles.question \
   "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
 message_define procedure.dotfiles.label \
   "Apply dotfiles, Zsh config and wallpapers"
 message_define procedure.dotfiles.description \
-  "Stow will apply .configs, zsh_common, wallpaper, and zsh_linux from the Dotfiles directory."
+  "Stow will apply .configs, zsh_common, wallpaper, and the platform-specific zsh configuration from the Dotfiles directory."
 
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
-procedure_platforms homebrew arch debian fedora
-procedure_requires_root homebrew
+procedure_platforms homebrew arch debian fedora macos
+procedure_requires_root homebrew arch debian fedora
 procedure_packages homebrew \
   brew extensions \
   brew cli_tools \
@@ -58,7 +58,7 @@ message_define procedure.homebrew.description \
 
 procedure_define homebrew_extended
 procedure_handler homebrew_extended action_install_homebrew_extended
-procedure_platforms homebrew_extended arch debian fedora
+procedure_platforms homebrew_extended arch debian fedora macos
 procedure_requires homebrew_extended homebrew
 procedure_selectable homebrew_extended
 procedure_packages homebrew_extended \

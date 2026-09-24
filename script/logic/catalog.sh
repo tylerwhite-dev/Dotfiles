@@ -38,7 +38,7 @@ procedure_define() {
   _CATALOG_PROCEDURE_HANDLER["$id"]=""
   _CATALOG_PROCEDURE_PLATFORMS["$id"]=""
   _CATALOG_PROCEDURE_REQUIREMENT["$id"]=""
-  _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]="no"
+  _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]=""
   _CATALOG_PROCEDURE_SELECTABLE["$id"]="no"
   _CATALOG_PROCEDURE_PACKAGE_REFS["$id"]=""
 }
@@ -74,10 +74,19 @@ procedure_requires() {
   _CATALOG_PROCEDURE_REQUIREMENT["$1"]="$2"
 }
 
-# Marks a procedure as requiring root privileges.
+# Marks a procedure as requiring root privileges on the listed platforms.
 procedure_requires_root() {
-  _catalog_require_procedure "$1" || return
-  _CATALOG_PROCEDURE_REQUIRES_ROOT["$1"]="yes"
+  local id="$1"
+  shift
+
+  _catalog_require_procedure "$id" || return
+
+  if (($# == 0)); then
+    printf 'Root requirement for procedure %s needs at least one platform.\n' "$id" >&2
+    return 1
+  fi
+
+  _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]="$*"
 }
 
 # Marks a procedure as offering a package-by-package checkbox selection.
@@ -127,9 +136,15 @@ catalog_requirement() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_REQUIREMENT[$2]}"
 }
 
-# Returns whether a procedure was marked as requiring root privileges.
+# Returns whether a procedure requires root privileges on a platform.
 catalog_requires_root() {
-  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$2]}"
+  local platforms=" ${_CATALOG_PROCEDURE_REQUIRES_ROOT[$2]:-} "
+
+  if [[ "$platforms" == *" ${3} "* ]]; then
+    printf -v "$1" '%s' yes
+  else
+    printf -v "$1" '%s' no
+  fi
 }
 
 # Copies a procedure's selectable flag into the caller-provided variable.
@@ -275,11 +290,13 @@ catalog_validate() {
         "$id" "$requirement" >&2
       return 1
     fi
-    if [[ "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$id]}" != "yes" && \
-      "${_CATALOG_PROCEDURE_REQUIRES_ROOT[$id]}" != "no" ]]; then
-      printf 'Procedure %s has an invalid root requirement.\n' "$id" >&2
-      return 1
-    fi
+    for platform in ${_CATALOG_PROCEDURE_REQUIRES_ROOT[$id]}; do
+      if ! catalog_is_available "$id" "$platform"; then
+        printf 'Procedure %s requires root on unsupported platform: %s\n' \
+          "$id" "$platform" >&2
+        return 1
+      fi
+    done
     if [[ "${_CATALOG_PROCEDURE_SELECTABLE[$id]}" != "yes" && \
       "${_CATALOG_PROCEDURE_SELECTABLE[$id]}" != "no" ]]; then
       printf 'Procedure %s has an invalid selectable flag.\n' "$id" >&2

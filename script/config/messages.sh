@@ -5,7 +5,7 @@ message_define error.interactive_required \
 message_define error.config_invalid \
   "Could not load the setup configuration."
 message_define error.distribution_unsupported \
-  $'The distribution could not be detected or is not supported.\nSupported distributions: Arch Linux, Debian, Ubuntu, and Fedora.'
+  $'The system could not be detected or is not supported.\nSupported systems: Arch Linux, Debian, Ubuntu, Fedora, and macOS.'
 message_define error.dry_run_invalid \
   "SETUP_DRY_RUN must be 0 or 1."
 message_define error.unknown_flag \
@@ -36,7 +36,7 @@ message_define error.flags_conflict \
   "Conflicting flags: --yolo and --add-optionals cannot be used together."
 
 message_define status.distribution_detected \
-  "Detected distribution: %s"
+  "Detected system: %s"
 message_define status.settings_confirmed \
   "Settings confirmed."
 message_define status.yolo_mode \

@@ -1,12 +1,20 @@
 #!/usr/bin/env bash
 
-# Downloads and runs the Linux Homebrew installer when Homebrew is absent.
+# Downloads and runs the Homebrew installer when Homebrew is absent.
+# On macOS no system directories or root privileges are needed.
 _action_install_homebrew_binary() {
   local installer
+  local setup_dir=0
+
+  if [[ "${OSTYPE:-}" != darwin* ]]; then
+    setup_dir=1
+  fi
 
   installer="$(executor_temp_file)" || return
-  executor_run_as_root mkdir -p /home/linuxbrew || return
-  executor_run_as_root chown "$(id -u):$(id -g)" /home/linuxbrew || return
+  if ((setup_dir)); then
+    executor_run_as_root mkdir -p /home/linuxbrew || return
+    executor_run_as_root chown "$(id -u):$(id -g)" /home/linuxbrew || return
+  fi
   executor_download \
     https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh \
     "$installer" || return
@@ -27,17 +35,20 @@ _action_install_homebrew_binary() {
 action_install_homebrew() {
   local platform="$1"
   local -a packages=()
+  local brew_bin
 
-  if executor_is_dry_run || [[ ! -x "$SETUP_BREW_BIN" ]]; then
+  brew_bin="$(executor_brew_bin)"
+
+  if executor_is_dry_run || [[ ! -x "$brew_bin" ]]; then
     _action_install_homebrew_binary || return
   fi
 
-  if ! executor_is_dry_run && [[ ! -x "$SETUP_BREW_BIN" ]]; then
-    error_report error.homebrew_missing "$SETUP_BREW_BIN"
+  if ! executor_is_dry_run && [[ ! -x "$brew_bin" ]]; then
+    error_report error.homebrew_missing "$brew_bin"
     return 1
   fi
 
-  executor_run "$SETUP_BREW_BIN" --version || return
+  executor_run "$brew_bin" --version || return
   catalog_packages packages homebrew "$platform" brew || return
   executor_brew install "${packages[@]}" || return
   catalog_packages packages homebrew "$platform" brew_cask || return

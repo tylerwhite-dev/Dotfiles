@@ -6,6 +6,9 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
+The setup script at the repository root can run the installation and the
+package groups below for you; see [`script/README.md`](../../script/README.md).
+
 # packages
 
 ## casks

@@ -129,12 +129,35 @@ executor_temp_file() {
   "_executor_${_executor_adapter}_temp_file"
 }
 
+# Returns the Homebrew binary path for the current platform.
+executor_brew_bin() {
+  case "${OSTYPE:-}" in
+    darwin*)
+      if [[ -x /opt/homebrew/bin/brew ]]; then
+        printf '%s\n' /opt/homebrew/bin/brew
+      elif [[ -x /usr/local/bin/brew ]]; then
+        printf '%s\n' /usr/local/bin/brew
+      elif [[ "$(uname -m)" == "arm64" ]]; then
+        printf '%s\n' /opt/homebrew/bin/brew
+      else
+        printf '%s\n' /usr/local/bin/brew
+      fi
+      ;;
+    *)
+      printf '%s\n' "$SETUP_BREW_BIN"
+      ;;
+  esac
+}
+
 # Runs a Homebrew command with stable no-prompt and retry settings.
 executor_brew() {
+  local brew_bin
+  brew_bin="$(executor_brew_bin)"
+
   executor_retry "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" env \
     HOMEBREW_NO_ANALYTICS=1 \
     HOMEBREW_NO_ASK=1 \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     HOMEBREW_CURL_RETRIES=3 \
-    "$SETUP_BREW_BIN" "$@"
+    "$brew_bin" "$@"
 }

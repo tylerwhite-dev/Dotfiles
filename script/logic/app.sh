@@ -29,6 +29,7 @@ setup_run() {
   local brew_yes_option
   local brew_no_option
   local brew_selected_index
+  local brew_bin
   local -a selected_optionals=()
   local -a yolo_available=()
   local procedure_id
@@ -58,7 +59,8 @@ setup_run() {
       return 1
     fi
 
-    if ! executor_is_dry_run && [[ ! -x "$SETUP_BREW_BIN" ]]; then
+    brew_bin="$(executor_brew_bin)"
+    if ! executor_is_dry_run && [[ ! -x "$brew_bin" ]]; then
       message_format brew_prompt prompt.brew_install
       message_format brew_yes_option option.yes
       message_format brew_no_option option.no

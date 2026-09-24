@@ -2,10 +2,16 @@
 
 # Applies the repository's Stow packages after checking its marker file.
 action_apply_dotfiles() {
-  local _platform="$1"
+  local platform="$1"
   local repository_dir="$2"
-  local packages=(. zsh_common wallpaper zsh_linux)
+  local -a packages=()
   local package
+
+  if [[ "$platform" == "macos" ]]; then
+    packages=(. zsh_common wallpaper zsh_mac)
+  else
+    packages=(. zsh_common wallpaper zsh_linux)
+  fi
 
   if [[ ! -f "${repository_dir}/.stow-local-ignore" ]]; then
     error_report error.repository_marker_missing \

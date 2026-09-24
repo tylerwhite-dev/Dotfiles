@@ -36,7 +36,7 @@ runner_run() {
   for procedure_id in "${selected[@]}"; do
     ((current += 1))
     catalog_handler handler "$procedure_id"
-    catalog_requires_root requires_root "$procedure_id"
+    catalog_requires_root requires_root "$procedure_id" "$platform"
     message_format label "procedure.${procedure_id}.label"
 
     process_run \

@@ -16,7 +16,8 @@ package_group brew extensions \
   starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs
 
 package_group brew cli_tools \
-  herdr superfile neovim btop opencode lazygit fastfetch zip zoxide fzf eza
+  herdr superfile neovim btop opencode lazygit fastfetch zip zoxide fzf eza \
+  stow git git-lfs
 
 package_group brew_cask fonts \
   font-jetbrains-mono-nerd-font font-hack-nerd-font

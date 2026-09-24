@@ -6,10 +6,10 @@ script_root="$(cd -- "${test_dir}/.." && pwd)"
 platform="${1:-}"
 
 case "$platform" in
-  arch | debian | fedora)
+  arch | debian | fedora | macos)
     ;;
   *)
-    printf 'Usage: %s {arch|debian|fedora}\n' "$0" >&2
+    printf 'Usage: %s {arch|debian|fedora|macos}\n' "$0" >&2
     exit 2
     ;;
 esac

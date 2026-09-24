@@ -2,7 +2,9 @@
 
 ## Automated tests (non-interactive)
 
-Run from the repository root in a Linux shell or WSL:
+The suite requires bash 5. Run from the repository root. On macOS install
+Homebrew bash first (`brew install bash`) and run with
+`/opt/homebrew/bin/bash`:
 
 ```bash
 bash script/tests/config_validation.sh
@@ -12,6 +14,7 @@ bash script/tests/layer_dependencies.sh
 bash script/tests/execution_dry_run.sh fedora
 bash script/tests/execution_dry_run.sh debian
 bash script/tests/execution_dry_run.sh arch
+bash script/tests/execution_dry_run.sh macos
 ```
 
 | Script | What it verifies |
@@ -20,7 +23,7 @@ bash script/tests/execution_dry_run.sh arch
 | `workflow.sh` | In-memory yes/no selection and dependency filtering rules. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
-| `execution_dry_run.sh {arch\|debian\|fedora}` | Full setup flow in dry-run mode prints commands without changing the system. |
+| `execution_dry_run.sh {arch\|debian\|fedora\|macos}` | Full setup flow in dry-run mode prints commands without changing the system. |
 
 ## Manual UI tests (interactive)
 

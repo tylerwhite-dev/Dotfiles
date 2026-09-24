@@ -6,6 +6,11 @@ Run the interactive setup from any directory:
 bash /path/to/Dotfiles/dotfiles-deploy.sh
 ```
 
+The script requires bash 5 or newer. On macOS the system ships bash 3.2, so use
+a Homebrew bash (`brew install bash`, then
+`/opt/homebrew/bin/bash dotfiles-deploy.sh`); the entry point prints this
+instruction otherwise.
+
 The executable entry point lives at the repository root and loads this
 `script/` directory for its logic, configuration, and UI.
 
@@ -53,8 +58,8 @@ Add a block to `config/procedures.sh`:
 ```bash
 procedure_define example
 procedure_handler example action_run_example
-procedure_platforms example arch debian fedora
-procedure_requires_root example
+procedure_platforms example arch debian fedora macos
+procedure_requires_root example arch debian fedora
 procedure_packages example native example_packages
 message_define procedure.example.question "Run the example?"
 message_define procedure.example.label "Run the example"
@@ -62,10 +67,11 @@ message_define procedure.example.description "These packages will be installed:"
 ```
 
 Only `procedure_define`, `procedure_handler`, and `procedure_platforms` are
-required. Use `procedure_requires`, `procedure_requires_root`, and
-`procedure_packages` when the procedure needs them. Put package groups in
-`config/packages.sh`. Mark a procedure with `procedure_selectable` to present
-its packages as a checkbox list and install only the chosen items.
+required. Use `procedure_requires`, `procedure_requires_root` (lists the
+platforms that need sudo), and `procedure_packages` when the procedure needs
+them. Put package groups in `config/packages.sh`. Mark a procedure with
+`procedure_selectable` to present its packages as a checkbox list and install
+only the chosen items.
 
 Add the action to a file under `logic/actions/`:
 
@@ -107,6 +113,7 @@ For a non-interactive execution check, run:
 bash script/tests/execution_dry_run.sh fedora
 bash script/tests/execution_dry_run.sh arch
 bash script/tests/execution_dry_run.sh debian
+bash script/tests/execution_dry_run.sh macos
 ```
 
 Validate declarations and dependency behavior with:
