@@ -9,6 +9,7 @@ ui_color_hint=""
 ui_color_comment=""
 ui_color_selected=""
 ui_color_package=""
+ui_color_group=""
 
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   ui_color_reset=$'\033[0m'
@@ -20,6 +21,7 @@ if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   ui_color_comment=$'\033[0;33m'
   ui_color_selected=$'\033[1;34m'
   ui_color_package=$'\033[90m'
+  ui_color_group=$'\033[1;2m'
 fi
 
 ui_timeline_frames=('◎' '◉' '●' '◉' '◎' '○')

@@ -16,17 +16,16 @@ _questionnaire_read_selectable_packages() {
   local current="$3"
   local total="$4"
   local question
-  local description
   local prompt
-  local -a packages=()
+  local -a rows=()
+  local -a kinds=()
   local -a selected=()
 
   _questionnaire_procedure_text question "$procedure_id" question
-  _questionnaire_procedure_text description "$procedure_id" description
   message_format prompt question.progress "$current" "$total" "$question"
-  catalog_packages packages "$procedure_id" "$platform" brew || return
+  catalog_package_rows rows kinds "$procedure_id" "$platform" brew || return
 
-  if ! ui_multiselect selected "$prompt" "${packages[@]}"; then
+  if ! ui_multiselect_grouped selected "$prompt" rows kinds; then
     error_report error.input_interrupted
     return 1
   fi

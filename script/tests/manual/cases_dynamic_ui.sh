@@ -226,3 +226,86 @@ run_ui_multiselect() {
     _multiselect_no_options
   _series_end
 }
+
+_grouped_rows=(
+  'Dev tools'
+  'go' 'nvm' 'rustup'
+  'Media'
+  'yt-dlp' 'ffmpeg'
+)
+_grouped_kinds=(g i i i g i i)
+
+_grouped_choose() {
+  local -a chosen=()
+  local status=0
+  ui_multiselect_grouped chosen "Select packages:" \
+    _grouped_rows _grouped_kinds || status=$?
+  printf '\n'
+  if ((status != 0)); then
+    _test_msg "  Menu exited with code ${status}"
+    return "$status"
+  fi
+  _multiselect_done "${chosen[@]}"
+}
+
+_multiselect_group_header() {
+  _grouped_choose
+}
+
+_multiselect_group_toggle() {
+  _grouped_choose
+}
+
+_multiselect_group_partial() {
+  _grouped_choose
+}
+
+_multiselect_group_all() {
+  _grouped_choose
+}
+
+_multiselect_group_mixed() {
+  _grouped_choose
+}
+
+_multiselect_group_scroll() {
+  _grouped_choose
+}
+
+_multiselect_group_real() {
+  local -a chosen=()
+  local status=0
+  local -a rows=()
+  local -a kinds=()
+  if ! catalog_package_rows rows kinds homebrew_extended macos brew; then
+    _test_msg "  catalog_package_rows failed"
+    return 1
+  fi
+  ui_multiselect_grouped chosen "Select extra packages:" rows kinds || status=$?
+  printf '\n'
+  if ((status != 0)); then
+    _test_msg "  Menu exited with code ${status}"
+    return "$status"
+  fi
+  _multiselect_done "${chosen[@]}"
+}
+
+run_ui_multiselect_grouped() {
+  _series_begin "ui_multiselect_grouped" \
+    "grouped checkbox list: group headers, tri-state, All shortcut, real catalog"
+  _case "Press Enter immediately: headers shown, no blank line before the first group, result empty" \
+    _multiselect_group_header
+  _case "Space on a group header: selects exactly that group, header shows [x], count matches" \
+    _multiselect_group_toggle
+  _case "Toggle one item inside a group: header shows [-], only that item selected" \
+    _multiselect_group_partial
+  _case "Space on All: every group and item shows [x], result lists every package; press Space on All again to clear" \
+    _multiselect_group_all
+  _case "All, then Space on one group header: only that group clears, others stay [x]" \
+    _multiselect_group_mixed
+  _case "Long grouped list: cursor moves across headers and items, blank line appears between groups" \
+    _multiselect_group_scroll
+  _case "Real catalog (homebrew_extended): four groups render with the production package names" \
+    _multiselect_group_real
+  _series_end
+}

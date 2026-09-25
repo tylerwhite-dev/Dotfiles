@@ -72,6 +72,18 @@ them. Put package groups in `config/packages.sh`. Mark a procedure with
 only the chosen items. `procedure_finish_handler` runs after the main action
 succeeds, with direct terminal output for commands that may ask for input.
 
+Group the checkbox list by registering categories that name existing groups and
+carry a display label, then reference a category from the procedure:
+
+```bash
+package_category brew extended "Dev tools" extended_dev_tools extended_terminal
+procedure_packages homebrew_extended brew extended
+```
+
+Grouping only changes how the questionnaire renders the list. An action still
+calls `catalog_packages` to get the flat package list, and
+`catalog_package_rows` is what the questionnaire uses to draw the groups.
+
 Add the action to a file under `logic/actions/`:
 
 ```bash

@@ -15,7 +15,7 @@ bash script/tests/layer_dependencies.sh
 
 | Script | What it verifies |
 | --- | --- |
-| `config_validation.sh` | Procedure and package catalog declarations are valid. |
+| `config_validation.sh` | Procedure and package catalog declarations are valid, including category groups, grouped row output, and declaration errors. |
 | `workflow.sh` | In-memory yes/no selection and dependency filtering rules. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
@@ -63,6 +63,7 @@ bash script/tests/manual/dynamic_ui.sh --list      # list available components
 | --- | --- |
 | `ui_select` | Single-choice menu: keyboard navigation, default highlight, detail text, the yes/no questionnaire question (2 options), many options, exit codes. |
 | `ui_multiselect` | Checkbox list: Space toggle, All shortcut, count line, resulting selection, duplicates, exit codes. |
+| `ui_multiselect_grouped` | Grouped checkbox list: group headers, blank line between groups, `[-]` partial state, Space on a group header, All shortcut, cursor movement across headers, and the real `homebrew_extended` catalog. |
 
 Note: the questionnaire's yes/no questions are not a separate element — they
 are `ui_select` with two options (`Yes`/`No`), covered in the `ui_select` suite.

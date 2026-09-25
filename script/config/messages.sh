@@ -85,6 +85,7 @@ message_define option.restart "Restart questionnaire"
 message_define option.exit "Exit without changes"
 message_define label.yes "yes"
 message_define label.no "no"
+message_define package_category_other "Other"
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
 

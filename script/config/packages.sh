@@ -22,9 +22,21 @@ package_group brew cli_tools \
 package_group brew_cask fonts \
   font-jetbrains-mono-nerd-font font-hack-nerd-font
 
-package_group brew optional \
-  go nvm rustup uv sdkman-cli \
-  lazydocker nvtop tio \
-  yt-dlp ffmpeg ffmpeg-full \
-  imagemagick imagemagick-full \
-  taproom tmux yazi mailsy
+# Optional packages. A group is a plain list; a category is a labeled group of
+# groups that the checkbox list renders as one section.
+package_group brew toolchains \
+  go nvm rustup uv sdkman-cli
+
+package_group brew shell_addons \
+  tmux yazi mailsy taproom
+
+package_group brew monitors \
+  lazydocker nvtop tio
+
+package_group brew media_tools \
+  yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
+
+package_category brew dev_tools "Dev tools" toolchains
+package_category brew terminal "Terminal" shell_addons
+package_category brew monitoring "Monitoring" monitors
+package_category brew media "Media" media_tools

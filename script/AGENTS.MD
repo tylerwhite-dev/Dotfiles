@@ -37,6 +37,7 @@ The application flow is:
    procedure is selected without prompting. A procedure marked with
    `procedure_selectable` shows a checkbox list instead of a plain yes/no
    question, and records the chosen packages with `workflow_select_packages`.
+   The list is grouped under the categories its package references name.
 6. `questionnaire_confirm` renders the selected procedures and waits for
    `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
    `--yolo` mode this step is skipped and execution starts immediately.
@@ -114,6 +115,34 @@ succeeds, with direct terminal output so interactive prompts remain visible.
 platform. `catalog_packages` expands one procedure's references into an array
 for an action.
 
+### Package category
+
+`package_category` names an ordered set of package groups under a
+`source:category` key and gives it a display label. A procedure may reference a
+category instead of a group, and the questionnaire then renders a grouped
+checkbox list:
+
+```bash
+package_category brew extended "Dev tools" extended_dev_tools extended_terminal
+procedure_packages homebrew_extended brew extended
+```
+
+Every member group must already be declared and must not be empty, because a
+group row with no items would render as a row the cursor can reach but Space
+cannot act on. A member must also be a group, not another category, and a
+category name may not collide with a group name.
+
+`catalog_package_rows` returns two parallel arrays for that list: display rows
+and row kinds, where `g` is a group row that owns the following `i` item rows.
+`catalog_packages` still returns the flat package list, and the item rows always
+match it in order, so grouping is a presentation concern only. References that
+are plain groups appear under a fallback group labeled by the
+`package_category_other` message. A procedure with no category references
+produces a plain item list with no group rows.
+
+Neither function de-duplicates: referencing the same group twice lists its
+packages twice. Keep a procedure's references disjoint.
+
 ### Message template
 
 `message_define` registers immutable text by key. `message_format` expands a
@@ -133,7 +162,9 @@ in `_WORKFLOW_PACKAGE_SELECTIONS`. `workflow_select_packages` stores them,
 `workflow_select_packages_all` selects every available package for the
 non-interactive `--yolo` path. An action for a selectable procedure must call
 `workflow_selected_packages` instead of `catalog_packages` to install only the
-chosen packages.
+chosen packages. The questionnaire asks for those packages with
+`ui_multiselect_grouped`, which returns the checked item rows only; group rows
+and the `All` row are never part of the result.
 
 ### Command execution
 
@@ -154,9 +185,14 @@ successful process ends with `●`; a failure ends with `×`.
 ## Layer rules
 
 - `config/` declares data through catalog and message interfaces. It must not
-  call UI, workflow, executor, or system commands.
+  call UI, workflow, executor, or system commands. A category label is
+  display text passed to the UI as a row, so it belongs in
+  `config/packages.sh` rather than in a message key.
 - `ui/` renders values passed by callers. It must not know procedure IDs,
   package groups, workflow state, executors, or message keys.
+  `catalog_package_rows` returns display rows and row kinds as parallel arrays;
+  the catalog emits the kinds but only the UI interprets them, so `g` and `i`
+  stay out of the catalog's own vocabulary.
 - `logic/` owns ordering, validation, selection, environment, and process
   behavior. It may call catalog, message, UI, and executor interfaces.
 - `logic/actions/` owns system changes for one procedure. Actions receive
@@ -164,6 +200,11 @@ successful process ends with `●`; a failure ends with `×`.
   shell status. They do not format messages or render UI directly.
 - `config/messages.sh` is the only place for user-facing setup text. Errors in
   actions should use `error_report <message-key>`.
+- Functions that take arrays by name (`ui_multiselect_grouped` and the private
+  checkbox helpers) must be given distinct names for every array role. A
+  nameref resolves to the nearest visible declaration, so reusing a name makes
+  the result overwrite the caller's input instead of failing. `ui_multiselect`
+  renames its own locals for the same reason.
 
 Keep interfaces narrow. When a new procedure is needed, add one declaration
 block, its messages, its package groups if any, and one action file. Avoid
@@ -174,12 +215,13 @@ putting procedure-specific branching into the runner or UI.
 The source comments give the local contract for every function. The main
 interfaces are grouped below for quick navigation.
 
-- Catalog: `package_group`, `procedure_define`, `procedure_handler`,
+- Catalog: `package_group`, `package_category`, `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
   `procedure_selectable`, `procedure_packages`, `catalog_procedure_ids`,
   `catalog_handler`, `catalog_finish_handler`, `catalog_requirement`, `catalog_requires_root`,
-  `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`, and
+  `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`,
+  `catalog_package_rows`, and
   `catalog_validate`.
 - Messages: `message_define`, `message_format`, `message_exists`.
 - Flags: `flags_parse`.
@@ -192,7 +234,7 @@ interfaces are grouped below for quick navigation.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
-- UI: `ui_select`, `ui_multiselect`, `ui_stage`, `ui_summary_item`,
+- UI: `ui_select`, `ui_multiselect`, `ui_multiselect_grouped`, `ui_stage`, `ui_summary_item`,
   `ui_summary_item_packages`, `ui_detail`,
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
