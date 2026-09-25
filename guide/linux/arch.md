@@ -12,6 +12,40 @@ yay -Syyu && brew upgrade -y && flatpak update -y
 yay -Scc && brew cleanup && flatpak uninstall --unused -y
 ```
 
+## WSL fast setup
+
+Install the official Arch Linux WSL image from PowerShell:
+
+```powershell
+wsl --install archlinux
+```
+
+On the first launch, Arch opens as `root`. Run these commands in Arch WSL:
+
+```bash
+pacman -Syu --noconfirm && pacman -S --needed git sudo --noconfirm
+ARCH_USER=tyler
+useradd -m -G wheel -s /bin/bash "$ARCH_USER"
+passwd "$ARCH_USER"
+printf '%s\n' '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel
+chmod 0440 /etc/sudoers.d/10-wheel
+visudo -cf /etc/sudoers
+```
+
+Set that user as the WSL default from PowerShell, then reopen Arch:
+
+```powershell
+wsl --manage archlinux --set-default-user tyler
+```
+
+Run the deployment as the new user:
+
+```bash
+git clone https://github.com/tylerwhite-dev/Dotfiles
+chmod +x ~/Dotfiles/dotfiles-deploy.sh
+bash ~/Dotfiles/dotfiles-deploy.sh
+```
+
 ## apps
 `
 loupe - images;
