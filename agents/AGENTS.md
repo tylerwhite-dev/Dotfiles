@@ -5,10 +5,10 @@
 - Full Linux setup: `bash dotfiles-deploy.sh`
 - Automated (no prompts): `bash dotfiles-deploy.sh --yolo`
 - Apply configs only, from the repository root:
-  `stow --no-folding --dir="$(dirname "$PWD")" --target="$HOME" "$(basename "$PWD")"`
-- Apply common Zsh config: `stow --no-folding --target="$HOME" zsh_common`
-- Apply platform Zsh config: `stow --no-folding --target="$HOME" zsh_linux` or
-  `stow --no-folding --target="$HOME" zsh_mac`
+  `stow --no-folding --override='.*' --dir="$(dirname "$PWD")" --target="$HOME" "$(basename "$PWD")"`
+- Apply common Zsh config: `stow --no-folding --override='.*' --target="$HOME" zsh_common`
+- Apply platform Zsh config: `stow --no-folding --override='.*' --target="$HOME" zsh_linux` or
+  `stow --no-folding --override='.*' --target="$HOME" zsh_mac`
 
 ## Key Architecture Facts
 

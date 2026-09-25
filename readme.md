@@ -30,18 +30,21 @@ Run these commands from the repository root.
 ### Common Zsh configuration
 
 ```bash
-stow --no-folding --target="$HOME" zsh_common
+stow --no-folding --override='.*' --target="$HOME" zsh_common
 ```
 
 ### Platform-specific Zsh configuration
 
 ```bash
-stow --no-folding --target="$HOME" zsh_linux  # Linux
-stow --no-folding --target="$HOME" zsh_mac    # macOS
+stow --no-folding --override='.*' --target="$HOME" zsh_linux  # Linux
+stow --no-folding --override='.*' --target="$HOME" zsh_mac    # macOS
 ```
 
 ### Other configurations
 
 ```bash
-stow --no-folding --dir="$(dirname "$PWD")" --target="$HOME" "$(basename "$PWD")"
+stow --no-folding --override='.*' --dir="$(dirname "$PWD")" --target="$HOME" "$(basename "$PWD")"
 ```
+
+`--override` replaces links managed by another Stow package. Existing regular
+files still cause a conflict and must be resolved separately.
