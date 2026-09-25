@@ -55,8 +55,8 @@ procedure_selectable homebrew_extended
 procedure_packages homebrew_extended \
   brew dev_tools \
   brew terminal \
-  brew monitoring \
-  brew media
+  brew media \
+  brew harness
 message_define procedure.homebrew_extended.question \
   "Select the extended Homebrew packages to install?"
 message_define procedure.homebrew_extended.label \
