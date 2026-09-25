@@ -19,7 +19,7 @@
 - GNU Stow creates symlinks for dotfiles and platform-specific Zsh settings.
 - The setup script supports Arch, Debian/Ubuntu, and Fedora Linux.
 - Homebrew provides most CLI tools and extensions on Linux.
-- Detailed script interfaces and entities are documented in `script/AGENTS.MD`.
+- Detailed script interfaces and entities are documented in `script/AGENTS.md`.
 
 ## Important Commands
 
@@ -33,3 +33,15 @@
 - Setup code and tests live in `script/`
 - Configuration guides in `guide/` directory
 - Platform-specific ZSH configs in `zsh_linux/` and `zsh_mac/`
+
+## File Naming
+
+- A directory's landing document is `README.md`, always capitalized, and there is
+  at most one per directory. Agent instruction files are `AGENTS.md`; other
+  documents are lowercase, one word where possible, no spaces.
+- Vendored upstream content keeps its own filenames and is never renamed.
+  That currently covers the READMEs under `.config/yazi/`.
+- Change a filename's case only with `git mv`. The repository is on a
+  case-insensitive filesystem (`core.ignorecase=true`), where a plain `mv` or a
+  Finder rename leaves `git status` and `git diff` empty and the old casing
+  recorded in the index. Case-insensitive consumers will not resolve the name.
