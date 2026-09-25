@@ -21,6 +21,11 @@ flags_parse() {
   local has_yolo=0
   local has_add_optionals=0
 
+  if [[ -v SETUP_DRY_RUN ]]; then
+    error_report error.dry_run_removed
+    return 2
+  fi
+
   for arg in "$@"; do
     case "$arg" in
       --yolo)
@@ -28,9 +33,6 @@ flags_parse() {
         ;;
       --add-optionals)
         has_add_optionals=1
-        ;;
-      --dry-run)
-        SETUP_DRY_RUN=1
         ;;
       --help | -h)
         _flags_show_help

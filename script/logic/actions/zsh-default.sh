@@ -13,7 +13,7 @@ action_set_zsh_default() {
     return 1
   fi
 
-  if ! executor_is_dry_run && [[ ! -x /bin/zsh ]]; then
+  if [[ ! -x /bin/zsh ]]; then
     error_report error.zsh_missing
     return 1
   fi

@@ -53,14 +53,13 @@ setup_run() {
 
   if [[ "${SETUP_ADD_OPTIONALS:-0}" == "1" ]]; then
     started_at="$SECONDS"
-    executor_initialize || return
-    if ! executor_is_dry_run && ((EUID == 0)); then
+    if ((EUID == 0)); then
       error_report error.root_execution
       return 1
     fi
 
     brew_bin="$(executor_brew_bin)"
-    if ! executor_is_dry_run && [[ ! -x "$brew_bin" ]]; then
+    if [[ ! -x "$brew_bin" ]]; then
       message_format brew_prompt prompt.brew_install
       message_format brew_yes_option option.yes
       message_format brew_no_option option.no

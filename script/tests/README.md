@@ -11,10 +11,6 @@ bash script/tests/config_validation.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
-bash script/tests/execution_dry_run.sh fedora
-bash script/tests/execution_dry_run.sh debian
-bash script/tests/execution_dry_run.sh arch
-bash script/tests/execution_dry_run.sh macos
 ```
 
 | Script | What it verifies |
@@ -23,7 +19,6 @@ bash script/tests/execution_dry_run.sh macos
 | `workflow.sh` | In-memory yes/no selection and dependency filtering rules. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
-| `execution_dry_run.sh {arch\|debian\|fedora\|macos}` | Full setup flow in dry-run mode prints commands without changing the system. |
 
 ## Manual UI tests (interactive)
 

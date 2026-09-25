@@ -13,7 +13,7 @@ action_install_yay() {
   fi
   build_dir="${user_home}/.cache/yay-build"
 
-  if ! executor_is_dry_run && command -v yay >/dev/null 2>&1; then
+  if command -v yay >/dev/null 2>&1; then
     status_report status.yay_installed
     return 0
   fi
@@ -41,7 +41,7 @@ action_install_yay() {
     'cd -- "$1" && exec makepkg --clean --cleanbuild --install --needed --noconfirm' \
     bash "$build_dir" || return
 
-  if ! executor_is_dry_run && ! command -v yay >/dev/null 2>&1; then
+  if ! command -v yay >/dev/null 2>&1; then
     error_report error.yay_missing
     return 1
   fi

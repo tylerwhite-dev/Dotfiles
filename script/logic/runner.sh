@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Initializes execution and runs selected procedure handlers in catalog order.
+# Runs selected procedure handlers in catalog order.
 runner_run() {
   local platform="$1"
   local distribution_name="$2"
@@ -15,8 +15,7 @@ runner_run() {
   local current=0
   local -a selected=()
 
-  executor_initialize || return
-  if ! executor_is_dry_run && ((EUID == 0)); then
+  if ((EUID == 0)); then
     error_report error.root_execution
     return 1
   fi
@@ -44,11 +43,7 @@ runner_run() {
       "$requires_root" "$platform" "$repository_dir" || return
   done
 
-  if executor_is_dry_run; then
-    message_format completion_message status.dry_run_complete
-  else
-    message_format completion_message status.setup_complete
-  fi
+  message_format completion_message status.setup_complete
 
   ui_success "$completion_message"
 }

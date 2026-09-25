@@ -1,39 +1,16 @@
 #!/usr/bin/env bash
 
-_executor_adapter="real"
-
-# Selects the real or dry-run command adapter from SETUP_DRY_RUN.
-executor_initialize() {
-  local dry_run="${SETUP_DRY_RUN:-0}"
-
-  if [[ "$dry_run" != "0" && "$dry_run" != "1" ]]; then
-    error_report error.dry_run_invalid
-    return 1
-  fi
-
-  if [[ "$dry_run" == "1" ]]; then
-    _executor_adapter="dry_run"
-  else
-    _executor_adapter="real"
-  fi
-}
-
-# Reports whether command execution is currently in dry-run mode.
-executor_is_dry_run() {
-  [[ "$_executor_adapter" == "dry_run" ]]
-}
-
-# Prints a command and dispatches it through the selected adapter.
+# Prints and executes a command.
 executor_run() {
   ui_command "$@"
-  "_executor_${_executor_adapter}_run" "$@"
+  "$@"
 }
 
-# Checks a command without requiring it to exist during a dry run.
+# Checks that a required command exists.
 executor_require() {
   local command="$1"
 
-  if executor_is_dry_run || command -v "$command" >/dev/null 2>&1; then
+  if command -v "$command" >/dev/null 2>&1; then
     return 0
   fi
 
@@ -99,7 +76,7 @@ executor_retry_as_root() {
 
 # Refreshes the sudo timestamp when a later action needs root access.
 executor_prepare_privilege() {
-  if executor_is_dry_run || ((EUID == 0)); then
+  if ((EUID == 0)); then
     return 0
   fi
 
@@ -124,9 +101,9 @@ executor_download() {
     "$url"
 }
 
-# Returns a temporary-file path from the selected executor adapter.
+# Creates a unique temporary file for command execution.
 executor_temp_file() {
-  "_executor_${_executor_adapter}_temp_file"
+  mktemp "${TMPDIR:-/tmp}/dotfiles-setup.XXXXXX"
 }
 
 # Returns the Homebrew binary path for the current platform.

@@ -24,7 +24,7 @@ _action_install_homebrew_binary() {
     HOMEBREW_NO_ANALYTICS=1 \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     /bin/bash "$installer"; then
-    executor_is_dry_run || rm -f -- "$installer"
+    rm -f -- "$installer"
     return 1
   fi
 
@@ -39,11 +39,11 @@ action_install_homebrew() {
 
   brew_bin="$(executor_brew_bin)"
 
-  if executor_is_dry_run || [[ ! -x "$brew_bin" ]]; then
+  if [[ ! -x "$brew_bin" ]]; then
     _action_install_homebrew_binary || return
   fi
 
-  if ! executor_is_dry_run && [[ ! -x "$brew_bin" ]]; then
+  if [[ ! -x "$brew_bin" ]]; then
     error_report error.homebrew_missing "$brew_bin"
     return 1
   fi

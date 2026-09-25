@@ -2,8 +2,7 @@
 
 This directory contains the interactive Linux and macOS setup program for the
 Dotfiles repository. The program asks for all choices first, shows a review
-screen, and only then runs the selected procedures. `SETUP_DRY_RUN=1` keeps the
-same flow but prints commands without changing the system. The `--yolo` flag
+screen, and only then runs the selected procedures. The `--yolo` flag
 answers `yes` to every question and skips the review screen, so all available
 procedures run without confirmation.
 
@@ -26,7 +25,7 @@ directory, `dotfiles-deploy.sh` loads `logic/load.sh`, parses CLI flags with
 
 The application flow is:
 
-1. `flags_parse` records CLI flags such as `--yolo` and `--dry-run`.
+1. `flags_parse` records CLI flags such as `--yolo` and `--add-optionals`.
 2. `ui_is_interactive` rejects non-interactive input and output unless `--yolo`
    is given, which skips the interactive requirement.
 3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
@@ -41,8 +40,7 @@ The application flow is:
 6. `questionnaire_confirm` renders the selected procedures and waits for
    `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
    `--yolo` mode this step is skipped and execution starts immediately.
-7. `runner_run` initializes the real or dry-run executor, filters selected
-   procedures, and runs them in declaration order.
+7. `runner_run` filters selected procedures and runs them in declaration order.
 8. `process_run` adds privilege preparation, timeline rendering, output capture,
    and final status handling around each action.
 9. `_app_print_elapsed_time` reports the duration measured from the execution
@@ -60,15 +58,13 @@ The application flow is:
 | `logic/load.sh` | Loads interfaces, implementations, declarations, actions, and the application in dependency order. |
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
-| `logic/flags.sh` | CLI flag parsing for `--yolo`, `--dry-run`, and `--help`. |
+| `logic/flags.sh` | CLI flag parsing for `--yolo`, `--add-optionals`, and `--help`. |
 | `logic/environment.sh` | Linux and macOS system detection. |
 | `logic/workflow.sh` | In-memory yes/no selections and dependency filtering. |
 | `logic/questionnaire.sh` | Business flow for questions, summary, and final action choice. |
 | `logic/process.sh` | Runs one action with plain or animated output and records its status. |
 | `logic/runner.sh` | Orchestrates the selected procedures in catalog order. |
 | `logic/executor.sh` | Command, privilege, retry, download, temporary-file, and Homebrew helpers. |
-| `logic/executors/real.sh` | Real command and temporary-file adapter. |
-| `logic/executors/dry-run.sh` | No-op command and deterministic temporary-file adapter. |
 | `logic/actions/*.sh` | System-changing implementations for individual procedures. |
 | `logic/errors.sh` | Converts message keys into error and status output through the UI. |
 | `logic/app.sh` | Top-level application lifecycle and elapsed-time reporting. |
@@ -78,7 +74,7 @@ The application flow is:
 | `ui/stage.sh` | Stage headings and review rows. |
 | `ui/timeline.sh` | Active, finished, and captured-output timeline rows. |
 | `ui/ui.sh` | UI entry point that sources the UI modules. |
-| `tests/*.sh` | Shell checks for declarations, workflow rules, UI output, layer rules, and dry-run execution. |
+| `tests/*.sh` | Shell checks for declarations, workflow rules, UI output, and layer rules. |
 
 ## Domain entities
 
@@ -137,19 +133,17 @@ non-interactive `--yolo` path. An action for a selectable procedure must call
 `workflow_selected_packages` instead of `catalog_packages` to install only the
 chosen packages.
 
-### Executor adapter
+### Command execution
 
-`executor_run` is the command seam. The selected adapter dispatches to
-`_executor_real_run` or `_executor_dry_run_run`. The real adapter invokes the
-command; the dry-run adapter returns success after the UI prints the command.
-Temporary-file creation uses the same seam. Add command behavior to
-`logic/executor.sh`, not to individual actions.
+`executor_run` prints and executes commands. `executor_temp_file` creates a
+temporary file. Add shared command behavior to `logic/executor.sh`, not to
+individual actions.
 
 ### Process and timeline
 
 `process_run` is the seam around one procedure action. It prepares sudo when the
-procedure requires root, then uses plain output for dry-run/non-interactive
-execution and a coprocess plus `ui_timeline_*` for interactive execution. A
+procedure requires root, then uses plain output for non-interactive execution
+and a coprocess plus `ui_timeline_*` for interactive execution. A
 successful process ends with `●`; a failure ends with `×`.
 
 ## Layer rules
@@ -163,8 +157,6 @@ successful process ends with `●`; a failure ends with `×`.
 - `logic/actions/` owns system changes for one procedure. Actions receive
   `(platform, repository_dir)`, use catalog/executor helpers, and return a
   shell status. They do not format messages or render UI directly.
-- `logic/executors/` contains adapters only. Keep real and dry-run behavior
-  interchangeable through the executor interface.
 - `config/messages.sh` is the only place for user-facing setup text. Errors in
   actions should use `error_report <message-key>`.
 
@@ -191,8 +183,7 @@ interfaces are grouped below for quick navigation.
   `workflow_select_packages_all`.
 - Questionnaire and application: `questionnaire_collect`,
   `questionnaire_confirm`, `runner_run`, `process_run`, and `setup_run`.
-- Execution: `executor_initialize`, `executor_is_dry_run`, `executor_run`,
-  `executor_require`, `executor_run_as_root`, `executor_retry`,
+- Execution: `executor_run`, `executor_require`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
 - UI: `ui_select`, `ui_multiselect`, `ui_stage`, `ui_summary_item`,
@@ -217,10 +208,6 @@ bash script/tests/config_validation.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
-bash script/tests/execution_dry_run.sh fedora
-bash script/tests/execution_dry_run.sh debian
-bash script/tests/execution_dry_run.sh arch
-bash script/tests/execution_dry_run.sh macos
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit

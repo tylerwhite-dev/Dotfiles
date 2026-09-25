@@ -6,10 +6,10 @@ message_define error.config_invalid \
   "Could not load the setup configuration."
 message_define error.distribution_unsupported \
   $'The system could not be detected or is not supported.\nSupported systems: Arch Linux, Debian, Ubuntu, Fedora, and macOS.'
-message_define error.dry_run_invalid \
-  "SETUP_DRY_RUN must be 0 or 1."
 message_define error.unknown_flag \
   "Unknown flag: %s"
+message_define error.dry_run_removed \
+  "SETUP_DRY_RUN is no longer supported. Unset it before running setup."
 message_define error.root_execution \
   "Run this setup as a regular user. It will request sudo when needed."
 message_define error.command_missing \
@@ -53,8 +53,6 @@ message_define status.all_packages_selected \
   "all"
 message_define status.no_packages_selected \
   "no packages selected"
-message_define status.dry_run_complete \
-  "Dry run completed. No changes were made."
 message_define status.setup_complete \
   "Setup completed successfully."
 message_define status.yay_installed \
@@ -84,4 +82,4 @@ message_define label.no "no"
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
 
-message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo            Execute all procedures without confirmation.\n  --add-optionals   Install only optional brew packages.\n  --dry-run         Print commands without changing the system.\n  -h, --help        Show this help message.\n\nNote: --yolo and --add-optionals cannot be combined. Both accept --dry-run.'
+message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo            Execute all procedures without confirmation.\n  --add-optionals   Install only optional brew packages.\n  -h, --help        Show this help message.\n\nNote: --yolo and --add-optionals cannot be combined.'

@@ -258,6 +258,7 @@ catalog_validate() {
   local id
   local handler
   local requirement
+  local platform
   local -A seen=()
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then

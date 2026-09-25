@@ -8,9 +8,9 @@ action_apply_dotfiles() {
   local package
 
   if [[ "$platform" == "macos" ]]; then
-    packages=(. zsh_common wallpaper zsh_mac)
+    packages=(zsh_common wallpaper zsh_mac)
   else
-    packages=(. zsh_common wallpaper zsh_linux)
+    packages=(zsh_common wallpaper zsh_linux)
   fi
 
   if [[ ! -f "${repository_dir}/.stow-local-ignore" ]]; then
@@ -23,8 +23,12 @@ action_apply_dotfiles() {
 
   (
     cd -- "$repository_dir" || return
+    executor_run stow --no-folding \
+      --dir="$(dirname "$repository_dir")" \
+      --target="$HOME" \
+      "$(basename "$repository_dir")" || return
     for package in "${packages[@]}"; do
-      executor_run stow --no-folding "$package" || return
+      executor_run stow --no-folding --target="$HOME" "$package" || return
     done
   )
 }

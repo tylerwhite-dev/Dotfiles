@@ -22,10 +22,6 @@ source "${SETUP_SCRIPT_ROOT}/logic/flags.sh"
 source "${SETUP_SCRIPT_ROOT}/logic/errors.sh"
 # shellcheck source=environment.sh
 source "${SETUP_SCRIPT_ROOT}/logic/environment.sh"
-# shellcheck source=executors/real.sh
-source "${SETUP_SCRIPT_ROOT}/logic/executors/real.sh"
-# shellcheck source=executors/dry-run.sh
-source "${SETUP_SCRIPT_ROOT}/logic/executors/dry-run.sh"
 # shellcheck source=executor.sh
 source "${SETUP_SCRIPT_ROOT}/logic/executor.sh"
 # shellcheck source=workflow.sh

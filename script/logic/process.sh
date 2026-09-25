@@ -123,7 +123,7 @@ process_run() {
     return 1
   fi
 
-  if executor_is_dry_run || ! ui_is_interactive; then
+  if ! ui_is_interactive; then
     _process_run_plain \
       "$handler" "$current" "$total" "$label" "$platform" "$repository_dir"
   else

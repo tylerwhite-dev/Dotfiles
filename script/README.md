@@ -23,13 +23,10 @@ action.
 
 ```bash
 bash dotfiles-deploy.sh --yolo
-bash dotfiles-deploy.sh --yolo --dry-run
 ```
 
 - `--yolo` answers `yes` to every question and starts execution without the
   confirmation summary. All available procedures run automatically.
-- `--dry-run` is the CLI equivalent of `SETUP_DRY_RUN=1`: it prints commands
-  without changing the system.
 - `-h, --help` prints usage.
 
 Any other flag exits with status 2 and an `Unknown flag` error.
@@ -45,7 +42,8 @@ Any other flag exits with status 2 and an `Unknown flag` error.
 - `logic/` controls the questionnaire, dependencies, execution order, processes,
   errors, and environment detection.
 - `logic/actions/` contains the system changes for each procedure.
-- `logic/executors/` contains the real and dry-run command adapters.
+- `logic/executor.sh` prints and executes commands and provides privilege,
+  retry, download, temporary-file, and Homebrew helpers.
 
 The main dependency direction is `config -> declaration interfaces`,
 `logic -> config interfaces and UI`, and `actions -> catalog and executor`.
@@ -94,27 +92,7 @@ dependencies, platforms, and package references before the questionnaire starts.
 Use `error_report` with a key from `config/messages.sh` instead of putting
 user-facing text in an action. Use `executor_run`, `executor_run_as_root`,
 `executor_retry`, `executor_retry_as_root`, `executor_download`, and
-`executor_brew` so commands remain visible and work in dry-run mode.
-
-## Dry run
-
-Set `SETUP_DRY_RUN=1` to print selected commands without executing them:
-
-```bash
-SETUP_DRY_RUN=1 bash dotfiles-deploy.sh
-```
-
-Dry-run mode still shows the questionnaire and requires summary confirmation
-unless `--yolo` is also given.
-
-For a non-interactive execution check, run:
-
-```bash
-bash script/tests/execution_dry_run.sh fedora
-bash script/tests/execution_dry_run.sh arch
-bash script/tests/execution_dry_run.sh debian
-bash script/tests/execution_dry_run.sh macos
-```
+`executor_brew` so commands remain visible during execution.
 
 Validate declarations and dependency behavior with:
 
