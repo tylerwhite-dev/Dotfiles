@@ -30,6 +30,8 @@ message_define error.home_unknown \
   "Could not determine the user's home directory."
 message_define error.yay_missing \
   "The yay build completed, but yay was not found in PATH."
+message_define error.yay_package_missing \
+  "The built yay package was not found: %s"
 message_define error.brew_not_installed \
   "Homebrew is required for --add-optionals but was not installed."
 message_define error.flags_conflict \
@@ -57,6 +59,10 @@ message_define status.setup_complete \
   "Setup completed successfully."
 message_define status.yay_installed \
   "yay is already installed."
+message_define status.yay_install_password \
+  "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
+message_define status.sudo_auth_prompt \
+  "Administrator access for %s. Enter your sudo password if prompted."
 message_define status.retry \
   "Command failed. Retrying in %s seconds (%s/%s)."
 message_define status.elapsed.minutes \

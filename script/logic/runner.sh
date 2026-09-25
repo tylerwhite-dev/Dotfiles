@@ -10,6 +10,7 @@ runner_run() {
   local completion_message
   local procedure_id
   local handler
+  local finish_handler
   local label
   local requires_root
   local current=0
@@ -35,12 +36,13 @@ runner_run() {
   for procedure_id in "${selected[@]}"; do
     ((current += 1))
     catalog_handler handler "$procedure_id"
+    catalog_finish_handler finish_handler "$procedure_id"
     catalog_requires_root requires_root "$procedure_id" "$platform"
     message_format label "procedure.${procedure_id}.label"
 
     process_run \
       "$handler" "$current" "${#selected[@]}" "$label" \
-      "$requires_root" "$platform" "$repository_dir" || return
+      "$requires_root" "$platform" "$repository_dir" "$finish_handler" || return
   done
 
   message_format completion_message status.setup_complete

@@ -18,6 +18,7 @@ _process_run_plain() {
   local label="$4"
   local platform="$5"
   local repository_dir="$6"
+  local finish_handler="$7"
   local started_at="$SECONDS"
   local status
 
@@ -28,6 +29,14 @@ _process_run_plain() {
     status=0
   else
     status=$?
+  fi
+
+  if ((status == 0)) && [[ -n "$finish_handler" ]]; then
+    if "$finish_handler" "$platform" "$repository_dir"; then
+      status=0
+    else
+      status=$?
+    fi
   fi
 
   _process_finish "$status" "$label" "$started_at"
@@ -79,6 +88,7 @@ _process_run_animated() {
   local label="$4"
   local platform="$5"
   local repository_dir="$6"
+  local finish_handler="$7"
   local started_at="$SECONDS"
   local started_at_microseconds="${EPOCHREALTIME/./}"
   local process_pid
@@ -104,6 +114,15 @@ _process_run_animated() {
 
   exec {output_fd}<&- 2>/dev/null || true
   unset setup_procedure_process setup_procedure_process_PID 2>/dev/null || true
+
+  if ((status == 0)) && [[ -n "$finish_handler" ]]; then
+    if "$finish_handler" "$platform" "$repository_dir"; then
+      status=0
+    else
+      status=$?
+    fi
+  fi
+
   _process_finish "$status" "$label" "$started_at"
 }
 
@@ -116,18 +135,24 @@ process_run() {
   local requires_root="$5"
   local platform="$6"
   local repository_dir="$7"
+  local finish_handler="$8"
   local started_at="$SECONDS"
 
-  if [[ "$requires_root" == "yes" ]] && ! executor_prepare_privilege; then
-    _process_finish 1 "$label" "$started_at"
-    return 1
+  if [[ "$requires_root" == "yes" ]]; then
+    if ((EUID != 0)) && ! sudo -n -v >/dev/null 2>&1; then
+      status_report status.sudo_auth_prompt "$label"
+    fi
+    if ! executor_prepare_privilege; then
+      _process_finish 1 "$label" "$started_at"
+      return 1
+    fi
   fi
 
   if ! ui_is_interactive; then
     _process_run_plain \
-      "$handler" "$current" "$total" "$label" "$platform" "$repository_dir"
+      "$handler" "$current" "$total" "$label" "$platform" "$repository_dir" "$finish_handler"
   else
     _process_run_animated \
-      "$handler" "$current" "$total" "$label" "$platform" "$repository_dir"
+      "$handler" "$current" "$total" "$label" "$platform" "$repository_dir" "$finish_handler"
   fi
 }

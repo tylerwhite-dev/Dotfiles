@@ -103,6 +103,8 @@ lowercase identifier. A requirement must refer to a procedure declared earlier;
 when it is not selected, the dependent procedure is omitted from execution.
 `procedure_requires_root` lists the platforms that need root privileges; a
 procedure whose platforms are not listed runs without sudo.
+`procedure_finish_handler` is optional. It runs only after the main handler
+succeeds, with direct terminal output so interactive prompts remain visible.
 
 ### Package group
 
@@ -143,8 +145,10 @@ Add shared command behavior to `logic/executor.sh`, not to individual actions.
 ### Process and timeline
 
 `process_run` is the seam around one procedure action. It prepares sudo when the
-procedure requires root, then uses plain output for non-interactive execution
-and a coprocess plus `ui_timeline_*` for interactive execution. A
+procedure requires root and announces a password prompt when authentication is
+needed. It then uses plain output for non-interactive execution
+and a coprocess plus `ui_timeline_*` for interactive execution. An optional
+finish handler runs in the parent process after the coprocess ends. A
 successful process ends with `●`; a failure ends with `×`.
 
 ## Layer rules
@@ -171,9 +175,10 @@ The source comments give the local contract for every function. The main
 interfaces are grouped below for quick navigation.
 
 - Catalog: `package_group`, `procedure_define`, `procedure_handler`,
+  `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
   `procedure_selectable`, `procedure_packages`, `catalog_procedure_ids`,
-  `catalog_handler`, `catalog_requirement`, `catalog_requires_root`,
+  `catalog_handler`, `catalog_finish_handler`, `catalog_requirement`, `catalog_requires_root`,
   `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`, and
   `catalog_validate`.
 - Messages: `message_define`, `message_format`, `message_exists`.
@@ -193,7 +198,7 @@ interfaces are grouped below for quick navigation.
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
   `action_install_homebrew_extended`, `action_set_zsh_default`,
-  `action_apply_dotfiles`, and `action_install_yay`.
+  `action_apply_dotfiles`, `action_install_yay`, and `action_install_yay_package`.
 
 Private helpers start with `_` and should stay within their module unless a
 stable interface is intentionally introduced.

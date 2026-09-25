@@ -2,6 +2,7 @@
 
 declare -ag _CATALOG_PROCEDURE_IDS=()
 declare -Ag _CATALOG_PROCEDURE_HANDLER=()
+declare -Ag _CATALOG_PROCEDURE_FINISH_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_PLATFORMS=()
 declare -Ag _CATALOG_PROCEDURE_REQUIREMENT=()
 declare -Ag _CATALOG_PROCEDURE_REQUIRES_ROOT=()
@@ -36,6 +37,7 @@ procedure_define() {
 
   _CATALOG_PROCEDURE_IDS+=("$id")
   _CATALOG_PROCEDURE_HANDLER["$id"]=""
+  _CATALOG_PROCEDURE_FINISH_HANDLER["$id"]=""
   _CATALOG_PROCEDURE_PLATFORMS["$id"]=""
   _CATALOG_PROCEDURE_REQUIREMENT["$id"]=""
   _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]=""
@@ -57,6 +59,12 @@ _catalog_require_procedure() {
 procedure_handler() {
   _catalog_require_procedure "$1" || return
   _CATALOG_PROCEDURE_HANDLER["$1"]="$2"
+}
+
+# Assigns an optional handler to run with direct terminal output after the action.
+procedure_finish_handler() {
+  _catalog_require_procedure "$1" || return
+  _CATALOG_PROCEDURE_FINISH_HANDLER["$1"]="$2"
 }
 
 # Assigns the platform families on which a procedure is available.
@@ -129,6 +137,11 @@ catalog_procedure_ids() {
 # Returns the action handler registered for a procedure.
 catalog_handler() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_HANDLER[$2]}"
+}
+
+# Returns the optional direct-output handler for a procedure.
+catalog_finish_handler() {
+  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_FINISH_HANDLER[$2]}"
 }
 
 # Returns the procedure ID required by another procedure, if any.
@@ -257,6 +270,7 @@ _catalog_validate_package_references() {
 catalog_validate() {
   local id
   local handler
+  local finish_handler
   local requirement
   local platform
   local -A seen=()
@@ -268,6 +282,7 @@ catalog_validate() {
 
   for id in "${_CATALOG_PROCEDURE_IDS[@]}"; do
     handler="${_CATALOG_PROCEDURE_HANDLER[$id]}"
+    finish_handler="${_CATALOG_PROCEDURE_FINISH_HANDLER[$id]}"
     requirement="${_CATALOG_PROCEDURE_REQUIREMENT[$id]}"
 
     if [[ ! "$id" =~ ^[a-z][a-z0-9_]*$ ]]; then
@@ -281,6 +296,14 @@ catalog_validate() {
     if ! declare -F "$handler" >/dev/null; then
       printf 'Procedure %s references an unknown handler: %s\n' "$id" "$handler" >&2
       return 1
+    fi
+    if [[ -n "$finish_handler" ]]; then
+      if [[ ! "$finish_handler" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
+        ! declare -F "$finish_handler" >/dev/null; then
+        printf 'Procedure %s references an unknown finish handler: %s\n' \
+          "$id" "$finish_handler" >&2
+        return 1
+      fi
     fi
     if [[ -z "${_CATALOG_PROCEDURE_PLATFORMS[$id]}" ]]; then
       printf 'Procedure %s has no supported platforms.\n' "$id" >&2

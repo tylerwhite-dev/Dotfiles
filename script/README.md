@@ -69,7 +69,8 @@ required. Use `procedure_requires`, `procedure_requires_root` (lists the
 platforms that need sudo), and `procedure_packages` when the procedure needs
 them. Put package groups in `config/packages.sh`. Mark a procedure with
 `procedure_selectable` to present its packages as a checkbox list and install
-only the chosen items.
+only the chosen items. `procedure_finish_handler` runs after the main action
+succeeds, with direct terminal output for commands that may ask for input.
 
 Add the action to a file under `logic/actions/`:
 

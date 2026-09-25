@@ -14,13 +14,14 @@ message_define procedure.native_packages.description \
 
 procedure_define yay
 procedure_handler yay action_install_yay
+procedure_finish_handler yay action_install_yay_package
 procedure_platforms yay arch
 procedure_requires_root yay arch
 procedure_packages yay native yay_prerequisites
 message_define procedure.yay.question "Install yay?"
 message_define procedure.yay.label "Install yay"
 message_define procedure.yay.description \
-  "The build dependencies will be installed first. Then yay will be built from the AUR and installed:"
+  "Build dependencies are installed first. Then yay is built from the AUR and installed with sudo, which may ask for your password."
 
 procedure_define zsh_default
 procedure_handler zsh_default action_set_zsh_default
