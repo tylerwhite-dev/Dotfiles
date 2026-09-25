@@ -18,6 +18,29 @@ executor_require() {
   return 1
 }
 
+# Resolves a command from PATH or the configured Homebrew bin directory.
+executor_resolve_command() {
+  local -n result_ref="$1"
+  local command_name="$2"
+  local brew_bin
+  local brew_command
+
+  if command -v "$command_name" >/dev/null 2>&1; then
+    result_ref="$command_name"
+    return 0
+  fi
+
+  brew_bin="$(executor_brew_bin)" || return
+  brew_command="${brew_bin%/*}/${command_name}"
+  if [[ -x "$brew_command" ]]; then
+    result_ref="$brew_command"
+    return 0
+  fi
+
+  error_report error.command_missing "$command_name"
+  return 1
+}
+
 # Builds a command prefixed with sudo when the current user is not root.
 _executor_root_command() {
   local -n result_ref="$1"

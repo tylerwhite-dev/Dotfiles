@@ -6,6 +6,7 @@ action_apply_dotfiles() {
   local repository_dir="$2"
   local -a packages=()
   local package
+  local stow_command
 
   if [[ "$platform" == "macos" ]]; then
     packages=(zsh_common wallpaper zsh_mac)
@@ -19,16 +20,16 @@ action_apply_dotfiles() {
     return 1
   fi
 
-  executor_require stow || return
+  executor_resolve_command stow_command stow || return
 
   (
     cd -- "$repository_dir" || return
-    executor_run stow --no-folding --override='.*' \
+    executor_run "$stow_command" --no-folding --override='.*' \
       --dir="$(dirname "$repository_dir")" \
       --target="$HOME" \
       "$(basename "$repository_dir")" || return
     for package in "${packages[@]}"; do
-      executor_run stow --no-folding --override='.*' --target="$HOME" "$package" || return
+      executor_run "$stow_command" --no-folding --override='.*' --target="$HOME" "$package" || return
     done
   )
 }

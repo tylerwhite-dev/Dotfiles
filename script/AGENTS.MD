@@ -135,9 +135,10 @@ chosen packages.
 
 ### Command execution
 
-`executor_run` prints and executes commands. `executor_temp_file` creates a
-temporary file. Add shared command behavior to `logic/executor.sh`, not to
-individual actions.
+`executor_run` prints and executes commands. `executor_resolve_command` finds
+commands in PATH or the configured Homebrew bin directory, including before
+shell startup files are loaded. `executor_temp_file` creates a temporary file.
+Add shared command behavior to `logic/executor.sh`, not to individual actions.
 
 ### Process and timeline
 
@@ -183,7 +184,7 @@ interfaces are grouped below for quick navigation.
   `workflow_select_packages_all`.
 - Questionnaire and application: `questionnaire_collect`,
   `questionnaire_confirm`, `runner_run`, `process_run`, and `setup_run`.
-- Execution: `executor_run`, `executor_require`, `executor_run_as_root`, `executor_retry`,
+- Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
 - UI: `ui_select`, `ui_multiselect`, `ui_stage`, `ui_summary_item`,
