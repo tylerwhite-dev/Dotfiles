@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 package_group native arch \
-  sudo git git-lfs curl openssh zsh file wl-clipboard base-devel
+  git git-lfs curl openssh zsh file wl-clipboard base-devel
 
 package_group native debian \
-  sudo git git-lfs curl ssh zsh nala file wl-clipboard build-essential
+  git git-lfs curl ssh zsh nala file wl-clipboard build-essential
 
 package_group native fedora \
-  sudo git git-lfs curl openssh-clients zsh file wl-clipboard gcc
+  git git-lfs curl openssh-clients zsh file wl-clipboard gcc
 
 package_group native yay_prerequisites \
   go

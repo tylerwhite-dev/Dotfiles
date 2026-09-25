@@ -32,7 +32,7 @@ snapshot - camera.
 
 basic
 ```
-nala sudo git git-lfs curl ssh zsh stow build-essential wl-clipboard wmctrl
+nala git git-lfs curl ssh zsh build-essential wl-clipboard wmctrl
 ``` 
 
 common
