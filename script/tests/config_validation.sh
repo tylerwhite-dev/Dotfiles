@@ -16,8 +16,8 @@ catalog_validate
 rows=()
 kinds=()
 catalog_package_rows rows kinds homebrew_extended macos brew
-[[ "${rows[*]}" == 'Dev tools go nvm rustup uv sdkman-cli Terminal tmux yazi mailsy taproom Monitoring lazydocker nvtop tio Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full' ]]
-[[ "${kinds[*]}" == 'g i i i i i g i i i i g i i i g i i i i i' ]]
+[[ "${rows[*]}" == 'Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja tio Terminal tmux zellij yazi nvtop lazyjournal lazydocker mailsy taproom Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full CLI Harness opencode hermes-agent openclaw' ]]
+[[ "${kinds[*]}" == 'g i i i i i i i i i i g i i i i i i i i g i i i i i g i i i' ]]
 
 flat=()
 items=()
