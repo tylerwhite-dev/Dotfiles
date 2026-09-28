@@ -1,3 +1,10 @@
+#!/usr/bin/env bash
+
+# Also support running this case file directly from the repository root.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  exec bash "$(dirname -- "${BASH_SOURCE[0]}")/dynamic_ui.sh" "$@"
+fi
+
 _select_minimal() {
   local choice="" status=0
   local -a options=(one two three)
@@ -269,7 +276,19 @@ _multiselect_group_mixed() {
 }
 
 _multiselect_group_scroll() {
-  _grouped_choose
+  local -a rows=('Long group') kinds=(g) chosen=()
+  local i status=0
+  for ((i=1; i<=30; i++)); do
+    rows+=("package-${i}")
+    kinds+=(i)
+  done
+  ui_multiselect_grouped chosen "Select packages:" rows kinds || status=$?
+  printf '\n'
+  if ((status != 0)); then
+    _test_msg "  Menu exited with code ${status}"
+    return "$status"
+  fi
+  _multiselect_done "${chosen[@]}"
 }
 
 _multiselect_group_real() {
@@ -292,18 +311,18 @@ _multiselect_group_real() {
 
 run_ui_multiselect_grouped() {
   _series_begin "ui_multiselect_grouped" \
-    "grouped checkbox list: group headers, tri-state, All shortcut, real catalog"
-  _case "Press Enter immediately: headers shown, no blank line before the first group, result empty" \
+    "grouped checkbox list: group headers, tri-state, no All row, real catalog"
+  _case "Press Enter immediately: first group focused, no All row, result empty" \
     _multiselect_group_header
   _case "Space on a group header: selects exactly that group, header shows [x], count matches" \
     _multiselect_group_toggle
   _case "Toggle one item inside a group: header shows [-], only that item selected" \
     _multiselect_group_partial
-  _case "Space on All: every group and item shows [x], result lists every package; press Space on All again to clear" \
+  _case "Toggle the first group on and off with Space" \
     _multiselect_group_all
-  _case "All, then Space on one group header: only that group clears, others stay [x]" \
+  _case "Select two groups, then clear one without changing the other" \
     _multiselect_group_mixed
-  _case "Long grouped list: cursor moves across headers and items, blank line appears between groups" \
+  _case "Long grouped list: navigate columns and see a repeated group heading" \
     _multiselect_group_scroll
   _case "Real catalog (homebrew_extended): four groups render with the production package names" \
     _multiselect_group_real

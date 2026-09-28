@@ -63,7 +63,7 @@ bash script/tests/manual/dynamic_ui.sh --list      # list available components
 | --- | --- |
 | `ui_select` | Single-choice menu: keyboard navigation, default highlight, detail text, the yes/no questionnaire question (2 options), many options, exit codes. |
 | `ui_multiselect` | Checkbox list: Space toggle, All shortcut, count line, resulting selection, duplicates, exit codes. |
-| `ui_multiselect_grouped` | Grouped checkbox list: group headers, blank line between groups, `[-]` partial state, Space on a group header, All shortcut, cursor movement across headers, and the real `homebrew_extended` catalog. |
+| `ui_multiselect_grouped` | Grouped checkbox list: temporary screen, bounded columns, repeated group headings, `[-]` partial state, Space on a group header, no global All row, and the real `homebrew_extended` catalog. |
 
 Note: the questionnaire's yes/no questions are not a separate element — they
 are `ui_select` with two options (`Yes`/`No`), covered in the `ui_select` suite.

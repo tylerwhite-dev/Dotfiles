@@ -8,6 +8,8 @@ source "${ui_dir}/theme.sh"
 source "${ui_dir}/terminal.sh"
 # shellcheck source=menu.sh
 source "${ui_dir}/menu.sh"
+# shellcheck source=multiselect.sh
+source "${ui_dir}/multiselect.sh"
 # shellcheck source=stage.sh
 source "${ui_dir}/stage.sh"
 # shellcheck source=timeline.sh

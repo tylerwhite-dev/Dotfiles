@@ -71,7 +71,8 @@ The application flow is:
 | `logic/app.sh` | Top-level application lifecycle and elapsed-time reporting. |
 | `ui/theme.sh` | Color variables, timeline frames, and animation interval. |
 | `ui/terminal.sh` | Terminal capability checks and low-level text output. |
-| `ui/menu.sh` | Keyboard menu rendering and arrow-key input. |
+| `ui/menu.sh` | Single-choice menu rendering and arrow-key input. |
+| `ui/multiselect.sh` | Temporary-screen checkbox menus, columns, and selection input. |
 | `ui/stage.sh` | Stage headings and review rows. |
 | `ui/timeline.sh` | Active, finished, and captured-output timeline rows. |
 | `ui/ui.sh` | UI entry point that sources the UI modules. |
@@ -164,7 +165,9 @@ non-interactive `--yolo` path. An action for a selectable procedure must call
 `workflow_selected_packages` instead of `catalog_packages` to install only the
 chosen packages. The questionnaire asks for those packages with
 `ui_multiselect_grouped`, which returns the checked item rows only; group rows
-and the `All` row are never part of the result.
+are never part of the result. The grouped menu has no global `All` row. The
+checkbox menu uses a temporary screen and restores the previous terminal view
+after confirmation.
 
 ### Command execution
 
