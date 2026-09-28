@@ -4,10 +4,8 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 HOMEBREW_NO_ENV_HINTS=1
 
 # <-- herdr on startup -->
-if [[ "$TERM_PROGRAM" == "ghostty" && "$SHLVL" -eq 1 ]]; then
-  if command -v herdr &> /dev/null && [ -z "$HERDR_CLIENT" ]; then
-    herdr
-  fi
+if [[ "$SHLVL" -eq 1 && "$PWD" == "$HOME" && -z "$HERDR_CLIENT" ]] && command -v herdr &> /dev/null; then
+  herdr
 fi
 
 # <-- alias -->

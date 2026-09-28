@@ -49,5 +49,7 @@
 # Shell scripts must keep Unix line endings.
 *.sh	text eol=lf
 
-# GNU Stow reads this file as line-based regular expressions.
+.zshrc	text eol=lf
+.common.zshrc	text eol=lf
+
 /.stow-local-ignore text eol=lf
