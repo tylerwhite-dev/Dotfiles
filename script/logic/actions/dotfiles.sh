@@ -25,9 +25,7 @@ action_apply_dotfiles() {
   (
     cd -- "$repository_dir" || return
     executor_run "$stow_command" --no-folding --override='.*' \
-      --dir="$(dirname "$repository_dir")" \
-      --target="$HOME" \
-      "$(basename "$repository_dir")" || return
+      --dir=. --target="$HOME" . || return
     for package in "${packages[@]}"; do
       executor_run "$stow_command" --no-folding --override='.*' --target="$HOME" "$package" || return
     done
