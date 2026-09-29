@@ -15,13 +15,13 @@ action_install_native_packages() {
         pacman -Syu --needed --noconfirm "${packages[@]}"
       ;;
     debian)
-      executor_require apt-get || return
+      executor_require apt || return
       executor_retry_as_root \
         "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt-get update || return
+        apt update || return
       executor_retry_as_root \
         "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt-get install -y "${packages[@]}"
+        apt install -y "${packages[@]}"
       ;;
     fedora)
       executor_require dnf || return
