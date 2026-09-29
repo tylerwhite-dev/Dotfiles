@@ -13,11 +13,11 @@ package_group native yay_prerequisites \
   go
 
 package_group brew extensions \
-  starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs
+  starship zsh-autosuggestions zsh-syntax-highlighting \
+  pfetch-rs fastfetch
 
 package_group brew cli_tools \
-  herdr superfile neovim btop lazygit fastfetch zip zoxide fzf eza \
-  stow git git-lfs
+  herdr superfile neovim zip zoxide fzf eza stow
 
 package_group brew_cask fonts \
   font-jetbrains-mono-nerd-font font-hack-nerd-font
@@ -29,7 +29,7 @@ package_group brew toolchains \
   cmake ninja tio
 
 package_group brew shell_addons \
-  tmux zellij yazi nvtop lazyjournal lazydocker mailsy taproom
+  lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy
 
 package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
