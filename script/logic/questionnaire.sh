@@ -23,7 +23,7 @@ _questionnaire_read_selectable_packages() {
 
   _questionnaire_procedure_text question "$procedure_id" question
   message_format prompt question.progress "$current" "$total" "$question"
-  catalog_package_rows rows kinds "$procedure_id" "$platform" brew || return
+  catalog_package_rows rows kinds "$procedure_id" "$platform" || return
 
   if ! ui_multiselect_grouped selected "$prompt" rows kinds; then
     error_report error.input_interrupted
@@ -173,7 +173,7 @@ _questionnaire_show_summary() {
       local -a all_packages=()
       local status
       workflow_selected_packages packages "$procedure_id"
-      catalog_packages all_packages "$procedure_id" "$platform" brew
+      catalog_packages all_packages "$procedure_id" "$platform"
       if ((${#packages[@]} == ${#all_packages[@]})) && ((${#packages[@]} > 0)); then
         message_format status status.all_packages_selected
       elif ((${#packages[@]} > 0)); then

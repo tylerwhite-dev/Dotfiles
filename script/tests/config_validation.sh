@@ -16,8 +16,8 @@ catalog_validate
 rows=()
 kinds=()
 catalog_package_rows rows kinds homebrew_extended macos brew
-[[ "${rows[*]}" == 'Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja tio Terminal tmux zellij yazi nvtop lazyjournal lazydocker mailsy taproom Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full CLI Harness opencode hermes-agent openclaw' ]]
-[[ "${kinds[*]}" == 'g i i i i i i i i i i g i i i i i i i i g i i i i i g i i i' ]]
+[[ "${rows[*]}" == 'Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja tio Terminal lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full CLI Harness opencode hermes-agent openclaw' ]]
+[[ "${kinds[*]}" == 'g i i i i i i i i i i g i i i i i i i i i i i g i i i i i g i i i' ]]
 
 flat=()
 items=()
@@ -29,6 +29,26 @@ done
 catalog_packages flat homebrew_extended macos brew
 [[ "${#items[@]}" -eq "${#flat[@]}" ]]
 [[ "${items[*]}" == "${flat[*]}" ]]
+
+# macOS casks use the same category UI but remain a separate package source.
+cask_rows=()
+cask_kinds=()
+cask_items=()
+cask_flat=()
+cask_categories=()
+catalog_package_rows cask_rows cask_kinds homebrew_casks macos brew_cask
+catalog_packages cask_flat homebrew_casks macos brew_cask
+for ((index = 0; index < ${#cask_rows[@]}; index++)); do
+  if [[ "${cask_kinds[index]}" == i ]]; then
+    cask_items+=("${cask_rows[index]}")
+  else
+    cask_categories+=("${cask_rows[index]}")
+  fi
+done
+[[ "${cask_items[*]}" == "${cask_flat[*]}" ]]
+[[ "${#cask_flat[@]}" -eq 29 ]]
+[[ "${cask_categories[*]}" == 'Internet Work & Media Dev tools System Games' ]]
+[[ "${cask_rows[*]}" == 'Internet firefox google-chrome telegram qbittorrent amneziavpn Work & Media obsidian libreoffice iina bitwarden veracrypt Dev tools android-studio intellij-idea-ce qt-creator vscodium docker-desktop ghostty lm-studio zed System utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager Games playcover-community steam' ]]
 
 # A procedure without category references renders a plain item list.
 plain_rows=()

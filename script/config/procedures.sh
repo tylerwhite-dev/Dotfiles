@@ -64,6 +64,25 @@ message_define procedure.homebrew_extended.label \
 message_define procedure.homebrew_extended.description \
   "An additional tap will be added when needed. Select the packages to install:"
 
+procedure_define homebrew_casks
+procedure_handler homebrew_casks action_prepare_homebrew_casks
+procedure_finish_handler homebrew_casks action_install_homebrew_casks
+procedure_platforms homebrew_casks macos
+procedure_requires homebrew_casks homebrew
+procedure_selectable homebrew_casks
+procedure_packages homebrew_casks \
+  brew_cask internet_apps \
+  brew_cask work_apps \
+  brew_cask developer_apps \
+  brew_cask system_apps \
+  brew_cask gaming
+message_define procedure.homebrew_casks.question \
+  "Select macOS applications to install as Homebrew casks?"
+message_define procedure.homebrew_casks.label \
+  "Install selected Homebrew casks"
+message_define procedure.homebrew_casks.description \
+  "Some casks may request administrator access during installation."
+
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles
 procedure_platforms dotfiles arch debian fedora macos

@@ -72,3 +72,24 @@ action_install_homebrew_extended() {
 
   executor_brew install "${selected[@]}"
 }
+
+# Checks Homebrew before the direct-input cask installation phase.
+action_prepare_homebrew_casks() {
+  local brew_bin
+  brew_bin="$(executor_brew_bin)"
+  if [[ ! -x "$brew_bin" ]]; then
+    error_report error.homebrew_missing "$brew_bin"
+    return 1
+  fi
+  executor_run "$brew_bin" --version
+}
+
+# Runs in the parent shell so Homebrew and macOS can display password prompts.
+action_install_homebrew_casks() {
+  local -a selected=()
+  workflow_selected_packages selected homebrew_casks || return
+  ((${#selected[@]} > 0)) || return 0
+
+  status_report status.cask_admin_prompt
+  executor_brew install --cask "${selected[@]}"
+}

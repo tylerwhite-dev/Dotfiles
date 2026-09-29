@@ -61,6 +61,8 @@ message_define status.yay_installed \
   "yay is already installed."
 message_define status.yay_install_password \
   "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
+message_define status.cask_admin_prompt \
+  "Installing selected casks. Enter your administrator password in the terminal or macOS dialog if prompted."
 message_define status.sudo_auth_prompt \
   "Administrator access for %s. Enter your sudo password if prompted."
 message_define status.retry \

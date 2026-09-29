@@ -18,6 +18,8 @@ The setup has two phases. The questionnaire records choices without changing the
 system. Execution starts only after the user confirms the summary.
 The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
+On macOS, the questionnaire also offers categorized Homebrew casks. Their
+installation runs with direct terminal access so password prompts stay visible.
 
 ## Flags
 
@@ -27,6 +29,7 @@ bash dotfiles-deploy.sh --yolo
 
 - `--yolo` answers `yes` to every question and starts execution without the
   confirmation summary. All available procedures run automatically.
+- `--add-optionals` asks only for the extended Homebrew formulae.
 - `-h, --help` prints usage.
 
 Any other flag exits with status 2 and an `Unknown flag` error.

@@ -15,8 +15,8 @@ bash script/tests/layer_dependencies.sh
 
 | Script | What it verifies |
 | --- | --- |
-| `config_validation.sh` | Procedure and package catalog declarations are valid, including category groups, grouped row output, and declaration errors. |
-| `workflow.sh` | In-memory yes/no selection and dependency filtering rules. |
+| `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, and declaration errors. |
+| `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 

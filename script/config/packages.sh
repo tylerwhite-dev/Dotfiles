@@ -41,3 +41,23 @@ package_category brew dev_tools "Dev tools" toolchains
 package_category brew terminal "Terminal" shell_addons
 package_category brew media "Media" media_tools
 package_category brew harness "CLI Harness" cli_harness
+
+# Optional macOS applications from guide/macos/brew.md.
+package_group brew_cask internet \
+  firefox google-chrome telegram qbittorrent amneziavpn
+package_group brew_cask work_media \
+  obsidian libreoffice iina bitwarden veracrypt
+package_group brew_cask development \
+  android-studio intellij-idea-ce qt-creator vscodium \
+  docker-desktop ghostty lm-studio zed
+package_group brew_cask system \
+  utm appcleaner betterdisplay coconutbattery macfuse mos raycast \
+  balenaetcher raspberry-pi-imager
+package_group brew_cask games \
+  playcover-community steam
+
+package_category brew_cask internet_apps "Internet" internet
+package_category brew_cask work_apps "Work & Media" work_media
+package_category brew_cask developer_apps "Dev tools" development
+package_category brew_cask system_apps "System" system
+package_category brew_cask gaming "Games" games

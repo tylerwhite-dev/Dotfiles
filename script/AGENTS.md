@@ -168,6 +168,8 @@ chosen packages. The questionnaire asks for those packages with
 are never part of the result. The grouped menu has no global `All` row. The
 checkbox menu uses a temporary screen and restores the previous terminal view
 after confirmation.
+On macOS, `homebrew_casks` uses the same selection UI and installs its selected
+`brew_cask` packages through a direct-input finish handler.
 
 ### Command execution
 
@@ -242,7 +244,8 @@ interfaces are grouped below for quick navigation.
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
-  `action_install_homebrew_extended`, `action_set_zsh_default`,
+  `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
+  `action_install_homebrew_casks`, `action_set_zsh_default`,
   `action_apply_dotfiles`, `action_install_yay`, and `action_install_yay_package`.
 
 Private helpers start with `_` and should stay within their module unless a

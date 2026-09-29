@@ -14,7 +14,7 @@ package groups below for you; see [`script/README.md`](../../script/README.md).
 ## casks
 
 ```bash
-brew install --cask amneziavpn appcleaner balenaetcher betterdisplay bitwarden coconutbattery docker-desktop firefox ghostty google-chrome iina libreoffice lm-studio macfuse mos obsidian playcover-community qbittorrent raspberry-pi-imager raycast steam telegram utm veracrypt zed
+brew install --cask amneziavpn appcleaner balenaetcher betterdisplay bitwarden coconutbattery docker-desktop firefox ghostty google-chrome iina libreoffice lm-studio macfuse mos obsidian playcover-community qbittorrent raspberry-pi-imager raycast steam telegram utm veracrypt zed android-studio intellij-idea-ce qt-creator vscodium
 ```
 
 ## utilities
@@ -26,7 +26,7 @@ brew install bash-completion btop cbonsai eza fastfetch ffmpeg-full git-lfs htop
 ## developer
 
 ```bash
-brew install android-studio cmake go intellij-idea-ce nvm qt qt-creator vscodium opencode rustup uv zig
+brew install cmake go nvm qt opencode rustup uv zig
 ```
 
 ## fonts
