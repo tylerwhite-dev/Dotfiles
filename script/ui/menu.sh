@@ -6,15 +6,22 @@ _ui_draw_menu_options() {
   shift
 
   local options=("$@")
-  local index
+  local index label
+  local columns="${COLUMNS:-80}"
+  [[ "$columns" =~ ^[1-9][0-9]*$ ]] || columns=80
+  local label_width=$((10#$columns-7))
+  ((label_width < 1)) && label_width=1
 
   for ((index = 0; index < ${#options[@]}; index++)); do
-    printf '\r\033[2K'
+    label="${options[index]}"
+    if ((${#label} > label_width)); then
+      label="${label:0:label_width-1}…"
+    fi
     if ((index == selected_index)); then
-      printf '    %s› %s%s\n' \
-        "$ui_color_selected" "${options[index]}" "$ui_color_reset"
+      printf '\r\033[2K    %s› %s%s\n' \
+        "$ui_color_selected" "$label" "$ui_color_reset"
     else
-      printf '      %s\n' "${options[index]}"
+      printf '\r\033[2K      %s\n' "$label"
     fi
   done
 }

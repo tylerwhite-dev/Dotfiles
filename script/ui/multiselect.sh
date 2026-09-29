@@ -6,7 +6,7 @@ _ui_ms_screen_open() {
   _ui_ms_old_int="$(trap -p INT)"
   _ui_ms_old_term="$(trap -p TERM)"
   _ui_ms_screen_active=1
-  printf '\033[?1049h\033[?25l'
+  printf '\033[?1049h\033[?25l\033[H\033[2J'
   trap '_ui_ms_exit' EXIT
   trap '_ui_ms_abort 130' INT
   trap '_ui_ms_abort 143' TERM
@@ -208,21 +208,21 @@ _ui_ms_draw() {
   for ((row=0; row<${#kinds_ref[@]}; row++)); do
     [[ "${kinds_ref[row]}" == i && "${marked_ref[$row]:-0}" == 1 ]] && ((selected+=1))
   done
-  printf '\033[H\033[2J%s%s%s\n' "$ui_color_question" "$(_ui_ms_fit "$prompt" "$((width-1))")" "$ui_color_reset"
+  printf '\033[2K%s%s%s\n' "$ui_color_question" "$(_ui_ms_fit "$prompt" "$((width-1))")" "$ui_color_reset"
   printf -v count_line 'cols %d-%d/%d  ·  %d selected' \
     "$((first+1))" "$((first+visible))" "$column_count" "$selected"
   ((first > 0)) && left_indicator='←'
   ((first+visible < column_count)) && right_indicator='→'
-  printf '%s%s%s %s %s%s%s\n' \
+  printf '\033[2K%s%s%s %s %s%s%s\n' \
     "$ui_color_selected" "$left_indicator" "$ui_color_hint" \
     "$(_ui_ms_fit "$count_line" "$((width-5))")" \
     "$ui_color_selected" "$right_indicator" "$ui_color_reset"
   if [[ "${kinds_ref[0]}" == a ]]; then
     printf '\033[2K'
     _ui_ms_cell "$1" "$2" "$3" 0 "$cursor" "$cell_width"
-    printf '\n\n'
+    printf '\n\033[2K\n'
   else
-    printf '\n'
+    printf '\033[2K\n'
   fi
   for ((row=0; row<height; row++)); do
     printf '\033[2K'
@@ -238,7 +238,7 @@ _ui_ms_draw() {
     printf '\n'
   done
   heading='↑↓ move  ←→ column  Space toggle  Enter confirm'
-  printf '%s%s%s' "$ui_color_hint" "$(_ui_ms_fit "$heading" "$((width-1))")" "$ui_color_reset"
+  printf '\033[2K%s%s%s' "$ui_color_hint" "$(_ui_ms_fit "$heading" "$((width-1))")" "$ui_color_reset"
 }
 
 _ui_ms_key() {
@@ -281,7 +281,7 @@ _ui_ms_run() {
   local -A _ms_marked=() _ms_cells=()
   local cursor=0 first=0 height width limit cell_width visible column_count
   local max_label=0 index key target_col target_row candidate best_distance distance
-  local status=0
+  local status=0 frame
   ((${#input_rows_ref[@]} > 0)) || return 2
   _ui_ms_screen_open
   while true; do
@@ -315,8 +315,9 @@ _ui_ms_run() {
       ((_ms_cols[cursor] >= first+visible)) && first=$((_ms_cols[cursor]-visible+1))
     fi
     ((first > column_count-visible)) && first=$((column_count-visible))
-    _ui_ms_draw _ms_rows _ms_kinds _ms_marked _ms_cells "$prompt" "$cursor" \
-      "$limit" "$width" "$first" "$visible" "$cell_width" "$column_count"
+    frame="$(_ui_ms_draw _ms_rows _ms_kinds _ms_marked _ms_cells "$prompt" "$cursor" \
+      "$limit" "$width" "$first" "$visible" "$cell_width" "$column_count")"
+    printf '\033[H%s\033[J' "$frame"
     _ui_ms_key key || { status=$?; break; }
     case "$key" in
       '') break ;;

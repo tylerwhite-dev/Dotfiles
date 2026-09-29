@@ -43,6 +43,23 @@ ui_select selection "Prompt" "" 0 default one two three \
   <<< $'\n' >"$menu_output"
 grep -Fq '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' "$menu_output"
 
+# Narrow menus keep each option on one row and return the original index.
+COLUMNS=16 ui_select selection "Prompt" "" 0 minimal \
+  'a long option label' second <<< $'\033[B\n' >"$menu_output"
+[[ "$selection" == 1 ]]
+grep -Fq 'a long o…' "$menu_output"
+if grep -Fq 'a long option label' "$menu_output"; then exit 1; fi
+
+# Timeline rows leave room for progress and duration in a narrow terminal.
+active_line="$(COLUMNS=30 ui_color_comment= ui_color_heading= ui_color_hint= ui_color_reset= \
+  ui_timeline_active 1 8 'A very long procedure label' 45 '◉' yes)"
+finished_line="$(COLUMNS=30 ui_color_success= ui_color_hint= ui_color_reset= \
+  ui_timeline_finished 0 'A very long procedure label' 135)"
+[[ "$active_line" == *'00:45' && "$finished_line" == *'2m 15s' ]]
+[[ "$active_line" == $'\r\033[2K'* ]]
+active_line="${active_line#$'\r\033[2K'}"
+[[ "${#active_line}" -lt 30 && "${#finished_line}" -lt 30 ]]
+
 saved_success_color="$ui_color_success"
 saved_hint_color="$ui_color_hint"
 saved_reset_color="$ui_color_reset"
@@ -185,6 +202,8 @@ LINES=28 COLUMNS=18 ui_multiselect many_selection "Prompt" "${many_rows[@]}" \
 grep -Fq 'cols 2-2/2' "$menu_output"
 grep -Fq '→' "$menu_output"
 grep -Fq '←' "$menu_output"
+# Scrolling redraws the frame without clearing the whole screen again.
+[[ "$(grep -oF $'\033[2J' "$menu_output" | wc -l)" -eq 1 ]]
 
 # The middle of a hidden-column window shows both directions at once.
 three_rows=(First one Second two Third three)

@@ -4,19 +4,19 @@
 _ui_timeline_truncate_label() {
   local result_name="$1"
   local label="$2"
+  local reserved_columns="${3:-32}"
   local terminal_columns="${COLUMNS:-80}"
   local maximum_length
 
-  if [[ ! "$terminal_columns" =~ ^[0-9]+$ ]]; then
+  if [[ ! "$terminal_columns" =~ ^[1-9][0-9]*$ ]]; then
     terminal_columns=80
   fi
 
-  maximum_length=$((terminal_columns - 32))
-  if ((maximum_length < 20)); then
-    maximum_length=20
-  fi
+  maximum_length=$((10#$terminal_columns - reserved_columns - 1))
 
-  if ((${#label} > maximum_length)); then
+  if ((maximum_length < 1)); then
+    printf -v "$result_name" '%s' ''
+  elif ((${#label} > maximum_length)); then
     printf -v "$result_name" '%s' "${label:0:maximum_length-1}…"
   else
     printf -v "$result_name" '%s' "$label"
@@ -76,17 +76,21 @@ ui_timeline_active() {
   local redraw="$6"
   local rendered_label
   local timer_label
+  local progress_label
+  local redraw_prefix=''
 
-  _ui_timeline_truncate_label rendered_label "$label"
   _ui_timeline_format_timer timer_label "$elapsed_seconds"
+  printf -v progress_label '%02d / %02d' "$current" "$total"
+  _ui_timeline_truncate_label rendered_label "$label" \
+    "$((${#marker}+${#progress_label}+${#timer_label}+6))"
 
   if [[ "$redraw" == "yes" ]]; then
-    printf '\r\033[2K'
+    redraw_prefix=$'\r\033[2K'
   fi
 
-  printf '%s%s%s  %s%02d / %02d%s  %s  %s%s%s' \
-    "$ui_color_comment" "$marker" "$ui_color_reset" \
-    "$ui_color_heading" "$current" "$total" "$ui_color_reset" \
+  printf '%s%s%s%s  %s%s%s  %s  %s%s%s' \
+    "$redraw_prefix" "$ui_color_comment" "$marker" "$ui_color_reset" \
+    "$ui_color_heading" "$progress_label" "$ui_color_reset" \
     "$rendered_label" \
     "$ui_color_hint" "$timer_label" "$ui_color_reset"
 }
@@ -114,7 +118,6 @@ ui_timeline_finished() {
   local symbol
   local symbol_color
 
-  _ui_timeline_truncate_label rendered_label "$label"
   _ui_timeline_format_duration duration_label "$elapsed_seconds"
 
   if ((status == 0)); then
@@ -124,6 +127,9 @@ ui_timeline_finished() {
     symbol='×'
     symbol_color="$ui_color_error"
   fi
+
+  _ui_timeline_truncate_label rendered_label "$label" \
+    "$((${#symbol}+${#duration_label}+4))"
 
   printf '%s%s%s  %s  %s%s%s\n' \
     "$symbol_color" "$symbol" "$ui_color_reset" \
