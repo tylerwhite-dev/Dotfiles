@@ -42,7 +42,9 @@ message_define status.distribution_detected \
 message_define status.settings_confirmed \
   "Settings confirmed."
 message_define status.yolo_mode \
-  "YOLO mode enabled: all procedures will be executed without confirmation."
+  "YOLO mode enabled: every procedure without a package selection runs without confirmation."
+message_define status.yolo_skipped_optionals \
+  "Skipped optional procedures: %s. Choose their packages in an interactive run."
 message_define status.exited \
   "Exited without changes."
 message_define status.no_selection \
@@ -91,4 +93,4 @@ message_define package_category_other "Other"
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
 
-message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  --yolo            Execute all procedures without confirmation.\n  --add-optionals   Install only optional brew packages.\n  -h, --help        Show this help message.\n\nNote: --yolo and --add-optionals cannot be combined.'
+message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Install only optional brew packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets and casks, and it cannot be\ncombined with --add-optionals.'

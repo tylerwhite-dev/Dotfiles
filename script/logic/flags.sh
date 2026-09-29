@@ -28,10 +28,10 @@ flags_parse() {
 
   for arg in "$@"; do
     case "$arg" in
-      --yolo)
+      --yolo | -y)
         has_yolo=1
         ;;
-      --add-optionals)
+      --add-optionals | -a)
         has_add_optionals=1
         ;;
       --help | -h)

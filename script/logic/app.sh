@@ -30,8 +30,12 @@ setup_run() {
   local brew_no_option
   local brew_selected_index
   local brew_bin
+  local is_selectable
+  local label
+  local skipped_list
   local -a selected_optionals=()
   local -a yolo_available=()
+  local -a yolo_skipped=()
   local procedure_id
 
   if [[ "${SETUP_YOLO:-0}" != "1" ]] && ! ui_is_interactive; then
@@ -94,14 +98,19 @@ setup_run() {
     workflow_reset
     workflow_available yolo_available "$distribution_family"
     for procedure_id in "${yolo_available[@]}"; do
-      local is_selectable
       catalog_is_selectable is_selectable "$procedure_id"
       if [[ "$is_selectable" == "yes" ]]; then
-        workflow_select_packages_all "$procedure_id" "$distribution_family" || return
-      else
-        workflow_select "$procedure_id" yes
+        message_format label "procedure.${procedure_id}.label"
+        yolo_skipped+=("$label")
+        continue
       fi
+      workflow_select "$procedure_id" yes
     done
+    if ((${#yolo_skipped[@]} > 0)); then
+      skipped_list="$(IFS=', '; printf '%s' "${yolo_skipped[*]}")"
+      message_format status_message status.yolo_skipped_optionals "$skipped_list"
+      ui_notice "$status_message"
+    fi
     action="start"
   else
     while true; do

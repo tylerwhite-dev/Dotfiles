@@ -2,9 +2,11 @@
 
 This directory contains the interactive Linux and macOS setup program for the
 Dotfiles repository. The program asks for all choices first, shows a review
-screen, and only then runs the selected procedures. The `--yolo` flag
-answers `yes` to every question and skips the review screen, so all available
-procedures run without confirmation.
+screen, and only then runs the selected procedures. The `--yolo` flag (`-y`)
+answers `yes` to every question and skips the review screen, so every
+procedure that needs no package selection runs without confirmation. Optional
+package sets and casks are skipped, because they install only the packages a
+run explicitly chooses.
 
 The script requires bash 5 or newer. macOS ships bash 3.2 in `/bin/bash`, so run
 it on macOS with a Homebrew bash, for example
@@ -34,10 +36,15 @@ The application flow is:
    `debian`, `fedora`, or `macos`.
 5. `questionnaire_collect` resets selections and asks one question per available
    procedure. It does not execute commands. In `--yolo` mode every available
-   procedure is selected without prompting. A procedure marked with
+   procedure that is not marked `procedure_selectable` is selected without
+   prompting, and the skipped ones are listed through
+   `status.yolo_skipped_optionals`. A procedure marked with
    `procedure_selectable` shows a checkbox list instead of a plain yes/no
    question, and records the chosen packages with `workflow_select_packages`.
-   The list is grouped under the categories its package references name.
+   The list is grouped under the categories its package references name. A
+   selectable procedure is the marker for an optional package set: `--yolo`
+   never selects one, so an optional set needs either an interactive run or
+   `--add-optionals`.
 6. `questionnaire_confirm` renders the selected procedures and waits for
    `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
    `--yolo` mode this step is skipped and execution starts immediately.
@@ -59,7 +66,7 @@ The application flow is:
 | `logic/load.sh` | Loads interfaces, implementations, declarations, actions, and the application in dependency order. |
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
-| `logic/flags.sh` | CLI flag parsing for `--yolo`, `--add-optionals`, and `--help`. |
+| `logic/flags.sh` | CLI flag parsing for `-y`/`--yolo`, `-a`/`--add-optionals`, and `-h`/`--help`. |
 | `logic/environment.sh` | Linux and macOS system detection. |
 | `logic/workflow.sh` | In-memory yes/no selections and dependency filtering. |
 | `logic/questionnaire.sh` | Business flow for questions, summary, and final action choice. |
@@ -158,16 +165,14 @@ resets it before each pass. `workflow_available` filters by platform, while
 requirement.
 
 A procedure marked with `procedure_selectable` records its per-package choices
-in `_WORKFLOW_PACKAGE_SELECTIONS`. `workflow_select_packages` stores them,
-`workflow_selected_packages` reads them back into an array, and
-`workflow_select_packages_all` selects every available package for the
-non-interactive `--yolo` path. An action for a selectable procedure must call
-`workflow_selected_packages` instead of `catalog_packages` to install only the
-chosen packages. The questionnaire asks for those packages with
-`ui_multiselect_grouped`, which returns the checked item rows only; group rows
-are never part of the result. The grouped menu has no global `All` row. The
-checkbox menu uses a temporary screen and restores the previous terminal view
-after confirmation.
+in `_WORKFLOW_PACKAGE_SELECTIONS`. `workflow_select_packages` stores them and
+`workflow_selected_packages` reads them back into an array. An action for a
+selectable procedure must call `workflow_selected_packages` instead of
+`catalog_packages` to install only the chosen packages. The questionnaire asks
+for those packages with `ui_multiselect_grouped`, which returns the checked
+item rows only; group rows are never part of the result. The grouped menu has
+no global `All` row. The checkbox menu uses a temporary screen and restores the
+previous terminal view after confirmation.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.
 
@@ -232,8 +237,7 @@ interfaces are grouped below for quick navigation.
 - Flags: `flags_parse`.
 - Workflow: `workflow_reset`, `workflow_select`, `workflow_selection`,
   `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
-  `workflow_select_packages`, `workflow_selected_packages`, and
-  `workflow_select_packages_all`.
+  `workflow_select_packages`, and `workflow_selected_packages`.
 - Questionnaire and application: `questionnaire_collect`,
   `questionnaire_confirm`, `runner_run`, `process_run`, and `setup_run`.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,

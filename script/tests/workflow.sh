@@ -48,7 +48,7 @@ if contains homebrew_casks "${selected[@]}"; then
   fail "macOS casks must remain unselected until packages are chosen"
 fi
 workflow_select homebrew no
-workflow_select_packages_all homebrew_casks macos
+workflow_select homebrew_casks yes
 workflow_selected selected macos
 if contains homebrew_casks "${selected[@]}"; then
   fail "selected macOS casks require the core Homebrew package set"
@@ -66,9 +66,24 @@ workflow_selected selected fedora
 if contains homebrew_casks "${selected[@]}"; then
   fail "macOS casks must not appear on Linux"
 fi
+# Selecting only the non-selectable procedures is what the YOLO path does, so
+# neither optional package set may reach the runner in that state.
+workflow_reset
+workflow_select homebrew yes
+workflow_selected selected macos
+contains homebrew "${selected[@]}" || fail "core Homebrew should be selected"
+if contains homebrew_extended "${selected[@]}"; then
+  fail "optional brew packages must stay out of the YOLO selection"
+fi
+if contains homebrew_casks "${selected[@]}"; then
+  fail "cask applications must stay out of the YOLO selection"
+fi
+
+# Chosen packages survive the round trip through the workflow store.
+workflow_select_packages homebrew_casks firefox ghostty
 casks=()
 workflow_selected_packages casks homebrew_casks
-[[ "${#casks[@]}" -eq 29 ]] || fail "YOLO must select every cask"
+[[ "${casks[*]}" == 'firefox ghostty' ]] || fail "chosen casks must be read back"
 
 # The cask command is handed to the direct-input finish handler.
 catalog_finish_handler finish_handler homebrew_casks

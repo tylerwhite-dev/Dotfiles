@@ -102,8 +102,9 @@ are never part of the result — only package names are.
 Grouping is presentation only. An action still calls `catalog_packages` and gets
 one flat array, and the item rows always match that array in order.
 
-In `--yolo` mode nothing is asked: every available package is selected
-automatically, so new packages install without appearing in any list.
+`--yolo` mode never selects a selectable procedure. Optional package sets and
+casks are reported as skipped and install nothing, so their contents change
+only through an interactive run or `--add-optionals`.
 
 ## Validation
 

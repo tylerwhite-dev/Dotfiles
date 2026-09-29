@@ -24,13 +24,16 @@ installation runs with direct terminal access so password prompts stay visible.
 ## Flags
 
 ```bash
-bash dotfiles-deploy.sh --yolo
+bash dotfiles-deploy.sh -y
+bash dotfiles-deploy.sh -a
 ```
 
-- `--yolo` answers `yes` to every question and starts execution without the
-  confirmation summary. All available procedures run automatically.
-- `--add-optionals` asks only for the extended Homebrew formulae.
-- `-h, --help` prints usage.
+- `-y`, `--yolo` answers `yes` to every question and starts execution without
+  the confirmation summary. Every procedure that needs no package selection
+  runs automatically; optional package sets and casks are skipped and listed as
+  skipped, because they install only explicitly chosen packages.
+- `-a`, `--add-optionals` asks only for the extended Homebrew formulae.
+- `-h`, `--help` prints usage.
 
 Any other flag exits with status 2 and an `Unknown flag` error.
 

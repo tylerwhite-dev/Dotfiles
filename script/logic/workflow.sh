@@ -93,16 +93,3 @@ workflow_selected_packages() {
     read -r -a result_ref <<< "${_WORKFLOW_PACKAGE_SELECTIONS[$procedure_id]}"
   fi
 }
-
-# Selects every package for a selectable procedure (YOLO mode).
-workflow_select_packages_all() {
-  local procedure_id="$1"
-  local platform="$2"
-  local -a packages=()
-  local -a all=()
-
-  catalog_packages packages "$procedure_id" "$platform" || return
-  all=("${packages[@]}")
-  _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]="${all[*]}"
-  _WORKFLOW_SELECTIONS["$procedure_id"]="yes"
-}

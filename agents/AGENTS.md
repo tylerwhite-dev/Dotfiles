@@ -3,7 +3,8 @@
 ## Setup Commands
 
 - Full Linux setup: `bash dotfiles-deploy.sh`
-- Automated (no prompts): `bash dotfiles-deploy.sh --yolo`
+- Automated (no prompts): `bash dotfiles-deploy.sh -y` (skips optional
+  package sets and casks)
 - Apply configs only, from the repository root:
   `stow --no-folding --override='.*' --dir="$(dirname "$PWD")" --target="$HOME" "$(basename "$PWD")"`
 - Apply common Zsh config: `stow --no-folding --override='.*' --target="$HOME" zsh_common`
