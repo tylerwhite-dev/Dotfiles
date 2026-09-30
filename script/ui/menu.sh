@@ -2,108 +2,63 @@
 
 # Draws all menu options while reserving space for the active marker.
 _ui_draw_menu_options() {
-  local selected_index="$1"
+  local __ui_draw_selected="$1"
   shift
-
-  local options=("$@")
-  local index label
-  local columns="${COLUMNS:-80}"
-  [[ "$columns" =~ ^[1-9][0-9]*$ ]] || columns=80
-  local label_width=$((10#$columns-7))
-  ((label_width < 1)) && label_width=1
-
-  for ((index = 0; index < ${#options[@]}; index++)); do
-    label="${options[index]}"
-    if ((${#label} > label_width)); then
-      label="${label:0:label_width-1}…"
-    fi
-    if ((index == selected_index)); then
-      printf '\r\033[2K    %s› %s%s\n' \
-        "$ui_color_selected" "$label" "$ui_color_reset"
+  local __ui_draw_index __ui_draw_label __ui_draw_columns="${COLUMNS:-80}"
+  local -a __ui_draw_options=("$@")
+  [[ "$__ui_draw_columns" =~ ^[1-9][0-9]*$ ]] || __ui_draw_columns=80
+  local __ui_draw_width=$((10#$__ui_draw_columns-7))
+  ((__ui_draw_width < 1)) && __ui_draw_width=1
+  for ((__ui_draw_index=0; __ui_draw_index<${#__ui_draw_options[@]}; __ui_draw_index++)); do
+    _ui_truncate __ui_draw_label "${__ui_draw_options[__ui_draw_index]}" "$__ui_draw_width"
+    if ((__ui_draw_index == __ui_draw_selected)); then
+      printf '\r\033[2K    %s› %s%s\n' "$ui_color_selected" "$__ui_draw_label" "$ui_color_reset"
     else
-      printf '\r\033[2K      %s\n' "$label"
+      printf '\r\033[2K      %s\n' "$__ui_draw_label"
     fi
   done
 }
 
-# Reads Enter or arrow-key input and returns the chosen menu index.
+# Reads normalized events, applies single-choice navigation, and redraws options.
 _ui_read_menu_choice() {
-  local result_name="$1"
-  local cursor_index="$2"
+  local __ui_choice_result="$1" __ui_choice_cursor="$2"
   shift 2
-
-  local options=("$@")
-  local option_count="${#options[@]}"
-  local key=""
-  local escape_sequence=""
-
+  local -a __ui_choice_options=("$@")
+  local __ui_choice_count="${#__ui_choice_options[@]}" __ui_choice_key
   while true; do
-    key=""
-    if ! IFS= read -rsn1 key; then
-      return 130
-    fi
-
-    case "$key" in
-      "")
-        printf -v "$result_name" '%d' "$cursor_index"
-        return 0
-        ;;
-      $'\033')
-        escape_sequence=""
-        if IFS= read -rsn2 -t 0.2 escape_sequence; then
-          case "$escape_sequence" in
-            '[A' | 'OA')
-              cursor_index=$(((cursor_index - 1 + option_count) % option_count))
-              ;;
-            '[B' | 'OB')
-              cursor_index=$(((cursor_index + 1) % option_count))
-              ;;
-            *)
-              continue
-              ;;
-          esac
-
-          printf '\033[%dA' "$option_count"
-          _ui_draw_menu_options "$cursor_index" "${options[@]}"
-        fi
-        ;;
+    _ui_read_key __ui_choice_key || return
+    case "$__ui_choice_key" in
+      enter) printf -v "$__ui_choice_result" '%d' "$__ui_choice_cursor"; return 0 ;;
+      up) __ui_choice_cursor=$(((__ui_choice_cursor-1+__ui_choice_count)%__ui_choice_count)) ;;
+      down) __ui_choice_cursor=$(((__ui_choice_cursor+1)%__ui_choice_count)) ;;
+      *) continue ;;
     esac
+    printf '\033[%dA' "$__ui_choice_count"
+    _ui_draw_menu_options "$__ui_choice_cursor" "${__ui_choice_options[@]}"
   done
 }
 
-# Renders a menu, handles keyboard navigation, and returns the selected index.
+# Renders a menu and returns its index; caller output names must not use __ui_.
 ui_select() {
-  local result_name="$1"
-  local prompt="$2"
-  local detail="$3"
-  local default_index="$4"
-  local style="$5"
+  _ui_output_name "$1" || return
+  local __ui_select_result="$1" __ui_select_prompt="$2" __ui_select_detail="$3"
+  local __ui_select_default="$4" __ui_select_style="$5"
   shift 5
-
-  local options=("$@")
-  local option_count="${#options[@]}"
-  local choice_value
-
-  if ((option_count == 0 || default_index < 0 || default_index >= option_count)); then
+  local -a __ui_select_options=("$@")
+  local __ui_select_count="${#__ui_select_options[@]}" __ui_select_choice
+  if ((__ui_select_count == 0 || __ui_select_default < 0 || __ui_select_default >= __ui_select_count)); then
     return 2
   fi
-
-  if [[ "$style" == "minimal" ]]; then
+  if [[ "$__ui_select_style" == minimal ]]; then
     printf '\n'
   else
-    printf '\n%s%s%s\n' \
-      "$ui_color_heading" \
-      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' \
-      "$ui_color_reset"
+    printf '\n%s%s%s\n' "$ui_color_heading" \
+      '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━' "$ui_color_reset"
   fi
-
-  printf '%s%s%s\n' "$ui_color_question" "$prompt" "$ui_color_reset"
-  if [[ -n "$detail" ]]; then
-    _ui_print_detail "$detail"
-  fi
-
+  printf '%s%s%s\n' "$ui_color_question" "$__ui_select_prompt" "$ui_color_reset"
+  [[ -z "$__ui_select_detail" ]] || _ui_print_detail "$__ui_select_detail"
   printf '\n'
-  _ui_draw_menu_options "$default_index" "${options[@]}"
-  _ui_read_menu_choice choice_value "$default_index" "${options[@]}" || return
-  printf -v "$result_name" '%d' "$choice_value"
+  _ui_draw_menu_options "$__ui_select_default" "${__ui_select_options[@]}"
+  _ui_read_menu_choice __ui_select_choice "$__ui_select_default" "${__ui_select_options[@]}" || return
+  printf -v "$__ui_select_result" '%d' "$__ui_select_choice"
 }

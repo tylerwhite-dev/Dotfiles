@@ -11,6 +11,8 @@ bash script/tests/config_validation.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
+bash script/tests/app.sh
+bash script/tests/process.sh
 ```
 
 | Script | What it verifies |
@@ -19,6 +21,8 @@ bash script/tests/layer_dependencies.sh
 | `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
+| `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |
+| `process.sh` | Completion statuses, parent-shell finish handler and privilege preparation failures using fixture handlers. |
 
 ## Manual UI tests (interactive)
 
@@ -70,3 +74,21 @@ are `ui_select` with two options (`Yes`/`No`), covered in the `ui_select` suite.
 
 Dynamic tests are interactive by design: use arrow keys, Space, and Enter to
 confirm a selection before rating the case.
+
+## Animated process contract (real TTY)
+
+```bash
+bash script/tests/manual/process.sh
+bash script/tests/manual/ui_contracts.sh
+```
+
+`process.sh` runs fixture handlers only. Checks success/failure propagation and that the finish
+handler runs in the parent shell with direct terminal input/output. Also checks
+that closing captured output does not disable parent stderr. No installation
+or privilege operations run. Run the dynamic UI cases in a TTY as well, including
+resize, narrow columns, Enter and interruptions. Caller-owned checkbox text is now
+passed explicitly; `checkbox_texts` is prepared in the manual fixture file.
+
+`ui_contracts.sh` uses scripted keys with real terminal dimensions. It temporarily
+resizes the TTY, restoring its dimensions on exit, and checks single/checkbox
+selection, hidden columns, resize on the next key, EOF and INT/TERM cleanup.

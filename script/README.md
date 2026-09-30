@@ -45,6 +45,8 @@ Any other flag exits with status 2 and an `Unknown flag` error.
   declarations. It does not render UI or execute system commands.
 - `ui/` renders menus, stages, messages, commands, and the execution timeline.
   UI functions receive their text from callers and do not know about procedures.
+  Checkbox widgets receive an explicit associative text array. Their output
+  and input variable names must not use the reserved `__ui_` prefix.
 - `logic/` controls the questionnaire, dependencies, execution order, processes,
   errors, and environment detection.
 - `logic/actions/` contains the system changes for each procedure.

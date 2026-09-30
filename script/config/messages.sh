@@ -90,6 +90,11 @@ message_define option.exit "Exit without changes"
 message_define label.yes "yes"
 message_define label.no "no"
 message_define package_category_other "Other"
+message_define ui.multiselect.all_label "All"
+# Escaped conversions survive message_format for the widget's four counters.
+message_define ui.multiselect.status_format "cols %%d-%%d/%%d  ·  %%d selected"
+message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space toggle  Enter confirm"
+message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
 

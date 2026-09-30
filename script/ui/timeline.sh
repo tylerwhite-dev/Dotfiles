@@ -2,25 +2,9 @@
 
 # Truncates a procedure label to fit the current terminal width.
 _ui_timeline_truncate_label() {
-  local result_name="$1"
-  local label="$2"
-  local reserved_columns="${3:-32}"
-  local terminal_columns="${COLUMNS:-80}"
-  local maximum_length
-
-  if [[ ! "$terminal_columns" =~ ^[1-9][0-9]*$ ]]; then
-    terminal_columns=80
-  fi
-
-  maximum_length=$((10#$terminal_columns - reserved_columns - 1))
-
-  if ((maximum_length < 1)); then
-    printf -v "$result_name" '%s' ''
-  elif ((${#label} > maximum_length)); then
-    printf -v "$result_name" '%s' "${label:0:maximum_length-1}…"
-  else
-    printf -v "$result_name" '%s' "$label"
-  fi
+  local __ui_tl_columns="${COLUMNS:-80}" __ui_tl_reserved="${3:-32}"
+  [[ "$__ui_tl_columns" =~ ^[1-9][0-9]*$ ]] || __ui_tl_columns=80
+  _ui_truncate "$1" "$2" "$((10#$__ui_tl_columns-__ui_tl_reserved-1))"
 }
 
 # Formats elapsed seconds as a compact clock label.
@@ -57,13 +41,14 @@ _ui_timeline_format_duration() {
 
 # Selects an animation frame from elapsed microseconds.
 ui_timeline_frame() {
-  local result_name="$1"
-  local elapsed_microseconds="$2"
-  local frame_count="${#ui_timeline_frames[@]}"
-  local frame_index=$((elapsed_microseconds / ui_timeline_frame_microseconds))
+  _ui_output_name "$1" || return
+  local __ui_frame_result_name="$1"
+  local __ui_frame_elapsed_microseconds="$2"
+  local __ui_frame_frame_count="${#ui_timeline_frames[@]}"
+  local __ui_frame_frame_index=$((__ui_frame_elapsed_microseconds / ui_timeline_frame_microseconds))
 
-  printf -v "$result_name" '%s' \
-    "${ui_timeline_frames[frame_index % frame_count]}"
+  printf -v "$__ui_frame_result_name" '%s' \
+    "${ui_timeline_frames[__ui_frame_frame_index % __ui_frame_frame_count]}"
 }
 
 # Renders the current procedure marker, progress, label, and timer.

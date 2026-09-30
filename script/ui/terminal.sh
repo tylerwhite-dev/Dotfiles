@@ -5,6 +5,64 @@ ui_is_interactive() {
   [[ -t 0 && -t 1 ]]
 }
 
+# Shared widget support: direct identifiers only; __ui_ belongs to UI internals.
+_ui_valid_name() {
+  [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ && "$1" != __ui_* ]] || return 2
+  local __ui_name_declaration
+  __ui_name_declaration="$(declare -p "$1" 2>/dev/null)" || return 0
+  [[ ! "$__ui_name_declaration" =~ ^declare\ -[^[:space:]]*n ]] || return 2
+}
+
+# Refuse readonly outputs before a renderer can change terminal state.
+_ui_output_name() {
+  _ui_valid_name "$1" || return
+  local __ui_output_declaration
+  __ui_output_declaration="$(declare -p "$1" 2>/dev/null)" || return 0
+  [[ ! "$__ui_output_declaration" =~ ^declare\ -[^[:space:]]*[rA] ]] || return 2
+}
+
+# Verifies an existing indexed (a) or associative (A) array, without aliases.
+_ui_array_type() {
+  local __ui_array_declaration
+  __ui_array_declaration="$(declare -p "$1" 2>/dev/null)" || return 2
+  [[ ! "$__ui_array_declaration" =~ ^declare\ -[^[:space:]]*n ]] || return 2
+  [[ "$__ui_array_declaration" =~ ^declare\ -[^[:space:]]*$2 ]] || return 2
+}
+
+# Returns a normalized event; widgets own navigation and redraw policy.
+_ui_read_key() {
+  local __ui_key_value='' __ui_key_sequence=''
+  IFS= read -rsn1 __ui_key_value || return 130
+  case "$__ui_key_value" in
+    '') __ui_key_value=enter ;;
+    ' ') __ui_key_value=space ;;
+    $'\033')
+      __ui_key_value=unknown
+      if IFS= read -rsn2 -t 0.2 __ui_key_sequence; then
+        case "$__ui_key_sequence" in
+          '[A'|'OA') __ui_key_value=up ;;
+          '[B'|'OB') __ui_key_value=down ;;
+          '[C'|'OC') __ui_key_value=right ;;
+          '[D'|'OD') __ui_key_value=left ;;
+        esac
+      fi
+      ;;
+    *) __ui_key_value=unknown ;;
+  esac
+  printf -v "$1" '%s' "$__ui_key_value"
+}
+
+# Truncates by Bash character length; padding and available width are caller-owned.
+_ui_truncate() {
+  local __ui_truncate_text="$2" __ui_truncate_limit="$3"
+  if ((__ui_truncate_limit <= 0)); then
+    __ui_truncate_text=''
+  elif ((${#__ui_truncate_text} > __ui_truncate_limit)); then
+    __ui_truncate_text="${__ui_truncate_text:0:__ui_truncate_limit-1}…"
+  fi
+  printf -v "$1" '%s' "$__ui_truncate_text"
+}
+
 # Prints a successful status message using the success color.
 ui_success() {
   printf '\n%s%s%s\n' "$ui_color_success" "$1" "$ui_color_reset"
@@ -53,24 +111,25 @@ ui_command() {
 
 # Builds a description and optional comma-separated package line.
 ui_detail() {
-  local result_name="$1"
-  local description="$2"
+  _ui_output_name "$1" || return
+  local __ui_detail_result_name="$1"
+  local __ui_detail_description="$2"
   shift 2
 
-  local rendered_detail="$description"
-  local packages=""
-  local package
+  local __ui_detail_rendered_detail="$__ui_detail_description"
+  local __ui_detail_packages=""
+  local __ui_detail_package
 
-  for package in "$@"; do
-    packages+="${packages:+, }${package}"
+  for __ui_detail_package in "$@"; do
+    __ui_detail_packages+="${__ui_detail_packages:+, }${__ui_detail_package}"
   done
 
-  if [[ -n "$packages" ]]; then
-    rendered_detail+=$'\n'
-    rendered_detail+="  ${packages}"
+  if [[ -n "$__ui_detail_packages" ]]; then
+    __ui_detail_rendered_detail+=$'\n'
+    __ui_detail_rendered_detail+="  ${__ui_detail_packages}"
   fi
 
-  printf -v "$result_name" '%s' "$rendered_detail"
+  printf -v "$__ui_detail_result_name" '%s' "$__ui_detail_rendered_detail"
 }
 
 # Prints each detail line with the package/comment color and two-space indent.

@@ -13,6 +13,11 @@ ui_stage() {
   printf '%s%s%s\n\n' "$ui_color_hint" "$metadata" "$ui_color_reset"
 }
 
+# Shared review-row rendering; wrappers own selection semantics and colors.
+_ui_summary_row() {
+  printf '%s%s%s  %s  %s\n' "$2" "$1" "$ui_color_reset" "$3" "$4"
+}
+
 # Prints one review row with a symbol and colored yes/no answer.
 ui_summary_item() {
   local label="$1"
@@ -33,8 +38,7 @@ ui_summary_item() {
     answer="${ui_color_error}${no_label}${ui_color_reset}"
   fi
 
-  printf '%s%s%s  %s  %s\n' \
-    "$symbol_color" "$symbol" "$ui_color_reset" "$label" "$answer"
+  _ui_summary_row "$symbol" "$symbol_color" "$label" "$answer"
 }
 
 # Prints a review row for a package-select procedure with a count status.
@@ -54,6 +58,5 @@ ui_summary_item_packages() {
     symbol_color="$ui_color_hint"
   fi
 
-  printf '%s%s%s  %s  %s\n' \
-    "$symbol_color" "$symbol" "$ui_color_reset" "$label" "$status"
+  _ui_summary_row "$symbol" "$symbol_color" "$label" "$status"
 }

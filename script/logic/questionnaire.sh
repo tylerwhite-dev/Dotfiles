@@ -9,7 +9,17 @@ _questionnaire_procedure_text() {
   message_format "$result_name" "procedure.${procedure_id}.${text_kind}"
 }
 
-# Collects the package selections for a selectable procedure via checkboxes.
+# Prepares caller-owned widget text without exposing message keys to UI.
+questionnaire_multiselect_texts() {
+  local -n __questionnaire_texts_result="$1"
+  local __questionnaire_texts_key
+  for __questionnaire_texts_key in all_label status_format navigation_hint resize_notice; do
+    message_format "__questionnaire_texts_result[$__questionnaire_texts_key]" \
+      "ui.multiselect.$__questionnaire_texts_key" || return
+  done
+}
+
+# Collects package choices without exposing message keys to the widget.
 _questionnaire_read_selectable_packages() {
   local procedure_id="$1"
   local platform="$2"
@@ -20,12 +30,14 @@ _questionnaire_read_selectable_packages() {
   local -a rows=()
   local -a kinds=()
   local -a selected=()
+  local -A texts=()
 
   _questionnaire_procedure_text question "$procedure_id" question
   message_format prompt question.progress "$current" "$total" "$question"
   catalog_package_rows rows kinds "$procedure_id" "$platform" || return
+  questionnaire_multiselect_texts texts || return
 
-  if ! ui_multiselect_grouped selected "$prompt" rows kinds; then
+  if ! ui_multiselect_grouped selected "$prompt" texts rows kinds; then
     error_report error.input_interrupted
     return 1
   fi

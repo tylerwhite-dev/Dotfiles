@@ -5,6 +5,9 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
   exec bash "$(dirname -- "${BASH_SOURCE[0]}")/dynamic_ui.sh" "$@"
 fi
 
+declare -A checkbox_texts=()
+questionnaire_multiselect_texts checkbox_texts
+
 _select_minimal() {
   local choice="" status=0
   local -a options=(one two three)
@@ -146,7 +149,7 @@ _multiselect_done() {
 _multiselect_all() {
   local -a chosen=()
   local status=0
-  ui_multiselect chosen "Select packages:" alpha beta gamma || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts alpha beta gamma || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -158,7 +161,7 @@ _multiselect_all() {
 _multiselect_two() {
   local -a chosen=()
   local status=0
-  ui_multiselect chosen "Select packages:" alpha beta gamma || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts alpha beta gamma || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -170,7 +173,7 @@ _multiselect_two() {
 _multiselect_none() {
   local -a chosen=()
   local status=0
-  ui_multiselect chosen "Select packages:" alpha beta gamma || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts alpha beta gamma || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -187,7 +190,7 @@ _multiselect_many() {
   for ((i = 0; i < 25; i++)); do
     options+=("pkg-${i}")
   done
-  ui_multiselect chosen "Select packages:" "${options[@]}" || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts "${options[@]}" || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -199,7 +202,7 @@ _multiselect_many() {
 _multiselect_duplicates() {
   local -a chosen=()
   local status=0
-  ui_multiselect chosen "Select packages:" dup dup other || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts dup dup other || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -211,7 +214,7 @@ _multiselect_duplicates() {
 _multiselect_no_options() {
   local -a chosen=()
   local status=0
-  ui_multiselect chosen "Select packages:" || status=$?
+  ui_multiselect chosen "Select packages:" checkbox_texts || status=$?
   printf '\n'
   _test_msg "  Exit code with no packages: ${status} (expected 2)"
 }
@@ -245,7 +248,7 @@ _grouped_kinds=(g i i i g i i)
 _grouped_choose() {
   local -a chosen=()
   local status=0
-  ui_multiselect_grouped chosen "Select packages:" \
+  ui_multiselect_grouped chosen "Select packages:" checkbox_texts \
     _grouped_rows _grouped_kinds || status=$?
   printf '\n'
   if ((status != 0)); then
@@ -282,7 +285,7 @@ _multiselect_group_scroll() {
     rows+=("package-${i}")
     kinds+=(i)
   done
-  ui_multiselect_grouped chosen "Select packages:" rows kinds || status=$?
+  ui_multiselect_grouped chosen "Select packages:" checkbox_texts rows kinds || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"
@@ -300,7 +303,7 @@ _multiselect_group_real() {
     _test_msg "  catalog_package_rows failed"
     return 1
   fi
-  ui_multiselect_grouped chosen "Select extra packages:" rows kinds || status=$?
+  ui_multiselect_grouped chosen "Select extra packages:" checkbox_texts rows kinds || status=$?
   printf '\n'
   if ((status != 0)); then
     _test_msg "  Menu exited with code ${status}"

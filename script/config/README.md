@@ -13,7 +13,7 @@ questionnaire asks a single question.
 | `procedures.sh` | One block per procedure, plus the questions and labels for it. |
 
 Keys in `messages.sh` are namespaced: `error.*`, `status.*`, `stage.*`,
-`option.*`, `label.*`, `prompt.*`, `question.*`, `flags.*`, and the single
+`option.*`, `label.*`, `prompt.*`, `question.*`, `flags.*`, `ui.multiselect.*`, and the single
 `package_category_other` fallback label. The per-procedure strings
 (`procedure.<id>.question`, `.label`, `.description`) are declared next to the
 procedure itself in `procedures.sh`, not here. Logic picks a key, the UI prints
@@ -87,8 +87,8 @@ same name as either a group or a category — the catalog resolves it.
 ## What the questionnaire shows
 
 Only procedures marked with `procedure_selectable` render a checkbox list.
-Today that is `homebrew_extended` alone; every other procedure installs its
-packages whole after a yes/no question.
+The selectable procedures are `homebrew_extended` and, on macOS,
+`homebrew_casks`. Other procedures install their package sets after a yes/no question.
 
 That flag is what makes categories visible. A category referenced from a
 non-selectable procedure still works — `catalog_packages` flattens it — but
@@ -96,11 +96,14 @@ the list is not drawn, so there is nothing to group on screen.
 
 Selecting a section header toggles every package in that section, and the header
 shows `[x]`, `[-]`, or `[ ]` depending on how many of its packages are marked.
-`All` on the first row marks or clears every package. Group headers and `All`
-are never part of the result — only package names are.
+The grouped list has no global `All` row. A flat checkbox list retains `All`.
+Headings and `All` are never part of the result; only package names are.
 
-Grouping is presentation only. An action still calls `catalog_packages` and gets
-one flat array, and the item rows always match that array in order.
+Grouping is presentation only. `catalog_packages` returns the complete flat
+array, and item rows match it in declaration order. Selectable actions use
+`workflow_selected_packages` to install only the chosen items. Ordinary groups
+appear at their declared position under `Other` when categories are present;
+adjacent ordinary groups share that heading, and later runs repeat it.
 
 `--yolo` mode never selects a selectable procedure. Optional package sets and
 casks are reported as skipped and install nothing, so their contents change
@@ -140,3 +143,10 @@ Common errors and what they mean:
 
 For procedures, actions, and the interfaces these declarations use, see
 `../README.md` and `../AGENTS.md`.
+
+## Checkbox text
+
+`ui.multiselect.*` messages provide the All label, status format, keyboard hint,
+and small-terminal notice. Logic passes an associative text array to the widget.
+The status message uses `%%d` conversions: message formatting produces literal
+`%d` placeholders for the UI's four counters. UI does not read message keys.

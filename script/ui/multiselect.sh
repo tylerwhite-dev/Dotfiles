@@ -2,10 +2,11 @@
 
 # The checkbox menu owns the alternate screen only while it is active.
 _ui_ms_screen_open() {
-  _ui_ms_old_exit="$(trap -p EXIT)"
-  _ui_ms_old_int="$(trap -p INT)"
-  _ui_ms_old_term="$(trap -p TERM)"
-  _ui_ms_screen_active=1
+  [[ "${__ui_ms_screen_active:-0}" == 0 ]] || return 2
+  __ui_ms_old_exit="$(trap -p EXIT)"
+  __ui_ms_old_int="$(trap -p INT)"
+  __ui_ms_old_term="$(trap -p TERM)"
+  __ui_ms_screen_active=1
   printf '\033[?1049h\033[?25l\033[H\033[2J'
   trap '_ui_ms_exit' EXIT
   trap '_ui_ms_abort 130' INT
@@ -13,109 +14,109 @@ _ui_ms_screen_open() {
 }
 
 _ui_ms_screen_close() {
-  if [[ "${_ui_ms_screen_active:-0}" == 1 ]]; then
+  if [[ "${__ui_ms_screen_active:-0}" == 1 ]]; then
     printf '\033[?25h\033[?1049l'
-    _ui_ms_screen_active=0
+    __ui_ms_screen_active=0
   fi
-  if [[ -n "${_ui_ms_old_exit:-}" ]]; then eval "$_ui_ms_old_exit"; else trap - EXIT; fi
-  if [[ -n "${_ui_ms_old_int:-}" ]]; then eval "$_ui_ms_old_int"; else trap - INT; fi
-  if [[ -n "${_ui_ms_old_term:-}" ]]; then eval "$_ui_ms_old_term"; else trap - TERM; fi
+  if [[ -n "${__ui_ms_old_exit:-}" ]]; then eval "$__ui_ms_old_exit"; else trap - EXIT; fi
+  if [[ -n "${__ui_ms_old_int:-}" ]]; then eval "$__ui_ms_old_int"; else trap - INT; fi
+  if [[ -n "${__ui_ms_old_term:-}" ]]; then eval "$__ui_ms_old_term"; else trap - TERM; fi
 }
 
 _ui_ms_abort() {
-  local status="$1"
+  local __ui_abort_status="$1"
   _ui_ms_screen_close
-  exit "$status"
+  exit "$__ui_abort_status"
 }
 
 # An unexpected shell exit must also run the EXIT handler that was present
 # before this menu opened (for example, a caller's temporary-file cleanup).
 _ui_ms_exit() {
-  local status="$?"
-  local previous="${_ui_ms_old_exit:-}"
+  local __ui_exit_status="$?"
+  local __ui_exit_previous="${__ui_ms_old_exit:-}"
   _ui_ms_screen_close
-  if [[ -n "$previous" ]]; then
-    eval "set -- ${previous#trap -- }"
+  if [[ -n "$__ui_exit_previous" ]]; then
+    eval "set -- ${__ui_exit_previous#trap -- }"
     eval "$1"
   fi
-  exit "$status"
+  exit "$__ui_exit_status"
 }
 
 # Read live geometry first. LINES/COLUMNS remain useful for redirected UI tests.
 _ui_ms_size() {
-  local -n height_ref="$1"
-  local -n width_ref="$2"
-  local size_height="${LINES:-24}"
-  local size_width="${COLUMNS:-80}"
-  local live_height live_width
-  if [[ -t 1 ]] && read -r live_height live_width < <(stty size </dev/tty 2>/dev/null); then
-    if [[ "$live_height" =~ ^[1-9][0-9]*$ && "$live_width" =~ ^[1-9][0-9]*$ ]]; then
-      size_height="$live_height"
-      size_width="$live_width"
+  local -n __ui_size_height_ref="$1"
+  local -n __ui_size_width_ref="$2"
+  local __ui_size_size_height="${LINES:-24}"
+  local __ui_size_size_width="${COLUMNS:-80}"
+  local __ui_size_live_height __ui_size_live_width
+  if [[ -t 1 ]] && read -r __ui_size_live_height __ui_size_live_width < <(stty size </dev/tty 2>/dev/null); then
+    if [[ "$__ui_size_live_height" =~ ^[1-9][0-9]*$ && "$__ui_size_live_width" =~ ^[1-9][0-9]*$ ]]; then
+      __ui_size_size_height="$__ui_size_live_height"
+      __ui_size_size_width="$__ui_size_live_width"
     fi
   fi
-  [[ "$size_height" =~ ^[1-9][0-9]*$ ]] || size_height=24
-  [[ "$size_width" =~ ^[1-9][0-9]*$ ]] || size_width=80
-  height_ref="$size_height"
-  width_ref="$size_width"
+  [[ "$__ui_size_size_height" =~ ^[1-9][0-9]*$ ]] || __ui_size_size_height=24
+  [[ "$__ui_size_size_width" =~ ^[1-9][0-9]*$ ]] || __ui_size_size_width=80
+  __ui_size_height_ref="$__ui_size_size_height"
+  __ui_size_width_ref="$__ui_size_size_width"
 }
 
 _ui_ms_group_state() {
-  local -n kinds_ref="$1"
-  local -n marked_ref="$2"
-  local head="$3" index total=0 on=0
-  for ((index=head+1; index<${#kinds_ref[@]}; index++)); do
-    [[ "${kinds_ref[index]}" == g ]] && break
-    ((total+=1))
-    [[ "${marked_ref[$index]:-0}" == 1 ]] && ((on+=1))
+  local -n __ui_gs_kinds_ref="$1"
+  local -n __ui_gs_marked_ref="$2"
+  local __ui_gs_head="$3" __ui_gs_index __ui_gs_total=0 __ui_gs_on=0
+  for ((__ui_gs_index=__ui_gs_head+1; __ui_gs_index<${#__ui_gs_kinds_ref[@]}; __ui_gs_index++)); do
+    [[ "${__ui_gs_kinds_ref[__ui_gs_index]}" == g ]] && break
+    ((__ui_gs_total+=1))
+    [[ "${__ui_gs_marked_ref[$__ui_gs_index]:-0}" == 1 ]] && ((__ui_gs_on+=1))
   done
-  if ((on == 0)); then printf -v "$4" '%s' empty
-  elif ((on == total)); then printf -v "$4" '%s' full
+  if ((__ui_gs_on == 0)); then printf -v "$4" '%s' empty
+  elif ((__ui_gs_on == __ui_gs_total)); then printf -v "$4" '%s' full
   else printf -v "$4" '%s' partial
   fi
 }
 
 _ui_ms_group_set() {
-  local -n kinds_ref="$1"
-  local -n marked_ref="$2"
-  local head="$3" state="$4" index
-  for ((index=head+1; index<${#kinds_ref[@]}; index++)); do
-    [[ "${kinds_ref[index]}" == g ]] && break
-    marked_ref[$index]="$state"
+  local -n __ui_set_kinds_ref="$1"
+  local -n __ui_set_marked_ref="$2"
+  local __ui_set_head="$3" __ui_set_state="$4" __ui_set_index
+  for ((__ui_set_index=__ui_set_head+1; __ui_set_index<${#__ui_set_kinds_ref[@]}; __ui_set_index++)); do
+    [[ "${__ui_set_kinds_ref[__ui_set_index]}" == g ]] && break
+    __ui_set_marked_ref[$__ui_set_index]="$__ui_set_state"
   done
 }
 
 _ui_ms_all_state() {
-  local -n kinds_ref="$1"
-  local -n marked_ref="$2"
-  local index
-  [[ "${kinds_ref[0]}" == a ]] || return 0
-  for ((index=1; index<${#kinds_ref[@]}; index++)); do
-    if [[ "${kinds_ref[index]}" == i && "${marked_ref[$index]:-0}" != 1 ]]; then
-      marked_ref[0]=0
+  local -n __ui_all_kinds_ref="$1"
+  local -n __ui_all_marked_ref="$2"
+  local __ui_all_index
+  [[ "${__ui_all_kinds_ref[0]}" == a ]] || return 0
+  for ((__ui_all_index=1; __ui_all_index<${#__ui_all_kinds_ref[@]}; __ui_all_index++)); do
+    if [[ "${__ui_all_kinds_ref[__ui_all_index]}" == i && "${__ui_all_marked_ref[$__ui_all_index]:-0}" != 1 ]]; then
+      __ui_all_marked_ref[0]=0
       return
     fi
   done
-  marked_ref[0]=1
+  __ui_all_marked_ref[0]=1
 }
 
 _ui_ms_toggle() {
-  local -n kinds_ref="$1"
-  local -n marked_ref="$2"
-  local index="$3" i state
-  if [[ "${kinds_ref[index]}" == a ]]; then
-    state=$((1-${marked_ref[0]:-0}))
-    for ((i=1; i<${#kinds_ref[@]}; i++)); do
-      [[ "${kinds_ref[i]}" == i ]] && marked_ref[$i]="$state"
+  local -n __ui_toggle_kinds_ref="$1"
+  local -n __ui_toggle_marked_ref="$2"
+  local __ui_toggle_index="$3" __ui_toggle_i __ui_toggle_state
+  if [[ "${__ui_toggle_kinds_ref[__ui_toggle_index]}" == a ]]; then
+    __ui_toggle_state=$((1-${__ui_toggle_marked_ref[0]:-0}))
+    for ((__ui_toggle_i=1; __ui_toggle_i<${#__ui_toggle_kinds_ref[@]}; __ui_toggle_i++)); do
+      [[ "${__ui_toggle_kinds_ref[__ui_toggle_i]}" == i ]] && __ui_toggle_marked_ref[$__ui_toggle_i]="$__ui_toggle_state"
     done
-    marked_ref[0]="$state"
-  elif [[ "${kinds_ref[index]}" == g ]]; then
-    _ui_ms_group_state "$1" "$2" "$index" state
-    if [[ "$state" == full ]]; then state=0; else state=1; fi
-    _ui_ms_group_set "$1" "$2" "$index" "$state"
+    __ui_toggle_marked_ref[0]="$__ui_toggle_state"
+  elif [[ "${__ui_toggle_kinds_ref[__ui_toggle_index]}" == g ]]; then
+    _ui_ms_group_state "$1" "$2" "$__ui_toggle_index" __ui_toggle_state
+    if [[ "$__ui_toggle_state" == full ]]; then __ui_toggle_state=0; else __ui_toggle_state=1; fi
+    _ui_ms_group_set "$1" "$2" "$__ui_toggle_index" "$__ui_toggle_state"
     _ui_ms_all_state "$1" "$2"
   else
-    marked_ref[$index]=$((1-${marked_ref[$index]:-0}))
+    __ui_toggle_marked_ref[$__ui_toggle_index]=$((1-${__ui_toggle_marked_ref[$__ui_toggle_index]:-0}))
     _ui_ms_all_state "$1" "$2"
   fi
 }
@@ -123,245 +124,292 @@ _ui_ms_toggle() {
 # Layout stores logical indices in physical cells. Negative values are
 # decorative copies of the active group title and never receive focus.
 _ui_ms_layout() {
-  local -n kinds_ref="$1"
-  local limit="$2"
-  local -n cells_ref="$3"
-  local -n cols_ref="$4"
-  local -n positions_ref="$5"
-  local index start=0 column=0 row=0 group=-1
-  cells_ref=(); cols_ref=(); positions_ref=()
-  if [[ "${kinds_ref[0]}" == a ]]; then
-    cols_ref[0]=0
-    positions_ref[0]=-1
-    start=1
+  local -n __ui_layout_kinds_ref="$1"
+  local __ui_layout_limit="$2"
+  local -n __ui_layout_cells_ref="$3"
+  local -n __ui_layout_cols_ref="$4"
+  local -n __ui_layout_positions_ref="$5"
+  local __ui_layout_index __ui_layout_start=0 __ui_layout_column=0 __ui_layout_row=0 __ui_layout_group=-1
+  __ui_layout_cells_ref=(); __ui_layout_cols_ref=(); __ui_layout_positions_ref=()
+  if [[ "${__ui_layout_kinds_ref[0]}" == a ]]; then
+    __ui_layout_cols_ref[0]=0
+    __ui_layout_positions_ref[0]=-1
+    __ui_layout_start=1
   fi
-  for ((index=start; index<${#kinds_ref[@]}; index++)); do
-    if [[ "${kinds_ref[index]}" == g ]]; then
+  for ((__ui_layout_index=__ui_layout_start; __ui_layout_index<${#__ui_layout_kinds_ref[@]}; __ui_layout_index++)); do
+    if [[ "${__ui_layout_kinds_ref[__ui_layout_index]}" == g ]]; then
       # A category always begins a fresh column, even if the prior one has room.
-      if ((row > 0)); then ((column+=1)); row=0; fi
-      group="$index"
-    elif ((row >= limit)); then
-      ((column+=1)); row=0
-      if ((group >= 0)); then
-        cells_ref["$column,$row"]=$((-group-1))
-        ((row+=1))
+      if ((__ui_layout_row > 0)); then ((__ui_layout_column+=1)); __ui_layout_row=0; fi
+      __ui_layout_group="$__ui_layout_index"
+    elif ((__ui_layout_row >= __ui_layout_limit)); then
+      ((__ui_layout_column+=1)); __ui_layout_row=0
+      if ((__ui_layout_group >= 0)); then
+        __ui_layout_cells_ref["$__ui_layout_column,$__ui_layout_row"]=$((-__ui_layout_group-1))
+        ((__ui_layout_row+=1))
       fi
     fi
-    cells_ref["$column,$row"]="$index"
-    cols_ref[index]="$column"
-    positions_ref[index]="$row"
-    ((row+=1))
+    __ui_layout_cells_ref["$__ui_layout_column,$__ui_layout_row"]="$__ui_layout_index"
+    __ui_layout_cols_ref[__ui_layout_index]="$__ui_layout_column"
+    __ui_layout_positions_ref[__ui_layout_index]="$__ui_layout_row"
+    ((__ui_layout_row+=1))
   done
-  printf -v "$6" '%d' "$((column+1))"
+  printf -v "$6" '%d' "$((__ui_layout_column+1))"
 }
 
 _ui_ms_fit() {
-  local value="$1" limit="$2"
-  if ((${#value} > limit)); then
-    value="${value:0:limit-1}…"
-  fi
-  printf '%-*s' "$limit" "$value"
+  local __ui_fit_value __ui_fit_limit="$2"
+  _ui_truncate __ui_fit_value "$1" "$__ui_fit_limit"
+  ((__ui_fit_limit > 0)) || return 0
+  printf '%-*s' "$__ui_fit_limit" "$__ui_fit_value"
 }
 
 # Draw one cell with a fixed visible width, including focus and checkbox marks.
 _ui_ms_cell() {
-  local -n rows_ref="$1"
-  local -n kinds_ref="$2"
-  local -n marked_ref="$3"
-  local value="$4" cursor="$5" width="$6"
-  local index label mark color text prefix
-  if ((value < 0)); then
-    index=$((-value-1))
-    label="↳ ${rows_ref[index]}"
-    prefix='          '
-    color="$ui_color_group"
+  local -n __ui_cell_rows_ref="$1"
+  local -n __ui_cell_kinds_ref="$2"
+  local -n __ui_cell_marked_ref="$3"
+  local __ui_cell_value="$4" __ui_cell_cursor="$5" __ui_cell_width="$6"
+  local __ui_cell_index __ui_cell_label __ui_cell_mark __ui_cell_color __ui_cell_text __ui_cell_prefix
+  if ((__ui_cell_value < 0)); then
+    __ui_cell_index=$((-__ui_cell_value-1))
+    __ui_cell_label="↳ ${__ui_cell_rows_ref[__ui_cell_index]}"
+    __ui_cell_prefix='          '
+    __ui_cell_color="$ui_color_group"
   else
-    index="$value"
-    label="${rows_ref[index]}"
-    if [[ "${kinds_ref[index]}" == g ]]; then
-      _ui_ms_group_state "$2" "$3" "$index" text
-      case "$text" in
-        full) mark='[x]' ;;
-        partial) mark='[-]' ;;
-        *) mark='[ ]' ;;
+    __ui_cell_index="$__ui_cell_value"
+    __ui_cell_label="${__ui_cell_rows_ref[__ui_cell_index]}"
+    if [[ "${__ui_cell_kinds_ref[__ui_cell_index]}" == g ]]; then
+      _ui_ms_group_state "$2" "$3" "$__ui_cell_index" __ui_cell_text
+      case "$__ui_cell_text" in
+        full) __ui_cell_mark='[x]' ;;
+        partial) __ui_cell_mark='[-]' ;;
+        *) __ui_cell_mark='[ ]' ;;
       esac
-      color="$ui_color_group"
+      __ui_cell_color="$ui_color_group"
     else
-      if [[ "${marked_ref[$index]:-0}" == 1 ]]; then mark='[x]'; else mark='[ ]'; fi
-      color="$ui_color_reset"
+      if [[ "${__ui_cell_marked_ref[$__ui_cell_index]:-0}" == 1 ]]; then __ui_cell_mark='[x]'; else __ui_cell_mark='[ ]'; fi
+      __ui_cell_color="$ui_color_reset"
     fi
-    if ((index == cursor)); then prefix="    › $mark "; color="$ui_color_selected"
-    else prefix="      $mark "; fi
+    if ((__ui_cell_index == __ui_cell_cursor)); then __ui_cell_prefix="    › $__ui_cell_mark "; __ui_cell_color="$ui_color_selected"
+    else __ui_cell_prefix="      $__ui_cell_mark "; fi
   fi
-  printf '%s%s%s' "$prefix" "$color" "$(_ui_ms_fit "$label" "$((width-10))")"
+  printf '%s%s%s' "$__ui_cell_prefix" "$__ui_cell_color" "$(_ui_ms_fit "$__ui_cell_label" "$((__ui_cell_width-10))")"
   printf '%s' "$ui_color_reset"
 }
 
 _ui_ms_draw() {
-  local -n rows_ref="$1"
-  local -n kinds_ref="$2"
-  local -n marked_ref="$3"
-  local -n cells_ref="$4"
-  local prompt="$5" cursor="$6" height="$7" width="$8" first="$9"
-  local visible="${10}" cell_width="${11}" column_count="${12}"
-  local row col cell selected=0 heading count_line left_indicator=' ' right_indicator=' '
-  for ((row=0; row<${#kinds_ref[@]}; row++)); do
-    [[ "${kinds_ref[row]}" == i && "${marked_ref[$row]:-0}" == 1 ]] && ((selected+=1))
+  local -n __ui_grid_rows_ref="$1"
+  local -n __ui_grid_kinds_ref="$2"
+  local -n __ui_grid_marked_ref="$3"
+  local -n __ui_grid_cells_ref="$4"
+  local __ui_grid_prompt="$5" __ui_grid_cursor="$6" __ui_grid_height="$7" __ui_grid_width="$8" __ui_grid_first="$9"
+  local __ui_grid_visible="${10}" __ui_grid_cell_width="${11}" __ui_grid_column_count="${12}"
+  local -n __ui_grid_texts_ref="${13}"
+  local __ui_grid_row __ui_grid_col __ui_grid_cell __ui_grid_selected=0 __ui_grid_heading __ui_grid_count_line \
+    __ui_grid_left_indicator=' ' __ui_grid_right_indicator=' '
+  for ((__ui_grid_row=0; __ui_grid_row<${#__ui_grid_kinds_ref[@]}; __ui_grid_row++)); do
+    [[ "${__ui_grid_kinds_ref[__ui_grid_row]}" == i && "${__ui_grid_marked_ref[$__ui_grid_row]:-0}" == 1 ]] && ((__ui_grid_selected+=1))
   done
-  printf '\033[2K%s%s%s\n' "$ui_color_question" "$(_ui_ms_fit "$prompt" "$((width-1))")" "$ui_color_reset"
-  printf -v count_line 'cols %d-%d/%d  ·  %d selected' \
-    "$((first+1))" "$((first+visible))" "$column_count" "$selected"
-  ((first > 0)) && left_indicator='←'
-  ((first+visible < column_count)) && right_indicator='→'
+  printf '\033[2K%s%s%s\n' "$ui_color_question" "$(_ui_ms_fit "$__ui_grid_prompt" "$((__ui_grid_width-1))")" "$ui_color_reset"
+  printf -v __ui_grid_count_line "${__ui_grid_texts_ref[status_format]}" \
+    "$((__ui_grid_first+1))" "$((__ui_grid_first+__ui_grid_visible))" "$__ui_grid_column_count" "$__ui_grid_selected"
+  ((__ui_grid_first > 0)) && __ui_grid_left_indicator='←'
+  ((__ui_grid_first+__ui_grid_visible < __ui_grid_column_count)) && __ui_grid_right_indicator='→'
   printf '\033[2K%s%s%s %s %s%s%s\n' \
-    "$ui_color_selected" "$left_indicator" "$ui_color_hint" \
-    "$(_ui_ms_fit "$count_line" "$((width-5))")" \
-    "$ui_color_selected" "$right_indicator" "$ui_color_reset"
-  if [[ "${kinds_ref[0]}" == a ]]; then
+    "$ui_color_selected" "$__ui_grid_left_indicator" "$ui_color_hint" \
+    "$(_ui_ms_fit "$__ui_grid_count_line" "$((__ui_grid_width-5))")" \
+    "$ui_color_selected" "$__ui_grid_right_indicator" "$ui_color_reset"
+  if [[ "${__ui_grid_kinds_ref[0]}" == a ]]; then
     printf '\033[2K'
-    _ui_ms_cell "$1" "$2" "$3" 0 "$cursor" "$cell_width"
+    _ui_ms_cell "$1" "$2" "$3" 0 "$__ui_grid_cursor" "$__ui_grid_cell_width"
     printf '\n\033[2K\n'
   else
     printf '\033[2K\n'
   fi
-  for ((row=0; row<height; row++)); do
+  for ((__ui_grid_row=0; __ui_grid_row<__ui_grid_height; __ui_grid_row++)); do
     printf '\033[2K'
-    for ((col=0; col<visible; col++)); do
-      if ((col > 0)); then printf '  '; fi
-      cell="${cells_ref[$((first+col)),$row]:-}"
-      if [[ -n "$cell" ]]; then
-        _ui_ms_cell "$1" "$2" "$3" "$cell" "$cursor" "$cell_width"
+    for ((__ui_grid_col=0; __ui_grid_col<__ui_grid_visible; __ui_grid_col++)); do
+      if ((__ui_grid_col > 0)); then printf '  '; fi
+      __ui_grid_cell="${__ui_grid_cells_ref[$((__ui_grid_first+__ui_grid_col)),$__ui_grid_row]:-}"
+      if [[ -n "$__ui_grid_cell" ]]; then
+        _ui_ms_cell "$1" "$2" "$3" "$__ui_grid_cell" "$__ui_grid_cursor" "$__ui_grid_cell_width"
       else
-        printf '%*s' "$cell_width" ''
+        printf '%*s' "$__ui_grid_cell_width" ''
       fi
     done
     printf '\n'
   done
-  heading='↑↓ move  ←→ column  Space toggle  Enter confirm'
-  printf '\033[2K%s%s%s' "$ui_color_hint" "$(_ui_ms_fit "$heading" "$((width-1))")" "$ui_color_reset"
+  __ui_grid_heading="${__ui_grid_texts_ref[navigation_hint]}"
+  printf '\033[2K%s%s%s' "$ui_color_hint" "$(_ui_ms_fit "$__ui_grid_heading" "$((__ui_grid_width-1))")" "$ui_color_reset"
 }
 
-_ui_ms_key() {
-  local -n key_ref="$1"
-  local sequence
-  key_ref=''
-  IFS= read -rsn1 key_ref || return 130
-  if [[ "$key_ref" == $'\033' ]]; then
-    sequence=''
-    if IFS= read -rsn2 -t 0.2 sequence; then
-      case "$sequence" in
-        '[A'|'OA') key_ref=up ;;
-        '[B'|'OB') key_ref=down ;;
-        '[C'|'OC') key_ref=right ;;
-        '[D'|'OD') key_ref=left ;;
-        *) key_ref=unknown ;;
-      esac
-    fi
-  fi
+# Checks role aliasing before any nameref or terminal state is created.
+_ui_ms_distinct() {
+  local -a __ui_distinct_names=("$@")
+  local __ui_distinct_left __ui_distinct_right
+  for ((__ui_distinct_left=0; __ui_distinct_left<${#__ui_distinct_names[@]}; __ui_distinct_left++)); do
+    for ((__ui_distinct_right=__ui_distinct_left+1; __ui_distinct_right<${#__ui_distinct_names[@]}; __ui_distinct_right++)); do
+      if [[ "${__ui_distinct_names[__ui_distinct_left]}" == "${__ui_distinct_names[__ui_distinct_right]}" ]]; then
+        printf 'Checkbox list needs different array names, got: %s\n' "$*" >&2
+        return 1
+      fi
+    done
+  done
 }
 
-_ui_ms_run() {
-  local result_name="$1" prompt="$2" rows_name="$3" kinds_name="$4" with_all="$5"
-  if [[ "$result_name" == "$rows_name" || "$result_name" == "$kinds_name" || "$rows_name" == "$kinds_name" ]]; then
-    printf 'Checkbox list needs three different array names, got: %s\n' \
-      "$result_name $rows_name $kinds_name" >&2
-    return 1
-  fi
-  local -n input_rows_ref="$rows_name"
-  local -n input_kinds_ref="$kinds_name"
-  local -a _ms_rows=() _ms_kinds=()
-  if [[ "$with_all" == yes ]]; then
-    _ms_rows=(All "${input_rows_ref[@]}")
-    _ms_kinds=(a "${input_kinds_ref[@]}")
+# All validation runs before opening the screen. A heading must own an item.
+_ui_ms_validate() {
+  _ui_array_type "$1" A || return
+  _ui_array_type "$2" a || return
+  _ui_array_type "$3" a || return
+  local -n __ui_validate_texts_ref="$1" __ui_validate_rows_ref="$2" __ui_validate_kinds_ref="$3"
+  local __ui_validate_index __ui_validate_name
+  for __ui_validate_name in all_label status_format navigation_hint resize_notice; do
+    [[ -v "__ui_validate_texts_ref[$__ui_validate_name]" ]] || return 2
+  done
+  ((${#__ui_validate_rows_ref[@]} > 0 && ${#__ui_validate_rows_ref[@]} == ${#__ui_validate_kinds_ref[@]})) || return 2
+  for ((__ui_validate_index=0; __ui_validate_index<${#__ui_validate_rows_ref[@]}; __ui_validate_index++)); do
+    [[ -v "__ui_validate_rows_ref[$__ui_validate_index]" ]] || return 2
+    case "${__ui_validate_kinds_ref[__ui_validate_index]:-}" in
+      i) ;;
+      g) [[ "${__ui_validate_kinds_ref[__ui_validate_index+1]:-}" == i ]] || return 2 ;;
+      *) return 2 ;;
+    esac
+  done
+}
+
+# Determines column width and visible count without modifying widget state.
+_ui_ms_measure() {
+  local -n __ui_measure_rows_ref="$1" __ui_measure_kinds_ref="$2"
+  local __ui_measure_width="$3" __ui_measure_column_count="$4" __ui_measure_index __ui_measure_candidate \
+    __ui_measure_max_label=0 __ui_measure_cell_width __ui_measure_visible
+  for ((__ui_measure_index=0; __ui_measure_index<${#__ui_measure_rows_ref[@]}; __ui_measure_index++)); do
+    __ui_measure_candidate=${#__ui_measure_rows_ref[__ui_measure_index]}
+    [[ "${__ui_measure_kinds_ref[__ui_measure_index]}" == g ]] && ((__ui_measure_candidate+=2))
+    ((__ui_measure_candidate > __ui_measure_max_label)) && __ui_measure_max_label="$__ui_measure_candidate"
+  done
+  __ui_measure_cell_width=$((__ui_measure_max_label+10))
+  ((__ui_measure_cell_width > __ui_measure_width-1)) && __ui_measure_cell_width=$((__ui_measure_width-1))
+  __ui_measure_visible=$(((__ui_measure_width+1)/(__ui_measure_cell_width+2)))
+  ((__ui_measure_visible < 1)) && __ui_measure_visible=1
+  ((__ui_measure_visible > __ui_measure_column_count)) && __ui_measure_visible="$__ui_measure_column_count"
+  printf -v "$5" '%d' "$__ui_measure_cell_width"
+  printf -v "$6" '%d' "$__ui_measure_visible"
+}
+
+# Keeps the nearest real row in the next column; ties retain logical order.
+_ui_ms_neighbor() {
+  local __ui_neighbor_cursor="$2" __ui_neighbor_direction="$3"
+  local -n __ui_neighbor_cols_ref="$4" __ui_neighbor_positions_ref="$5"
+  local __ui_neighbor_column_count="$6" __ui_neighbor_target_col="${__ui_neighbor_cols_ref[__ui_neighbor_cursor]}"
+  local __ui_neighbor_target_row="${__ui_neighbor_positions_ref[__ui_neighbor_cursor]}" __ui_neighbor_index \
+    __ui_neighbor_distance __ui_neighbor_best_distance=-1 __ui_neighbor_candidate="$__ui_neighbor_cursor"
+  if [[ "$__ui_neighbor_direction" == left ]]; then
+    __ui_neighbor_target_col=$((__ui_neighbor_target_col-1))
   else
-    _ms_rows=("${input_rows_ref[@]}")
-    _ms_kinds=("${input_kinds_ref[@]}")
+    __ui_neighbor_target_col=$((__ui_neighbor_target_col+1))
   fi
-  local -a _ms_cols=() _ms_positions=() checked=()
-  local -A _ms_marked=() _ms_cells=()
-  local cursor=0 first=0 height width limit cell_width visible column_count
-  local max_label=0 index key target_col target_row candidate best_distance distance
-  local status=0 frame
-  ((${#input_rows_ref[@]} > 0)) || return 2
-  _ui_ms_screen_open
-  while true; do
-    _ui_ms_size height width
-    if [[ "$with_all" == yes ]]; then
-      limit=$((height-5))
-      ((limit > 23)) && limit=23
-    else
-      limit=$((height-4))
-      ((limit > 24)) && limit=24
+  if ((__ui_neighbor_target_col >= 0 && __ui_neighbor_target_col < __ui_neighbor_column_count)); then
+    for ((__ui_neighbor_index=0; __ui_neighbor_index<${#__ui_neighbor_cols_ref[@]}; __ui_neighbor_index++)); do
+      ((${__ui_neighbor_cols_ref[__ui_neighbor_index]} == __ui_neighbor_target_col)) || continue
+      __ui_neighbor_distance=$((__ui_neighbor_target_row-${__ui_neighbor_positions_ref[__ui_neighbor_index]}))
+      ((__ui_neighbor_distance < 0)) && __ui_neighbor_distance=$((-__ui_neighbor_distance))
+      if ((__ui_neighbor_best_distance < 0 || __ui_neighbor_distance < __ui_neighbor_best_distance)); then
+        __ui_neighbor_candidate="$__ui_neighbor_index" __ui_neighbor_best_distance="$__ui_neighbor_distance"
+      fi
+    done
+  fi
+  printf -v "$1" '%d' "$__ui_neighbor_candidate"
+}
+
+# Returns original item values only, never group or decorative headings.
+_ui_ms_selected() {
+  local -n __ui_collect_result_ref="$1" __ui_collect_rows_ref="$2" __ui_collect_kinds_ref="$3" __ui_collect_marked_ref="$4"
+  local -a __ui_collect_checked=()
+  local __ui_collect_index
+  for ((__ui_collect_index=0; __ui_collect_index<${#__ui_collect_rows_ref[@]}; __ui_collect_index++)); do
+    if [[ "${__ui_collect_kinds_ref[__ui_collect_index]}" == i && "${__ui_collect_marked_ref[$__ui_collect_index]:-0}" == 1 ]]; then
+      __ui_collect_checked+=("${__ui_collect_rows_ref[__ui_collect_index]}")
     fi
-    if ((limit < 2 || width < 16)); then
-      printf '\033[H\033[2JIncrease terminal size, then press a key.'
-      _ui_ms_key key || { status=$?; break; }
+  done
+  __ui_collect_result_ref=("${__ui_collect_checked[@]}")
+}
+
+# Owns one screen session; geometry and navigation helpers remain internal.
+_ui_ms_run() {
+  local __ui_run_result_name="$1" __ui_run_prompt="$2" __ui_run_texts_name="$3" __ui_run_rows_name="$4" \
+    __ui_run_kinds_name="$5" __ui_run_with_all="$6"
+  _ui_ms_validate "$__ui_run_texts_name" "$__ui_run_rows_name" "$__ui_run_kinds_name" || return
+  local -n __ui_run_input_rows_ref="$__ui_run_rows_name" __ui_run_input_kinds_ref="$__ui_run_kinds_name" \
+    __ui_run_texts_ref="$__ui_run_texts_name"
+  local -a __ui_run_rows=() __ui_run_kinds=() __ui_run_cols=() __ui_run_positions=()
+  if [[ "$__ui_run_with_all" == yes ]]; then
+    __ui_run_rows=("${__ui_run_texts_ref[all_label]}" "${__ui_run_input_rows_ref[@]}")
+    __ui_run_kinds=(a "${__ui_run_input_kinds_ref[@]}")
+  else
+    __ui_run_rows=("${__ui_run_input_rows_ref[@]}")
+    __ui_run_kinds=("${__ui_run_input_kinds_ref[@]}")
+  fi
+  local -A __ui_run_marked=() __ui_run_cells=()
+  local __ui_run_cursor=0 __ui_run_first=0 __ui_run_height __ui_run_width __ui_run_limit __ui_run_cell_width \
+    __ui_run_visible __ui_run_column_count __ui_run_key __ui_run_status=0 __ui_run_frame
+  _ui_ms_screen_open || return
+  while true; do
+    _ui_ms_size __ui_run_height __ui_run_width
+    if [[ "$__ui_run_with_all" == yes ]]; then
+      __ui_run_limit=$((__ui_run_height-5)); ((__ui_run_limit > 23)) && __ui_run_limit=23
+    else
+      __ui_run_limit=$((__ui_run_height-4)); ((__ui_run_limit > 24)) && __ui_run_limit=24
+    fi
+    if ((__ui_run_limit < 2 || __ui_run_width < 16)); then
+      printf '\033[H\033[2J%s' "${__ui_run_texts_ref[resize_notice]}"
+      _ui_read_key __ui_run_key || { __ui_run_status=$?; break; }
       continue
     fi
-    _ui_ms_layout _ms_kinds "$limit" _ms_cells _ms_cols _ms_positions column_count
-    max_label=0
-    for ((index=0; index<${#_ms_rows[@]}; index++)); do
-      candidate=${#_ms_rows[index]}
-      [[ "${_ms_kinds[index]}" == g ]] && ((candidate+=2))
-      ((candidate > max_label)) && max_label="$candidate"
-    done
-    cell_width=$((max_label+10))
-    ((cell_width > width-1)) && cell_width=$((width-1))
-    visible=$(((width-1+2)/(cell_width+2)))
-    ((visible < 1)) && visible=1
-    ((visible > column_count)) && visible="$column_count"
-    if ((cursor < ${#_ms_cols[@]})); then
-      ((first > _ms_cols[cursor])) && first=${_ms_cols[cursor]}
-      ((_ms_cols[cursor] >= first+visible)) && first=$((_ms_cols[cursor]-visible+1))
-    fi
-    ((first > column_count-visible)) && first=$((column_count-visible))
-    frame="$(_ui_ms_draw _ms_rows _ms_kinds _ms_marked _ms_cells "$prompt" "$cursor" \
-      "$limit" "$width" "$first" "$visible" "$cell_width" "$column_count")"
-    printf '\033[H%s\033[J' "$frame"
-    _ui_ms_key key || { status=$?; break; }
-    case "$key" in
-      '') break ;;
-      ' ') _ui_ms_toggle _ms_kinds _ms_marked "$cursor" ;;
-      up) cursor=$(((cursor-1+${#_ms_rows[@]})%${#_ms_rows[@]})) ;;
-      down) cursor=$(((cursor+1)%${#_ms_rows[@]})) ;;
-      left|right)
-        target_col=${_ms_cols[cursor]}
-        if [[ "$key" == left ]]; then ((target_col-=1)); else ((target_col+=1)); fi
-        if ((target_col >= 0 && target_col < column_count)); then
-          target_row=${_ms_positions[cursor]}
-          candidate=-1 best_distance=9999
-          for ((index=0; index<${#_ms_rows[@]}; index++)); do
-            ((${_ms_cols[index]} == target_col)) || continue
-            distance=$((target_row-${_ms_positions[index]}))
-            ((distance < 0)) && distance=$((-distance))
-            if ((distance < best_distance)); then
-              candidate="$index" best_distance="$distance"
-            fi
-          done
-          ((candidate >= 0)) && cursor="$candidate"
-        fi
-        ;;
+    _ui_ms_layout __ui_run_kinds "$__ui_run_limit" __ui_run_cells __ui_run_cols __ui_run_positions __ui_run_column_count
+    _ui_ms_measure __ui_run_rows __ui_run_kinds "$__ui_run_width" "$__ui_run_column_count" __ui_run_cell_width __ui_run_visible
+    ((__ui_run_first > __ui_run_cols[__ui_run_cursor])) && __ui_run_first=${__ui_run_cols[__ui_run_cursor]}
+    ((__ui_run_cols[__ui_run_cursor] >= __ui_run_first+__ui_run_visible)) && __ui_run_first=$((__ui_run_cols[__ui_run_cursor]-__ui_run_visible+1))
+    ((__ui_run_first > __ui_run_column_count-__ui_run_visible)) && __ui_run_first=$((__ui_run_column_count-__ui_run_visible))
+    __ui_run_frame="$(_ui_ms_draw __ui_run_rows __ui_run_kinds __ui_run_marked __ui_run_cells "$__ui_run_prompt" "$__ui_run_cursor" \
+      "$__ui_run_limit" "$__ui_run_width" "$__ui_run_first" "$__ui_run_visible" "$__ui_run_cell_width" "$__ui_run_column_count" "$__ui_run_texts_name")"
+    printf '\033[H%s\033[J' "$__ui_run_frame"
+    _ui_read_key __ui_run_key || { __ui_run_status=$?; break; }
+    case "$__ui_run_key" in
+      enter) break ;;
+      space) _ui_ms_toggle __ui_run_kinds __ui_run_marked "$__ui_run_cursor" ;;
+      up) __ui_run_cursor=$(((__ui_run_cursor-1+${#__ui_run_rows[@]})%${#__ui_run_rows[@]})) ;;
+      down) __ui_run_cursor=$(((__ui_run_cursor+1)%${#__ui_run_rows[@]})) ;;
+      left|right) _ui_ms_neighbor __ui_run_cursor "$__ui_run_cursor" "$__ui_run_key" __ui_run_cols __ui_run_positions "$__ui_run_column_count" ;;
     esac
   done
   _ui_ms_screen_close
-  ((status == 0)) || return "$status"
-  for ((index=0; index<${#_ms_rows[@]}; index++)); do
-    if [[ "${_ms_kinds[index]}" == i && "${_ms_marked[$index]:-0}" == 1 ]]; then
-      checked+=("${_ms_rows[index]}")
-    fi
-  done
-  local -n result_ref="$result_name"
-  result_ref=("${checked[@]}")
+  ((__ui_run_status == 0)) || return "$__ui_run_status"
+  _ui_ms_selected "$__ui_run_result_name" __ui_run_rows __ui_run_kinds __ui_run_marked
 }
 
+# Explicit text array, then item values. Outputs change only on confirmation.
 ui_multiselect() {
-  local result_name="$1" prompt="$2" index
-  shift 2
-  local -a item_rows=("$@") item_kinds=()
-  for ((index=0; index<${#item_rows[@]}; index++)); do item_kinds+=(i); done
-  _ui_ms_run "$result_name" "$prompt" item_rows item_kinds yes
+  (($# >= 3)) || return 2
+  _ui_ms_distinct "$1" "$3" || return
+  _ui_output_name "$1" || return
+  _ui_valid_name "$3" || return
+  local __ui_flat_result="$1" __ui_flat_prompt="$2" __ui_flat_texts="$3" __ui_flat_index
+  shift 3
+  local -a __ui_flat_rows=("$@") __ui_flat_kinds=()
+  for ((__ui_flat_index=0; __ui_flat_index<${#__ui_flat_rows[@]}; __ui_flat_index++)); do
+    __ui_flat_kinds+=(i)
+  done
+  _ui_ms_run "$__ui_flat_result" "$__ui_flat_prompt" "$__ui_flat_texts" __ui_flat_rows __ui_flat_kinds yes
 }
 
+# g/i rows are presentation data; only original item values are returned.
 ui_multiselect_grouped() {
-  _ui_ms_run "$1" "$2" "$3" "$4" no
+  (($# == 5)) || return 2
+  _ui_ms_distinct "$1" "$3" "$4" "$5" || return
+  _ui_output_name "$1" || return
+  _ui_valid_name "$3" || return
+  _ui_valid_name "$4" || return
+  _ui_valid_name "$5" || return
+  _ui_ms_run "$1" "$2" "$3" "$4" "$5" no
 }

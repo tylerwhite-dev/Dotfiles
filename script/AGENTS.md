@@ -140,13 +140,15 @@ group row with no items would render as a row the cursor can reach but Space
 cannot act on. A member must also be a group, not another category, and a
 category name may not collide with a group name.
 
-`catalog_package_rows` returns two parallel arrays for that list: display rows
+`catalog_package_rows` prepares presentation data as two parallel arrays: display rows
 and row kinds, where `g` is a group row that owns the following `i` item rows.
 `catalog_packages` still returns the flat package list, and the item rows always
 match it in order, so grouping is a presentation concern only. References that
 are plain groups appear under a fallback group labeled by the
 `package_category_other` message. A procedure with no category references
-produces a plain item list with no group rows.
+produces a plain item list with no group rows. Loose groups remain in declaration
+order: adjacent loose groups share one fallback heading, and a category ends
+that run. A later loose group starts a new fallback heading.
 
 Neither function de-duplicates: referencing the same group twice lists its
 packages twice. Keep a procedure's references disjoint.
@@ -169,7 +171,8 @@ in `_WORKFLOW_PACKAGE_SELECTIONS`. `workflow_select_packages` stores them and
 `workflow_selected_packages` reads them back into an array. An action for a
 selectable procedure must call `workflow_selected_packages` instead of
 `catalog_packages` to install only the chosen packages. The questionnaire asks
-for those packages with `ui_multiselect_grouped`, which returns the checked
+for those packages with `ui_multiselect_grouped`, passing a caller-owned text
+array prepared by `questionnaire_multiselect_texts`. It returns the checked
 item rows only; group rows are never part of the result. The grouped menu has
 no global `All` row. The checkbox menu uses a temporary screen and restores the
 previous terminal view after confirmation.
@@ -201,20 +204,39 @@ successful process ends with `●`; a failure ends with `×`.
 - `ui/` renders values passed by callers. It must not know procedure IDs,
   package groups, workflow state, executors, or message keys.
   `catalog_package_rows` returns display rows and row kinds as parallel arrays;
-  the catalog emits the kinds but only the UI interprets them, so `g` and `i`
-  stay out of the catalog's own vocabulary.
+  this is the catalog's presentation projection. The UI interprets the kinds
+  without learning package sources, procedure IDs, or workflow state.
 - `logic/` owns ordering, validation, selection, environment, and process
   behavior. It may call catalog, message, UI, and executor interfaces.
 - `logic/actions/` owns system changes for one procedure. Actions receive
   `(platform, repository_dir)`, use catalog/executor helpers, and return a
   shell status. They do not format messages or render UI directly.
-- `config/messages.sh` is the only place for user-facing setup text. Errors in
+- `config/` owns user-facing text: shared messages in `messages.sh`, procedure
+  text in `procedures.sh`, and category labels in `packages.sh`. Errors in
   actions should use `error_report <message-key>`.
-- Functions that take arrays by name (`ui_multiselect_grouped` and the private
-  checkbox helpers) must be given distinct names for every array role. A
-  nameref resolves to the nearest visible declaration, so reusing a name makes
-  the result overwrite the caller's input instead of failing. `ui_multiselect`
-  renames its own locals for the same reason.
+- UI output variables and named inputs must be direct identifiers, not nameref
+  aliases. The `__ui_` prefix is reserved for UI implementation variables.
+  Catalog/workflow internals similarly use function-specific prefixes; callers
+  must not use those internal names as outputs.
+- Checkbox array roles must have different names. `ui_multiselect` takes
+  `(result_name, prompt, texts_name, item...)`; `ui_multiselect_grouped` takes
+  `(result_name, prompt, texts_name, rows_name, kinds_name)`.
+- `texts_name` is an associative array with `all_label`, `status_format`,
+  `navigation_hint`, and `resize_notice`. The status format receives four
+  integers: first visible column, last visible column, total columns, selected
+  item count. Configuration escapes conversions as `%%d` so `message_format`
+  leaves `%d` for the widget. UI never reads message keys.
+- Invalid checkbox input is rejected before opening the screen. Aliased role
+  names return 1; empty lists, invalid names/types/rows return 2. Row arrays are
+  dense indexed arrays of equal length, with g/i kinds and at least one item
+  per heading. Outputs change only after confirmation. EOF returns 130;
+  INT/TERM restore the screen and terminate with 130/143.
+- Only one checkbox screen may be active. Reopening returns 2 without changing
+  traps. Existing EXIT cleanup is preserved. Shared `_ui_*` terminal helpers
+  are an internal support interface for widgets; other private helpers remain
+  local to their module.
+- Workflow stores package names as whitespace-separated text, so package names
+  must not contain whitespace. Repeated names are preserved.
 
 Keep interfaces narrow. When a new procedure is needed, add one declaration
 block, its messages, its package groups if any, and one action file. Avoid
@@ -239,7 +261,7 @@ interfaces are grouped below for quick navigation.
   `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
   `workflow_select_packages`, and `workflow_selected_packages`.
 - Questionnaire and application: `questionnaire_collect`,
-  `questionnaire_confirm`, `runner_run`, `process_run`, and `setup_run`.
+  `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`, `process_run`, and `setup_run`.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
@@ -248,12 +270,13 @@ interfaces are grouped below for quick navigation.
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
-  `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
+  `action_install_homebrew_binary`, `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
   `action_install_homebrew_casks`, `action_set_zsh_default`,
   `action_apply_dotfiles`, `action_install_yay`, and `action_install_yay_package`.
 
-Private helpers start with `_` and should stay within their module unless a
-stable interface is intentionally introduced.
+Private helpers start with `_` and stay within their module unless an internal
+support interface or a public interface is intentionally introduced. Tests may
+exercise internal helpers to check their contracts.
 
 ## Validation
 
@@ -266,6 +289,8 @@ bash script/tests/config_validation.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
+bash script/tests/app.sh
+bash script/tests/process.sh
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit
