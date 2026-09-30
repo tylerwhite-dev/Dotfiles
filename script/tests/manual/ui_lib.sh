@@ -82,6 +82,29 @@ _final_summary() {
   fi
 }
 
+# Keep instructions visible until the operator opens the alternate screen.
+_screen_case_render() {
+  local screen_answer
+  while :; do
+    printf '    Enter opens the temporary screen; [q] quit → '
+    if ! IFS= read -r screen_answer; then screen_answer=q; fi
+    case "$screen_answer" in
+      '') "$@"; return ;;
+      q|Q|quit|exit)
+        printf '\n'
+        _series_end
+        _test_msg "Test stopped by user."
+        exit 0
+        ;;
+      *) printf '    Press Enter to open the test, or q to quit.\n' ;;
+    esac
+  done
+}
+
+_case_screen() {
+  _case "$1" _screen_case_render "${@:2}"
+}
+
 _case() {
   local description="$1"
   shift

@@ -74,6 +74,9 @@ are `ui_select` with two options (`Yes`/`No`), covered in the `ui_select` suite.
 
 Dynamic tests are interactive by design: use arrow keys, Space, and Enter to
 confirm a selection before rating the case.
+Checkbox cases first wait for Enter so the series title and instructions remain
+visible before the temporary screen opens. After closing it, rate the case with
+y/n/s/q. Empty-list rejection cases do not open a screen and need no extra pause.
 
 ## Animated process contract (real TTY)
 

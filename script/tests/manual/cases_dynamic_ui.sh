@@ -222,15 +222,15 @@ _multiselect_no_options() {
 run_ui_multiselect() {
   _series_begin "ui_multiselect" \
     "checkbox list: Space toggle, All shortcut, count line, selection summary"
-  _case "Press Space on All, then Enter: result must list every package and never include All" \
+  _case_screen "Press Space on All, then Enter: result must list every package and never include All" \
     _multiselect_all
-  _case "Toggle two by hand: result must list exactly those two, count '2 items selected'" \
+  _case_screen "Toggle two by hand: result must list exactly those two, count '2 items selected'" \
     _multiselect_two
-  _case "Press Enter immediately: 'No items selected', result empty" \
+  _case_screen "Press Enter immediately: 'No items selected', result empty" \
     _multiselect_none
-  _case "Many packages (25): browse, toggle several, check result ordering" \
+  _case_screen "Many packages (25): browse, toggle several, check result ordering" \
     _multiselect_many
-  _case "Duplicate names: each occurrence can be selected independently" \
+  _case_screen "Duplicate names: each occurrence can be selected independently" \
     _multiselect_duplicates
   _case "No packages: must be rejected with exit code 2" \
     _multiselect_no_options
@@ -315,19 +315,19 @@ _multiselect_group_real() {
 run_ui_multiselect_grouped() {
   _series_begin "ui_multiselect_grouped" \
     "grouped checkbox list: group headers, tri-state, no All row, real catalog"
-  _case "Press Enter immediately: first group focused, no All row, result empty" \
+  _case_screen "Press Enter immediately: first group focused, no All row, result empty" \
     _multiselect_group_header
-  _case "Space on a group header: selects exactly that group, header shows [x], count matches" \
+  _case_screen "Space on a group header: selects exactly that group, header shows [x], count matches" \
     _multiselect_group_toggle
-  _case "Toggle one item inside a group: header shows [-], only that item selected" \
+  _case_screen "Toggle one item inside a group: header shows [-], only that item selected" \
     _multiselect_group_partial
-  _case "Toggle the first group on and off with Space" \
+  _case_screen "Toggle the first group on and off with Space" \
     _multiselect_group_all
-  _case "Select two groups, then clear one without changing the other" \
+  _case_screen "Select two groups, then clear one without changing the other" \
     _multiselect_group_mixed
-  _case "Long grouped list: navigate columns and see a repeated group heading" \
+  _case_screen "Long grouped list: navigate columns and see a repeated group heading" \
     _multiselect_group_scroll
-  _case "Real catalog (homebrew_extended): four groups render with the production package names" \
+  _case_screen "Real catalog (homebrew_extended): four groups render with the production package names" \
     _multiselect_group_real
   _series_end
 }
