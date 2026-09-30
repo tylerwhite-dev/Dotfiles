@@ -129,6 +129,11 @@ executor_temp_file() {
   mktemp "${TMPDIR:-/tmp}/dotfiles-setup.XXXXXX"
 }
 
+# Checks the selected Apple toolchain without changing the active directory.
+executor_macos_developer_tools_ready() {
+  xcode-select -p >/dev/null 2>&1 && xcrun clang --version >/dev/null 2>&1
+}
+
 # Returns the Homebrew binary path for the current platform.
 executor_brew_bin() {
   case "${OSTYPE:-}" in

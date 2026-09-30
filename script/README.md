@@ -21,6 +21,20 @@ action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
 installation runs with direct terminal access so password prompts stay visible.
 
+The macOS-only Command Line Tools question comes before Homebrew and preserves
+a working CLT or full Xcode selection. When tools are missing, it opens Apple's
+installer: finish installation in the system dialog, then press Enter to verify.
+An incomplete installation stops execution. Homebrew installation also checks
+tools readiness if that question was skipped.
+
+These non-selectable macOS procedures also run in --yolo; installing missing
+tools still needs the system dialog and Enter.
+
+The entry point still requires Bash 5 before any procedure can run. On a clean
+Mac, prepare Command Line Tools, Homebrew and Bash first; the CLT procedure is
+not a bootstrap replacement for the system Bash 3.2. The automated tests replace
+macOS commands; verify the preferences on your target macOS version as well.
+
 ## Flags
 
 ```bash

@@ -178,6 +178,9 @@ no global `All` row. The checkbox menu uses a temporary screen and restores the
 previous terminal view after confirmation.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.
+The macOS Command Line Tools check uses the same finish-handler mechanism before
+Homebrew. It preserves a working selected Xcode or CLT; when installation is
+needed, the operator completes Apple's dialog and presses Enter to verify.
 
 ### Command execution
 
@@ -264,7 +267,8 @@ interfaces are grouped below for quick navigation.
   `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`, `process_run`, and `setup_run`.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
-  `executor_temp_file`, `executor_brew`, and `executor_brew_bin`.
+  `executor_temp_file`, `executor_brew`, `executor_brew_bin`,
+  and `executor_macos_developer_tools_ready`.
 - UI: `ui_select`, `ui_multiselect`, `ui_multiselect_grouped`, `ui_stage`, `ui_summary_item`,
   `ui_summary_item_packages`, `ui_detail`,
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
@@ -272,6 +276,7 @@ interfaces are grouped below for quick navigation.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
   `action_install_homebrew_binary`, `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
   `action_install_homebrew_casks`, `action_set_zsh_default`,
+  `action_prepare_macos_command_line_tools`, `action_install_macos_command_line_tools`,
   `action_apply_dotfiles`, `action_install_yay`, and `action_install_yay_package`.
 
 Private helpers start with `_` and stay within their module unless an internal
@@ -291,6 +296,7 @@ bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
 bash script/tests/app.sh
 bash script/tests/process.sh
+bash script/tests/macos.sh
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit

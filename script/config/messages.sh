@@ -36,6 +36,10 @@ message_define error.brew_not_installed \
   "Homebrew is required for --add-optionals but was not installed."
 message_define error.flags_conflict \
   "Conflicting flags: --yolo and --add-optionals cannot be used together."
+message_define error.macos_clt_missing \
+  "Apple developer tools are not ready. Complete the Command Line Tools installation or select a working Xcode, then run setup again."
+message_define error.macos_clt_wait_interrupted \
+  "Waiting for Apple developer tools was interrupted. The system installer may still be running."
 
 message_define status.distribution_detected \
   "Detected system: %s"
@@ -65,6 +69,9 @@ message_define status.yay_install_password \
   "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
 message_define status.cask_admin_prompt \
   "Installing selected casks. Enter your administrator password in the terminal or macOS dialog if prompted."
+message_define status.macos_clt_ready "Apple developer tools are ready."
+message_define status.macos_clt_wait \
+  "Complete the Command Line Tools installation in Apple's dialog, then press Enter to verify."
 message_define status.sudo_auth_prompt \
   "Administrator access for %s. Enter your sudo password if prompted."
 message_define status.retry \

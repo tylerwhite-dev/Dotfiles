@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
 # Downloads and runs the Homebrew installer when Homebrew is absent.
-# On macOS no system directories or root privileges are needed.
+# On macOS developer tools must be ready first.
 action_install_homebrew_binary() {
   local installer
   local setup_dir=0
 
-  if [[ "${OSTYPE:-}" != darwin* ]]; then
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
+    if ! executor_macos_developer_tools_ready; then
+      error_report error.macos_clt_missing
+      return 1
+    fi
+  else
     setup_dir=1
   fi
 

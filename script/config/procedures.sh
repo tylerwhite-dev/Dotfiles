@@ -32,6 +32,15 @@ message_define procedure.zsh_default.label "Set zsh as the default shell"
 message_define procedure.zsh_default.description \
   "The current user's login shell will be changed to /bin/zsh."
 
+procedure_define macos_command_line_tools
+procedure_handler macos_command_line_tools action_prepare_macos_command_line_tools
+procedure_finish_handler macos_command_line_tools action_install_macos_command_line_tools
+procedure_platforms macos_command_line_tools macos
+message_define procedure.macos_command_line_tools.question "Check and install Apple Command Line Tools?"
+message_define procedure.macos_command_line_tools.label "Check and install Apple Command Line Tools"
+message_define procedure.macos_command_line_tools.description \
+  "A working CLT or Xcode selection is preserved. If needed, complete Apple's installation dialog, then press Enter to verify."
+
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
 procedure_platforms homebrew arch debian fedora macos

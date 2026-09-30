@@ -13,6 +13,7 @@ bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
 bash script/tests/app.sh
 bash script/tests/process.sh
+bash script/tests/macos.sh
 ```
 
 | Script | What it verifies |
@@ -23,6 +24,7 @@ bash script/tests/process.sh
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |
 | `process.sh` | Completion statuses, parent-shell finish handler and privilege preparation failures using fixture handlers. |
+| `macos.sh` | Mocked CLT readiness/installation and platform filtering. No installation commands run. |
 
 ## Manual UI tests (interactive)
 
