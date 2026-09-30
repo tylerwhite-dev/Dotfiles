@@ -276,119 +276,93 @@ _catalog_reference_group_keys() {
   return 1
 }
 
-# Expands a procedure's package references into a caller-owned package array.
+# Reads one resolved package group into a caller-owned array.
+_catalog_group_packages() {
+  local -n __catalog_group_result="$1"
+  local __catalog_group_key="$2"
+  __catalog_group_result=()
+  read -r -a __catalog_group_result <<< "${_CATALOG_PACKAGE_GROUPS[$__catalog_group_key]}"
+}
+
+# Expands references in declaration order, without de-duplicating packages.
 catalog_packages() {
-  local -n result_ref="$1"
-  local id="$2"
-  local platform="$3"
-  local requested_source="${4:-}"
-  local reference
-  local source
-  local key
-  local group_key
-  local -a group_keys=()
-  local -a group_packages=()
-  local matched="no"
+  local -n __catalog_packages_result="$1"
+  local __catalog_packages_id="$2" __catalog_packages_platform="$3"
+  local __catalog_packages_source="${4:-}"
+  local __catalog_packages_reference __catalog_packages_key __catalog_packages_group
+  local -a __catalog_packages_groups=() __catalog_packages_items=()
+  local __catalog_packages_matched=no
 
-  result_ref=()
-
-  for reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]}; do
-    source="${reference%%:*}"
-    if [[ -n "$requested_source" && "$source" != "$requested_source" ]]; then
+  __catalog_packages_result=()
+  for __catalog_packages_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_packages_id]}; do
+    if [[ -n "$__catalog_packages_source" && "${__catalog_packages_reference%%:*}" != "$__catalog_packages_source" ]]; then
       continue
     fi
-
-    _catalog_resolve_package_reference key "$reference" "$platform"
-    _catalog_reference_group_keys group_keys "$key" "Procedure $id" || return
-
-    for group_key in "${group_keys[@]}"; do
-      read -r -a group_packages <<< "${_CATALOG_PACKAGE_GROUPS[$group_key]}"
-      result_ref+=("${group_packages[@]}")
+    _catalog_resolve_package_reference __catalog_packages_key "$__catalog_packages_reference" "$__catalog_packages_platform"
+    _catalog_reference_group_keys __catalog_packages_groups "$__catalog_packages_key" "Procedure $__catalog_packages_id" || return
+    for __catalog_packages_group in "${__catalog_packages_groups[@]}"; do
+      _catalog_group_packages __catalog_packages_items "$__catalog_packages_group"
+      __catalog_packages_result+=("${__catalog_packages_items[@]}")
     done
-    matched="yes"
+    __catalog_packages_matched=yes
   done
-
-  if [[ -n "$requested_source" && "$matched" == "no" ]]; then
+  if [[ -n "$__catalog_packages_source" && "$__catalog_packages_matched" == no ]]; then
     printf 'Procedure %s has no package group for source: %s\n' \
-      "$id" "$requested_source" >&2
+      "$__catalog_packages_id" "$__catalog_packages_source" >&2
     return 1
   fi
 }
 
-# Returns the group display texts and row kinds used to render a procedure's
-# package selection. A row of kind g opens a group that owns every following
-# item row. Groups referenced outside a category are appended under one
-# fallback group. When no reference is a category the result is a plain item
-# list with no group rows.
+# Projects references to g/i display rows in the same order as catalog_packages.
+# Consecutive loose groups share Other; categories end that run. Without any
+# category, only item rows are emitted. Headings are presentation data only.
 catalog_package_rows() {
-  local -n rows_ref="$1"
-  local -n kinds_ref="$2"
-  local id="$3"
-  local platform="$4"
-  local requested_source="${5:-}"
-  local reference
-  local source
-  local key
-  local group_key
-  local index
-  local -a group_keys=()
-  local -a group_packages=()
-  local -a loose_keys=()
-  local other_label
-  local any_category="no"
-  local matched="no"
+  local -n __catalog_rows_result="$1" __catalog_rows_kinds="$2"
+  local __catalog_rows_id="$3" __catalog_rows_platform="$4" __catalog_rows_source="${5:-}"
+  local __catalog_rows_reference __catalog_rows_key __catalog_rows_group __catalog_rows_item
+  local __catalog_rows_other __catalog_rows_has_category=no __catalog_rows_other_open=no
+  local __catalog_rows_matched=no
+  local -a __catalog_rows_groups=() __catalog_rows_items=()
 
-  rows_ref=()
-  kinds_ref=()
-
-  for reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]}; do
-    source="${reference%%:*}"
-    if [[ -n "$requested_source" && "$source" != "$requested_source" ]]; then
-      continue
+  __catalog_rows_result=(); __catalog_rows_kinds=()
+  for __catalog_rows_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_rows_id]}; do
+    [[ -z "$__catalog_rows_source" || "${__catalog_rows_reference%%:*}" == "$__catalog_rows_source" ]] || continue
+    _catalog_resolve_package_reference __catalog_rows_key "$__catalog_rows_reference" "$__catalog_rows_platform"
+    if [[ -v "_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]" ]]; then
+      __catalog_rows_has_category=yes
+      break
     fi
-
-    _catalog_resolve_package_reference key "$reference" "$platform"
-    _catalog_reference_group_keys group_keys "$key" "Procedure $id" || return
-    matched="yes"
-
-    if [[ ! -v "_CATALOG_PACKAGE_CATEGORY_LABELS[$key]" ]]; then
-      loose_keys+=("${group_keys[@]}")
-      continue
+  done
+  for __catalog_rows_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_rows_id]}; do
+    [[ -z "$__catalog_rows_source" || "${__catalog_rows_reference%%:*}" == "$__catalog_rows_source" ]] || continue
+    _catalog_resolve_package_reference __catalog_rows_key "$__catalog_rows_reference" "$__catalog_rows_platform"
+    _catalog_reference_group_keys __catalog_rows_groups "$__catalog_rows_key" "Procedure $__catalog_rows_id" || return
+    __catalog_rows_matched=yes
+    if [[ -v "_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]" ]]; then
+      __catalog_rows_result+=("${_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]}")
+      __catalog_rows_kinds+=(g)
+      __catalog_rows_other_open=no
+    elif [[ "$__catalog_rows_has_category" == yes && "$__catalog_rows_other_open" == no ]]; then
+      message_format __catalog_rows_other package_category_other || return
+      __catalog_rows_result+=("$__catalog_rows_other")
+      __catalog_rows_kinds+=(g)
+      __catalog_rows_other_open=yes
     fi
-
-    rows_ref+=("${_CATALOG_PACKAGE_CATEGORY_LABELS[$key]}")
-    kinds_ref+=(g)
-    any_category="yes"
-    for group_key in "${group_keys[@]}"; do
-      read -r -a group_packages <<< "${_CATALOG_PACKAGE_GROUPS[$group_key]}"
-      for ((index = 0; index < ${#group_packages[@]}; index++)); do
-        rows_ref+=("${group_packages[$index]}")
-        kinds_ref+=(i)
+    for __catalog_rows_group in "${__catalog_rows_groups[@]}"; do
+      _catalog_group_packages __catalog_rows_items "$__catalog_rows_group"
+      for __catalog_rows_item in "${__catalog_rows_items[@]}"; do
+        __catalog_rows_result+=("$__catalog_rows_item")
+        __catalog_rows_kinds+=(i)
       done
     done
   done
-
-  if [[ -n "$requested_source" && "$matched" == "no" ]]; then
+  if [[ -n "$__catalog_rows_source" && "$__catalog_rows_matched" == no ]]; then
     printf 'Procedure %s has no package group for source: %s\n' \
-      "$id" "$requested_source" >&2
+      "$__catalog_rows_id" "$__catalog_rows_source" >&2
     return 1
   fi
-
-  if ((${#loose_keys[@]} > 0)) && [[ "$any_category" == "yes" ]]; then
-    message_format other_label package_category_other
-    rows_ref+=("$other_label")
-    kinds_ref+=(g)
-  fi
-  for group_key in "${loose_keys[@]}"; do
-    read -r -a group_packages <<< "${_CATALOG_PACKAGE_GROUPS[$group_key]}"
-    for ((index = 0; index < ${#group_packages[@]}; index++)); do
-      rows_ref+=("${group_packages[$index]}")
-      kinds_ref+=(i)
-    done
-  done
-
-  if ((${#rows_ref[@]} == 0)); then
-    printf 'Procedure %s resolved to an empty package selection.\n' "$id" >&2
+  if ((${#__catalog_rows_result[@]} == 0)); then
+    printf 'Procedure %s resolved to an empty package selection.\n' "$__catalog_rows_id" >&2
     return 1
   fi
 }

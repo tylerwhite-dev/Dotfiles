@@ -59,8 +59,8 @@ for kind in "${plain_kinds[@]}"; do
   [[ "$kind" == "i" ]]
 done
 
-# Loose group references mixed with a category are appended under the fallback
-# group, and the flat list still matches the item rows. A subshell keeps these
+# Loose groups stay in declaration order under consecutive fallback headings.
+# A subshell keeps these
 # declarations out of the shared catalog.
 (
   package_group mix_source loose alpha beta
@@ -85,6 +85,34 @@ done
   mixed_flat=()
   catalog_packages mixed_flat mix_procedure macos mix_source
   [[ "${mixed_flat[*]}" == 'gamma alpha beta' ]]
+
+  # Leading loose groups, repeated Other headings, duplicates and source filters.
+  package_group mix_source extra delta
+  package_group other_source unrelated ignored
+  package_group native macos native-item
+  procedure_define alternating
+  procedure_packages alternating \
+    mix_source loose mix_source extra mix_source mixed mix_source loose \
+    other_source unrelated native @distribution
+  alternating_rows=(); alternating_kinds=(); alternating_flat=(); alternating_items=()
+  catalog_package_rows alternating_rows alternating_kinds alternating macos
+  catalog_packages alternating_flat alternating macos
+  [[ "${alternating_rows[*]}" == 'Other alpha beta delta Mixed gamma Other alpha beta ignored native-item' ]]
+  [[ "${alternating_kinds[*]}" == 'g i i i g i g i i i i' ]]
+  for ((index=0; index<${#alternating_rows[@]}; index++)); do
+    [[ "${alternating_kinds[index]}" == i ]] && alternating_items+=("${alternating_rows[index]}")
+  done
+  [[ "${alternating_items[*]}" == "${alternating_flat[*]}" ]]
+  catalog_package_rows alternating_rows alternating_kinds alternating macos other_source
+  [[ "${alternating_rows[*]}" == ignored && "${alternating_kinds[*]}" == i ]]
+  catalog_package_rows alternating_rows alternating_kinds alternating macos native
+  [[ "${alternating_rows[*]}" == native-item && "${alternating_kinds[*]}" == i ]]
+  # Output names may match the old implementation's locals.
+  group_packages=(); group_keys=()
+  catalog_package_rows group_packages group_keys alternating macos mix_source
+  catalog_packages key alternating macos mix_source
+  [[ "${key[*]}" == 'alpha beta delta gamma alpha beta' ]]
+  [[ "${group_packages[*]}" == 'Other alpha beta delta Mixed gamma Other alpha beta' ]]
 )
 
 # Declaration errors are rejected instead of silently producing broken rows.
