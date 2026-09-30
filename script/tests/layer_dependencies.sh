@@ -10,7 +10,7 @@ assert_no_match() {
   shift 2
 
   local matches
-  if matches="$(grep -REn "$pattern" "$@")"; then
+  if matches="$(grep -REn --include='*.sh' "$pattern" "$@")"; then
     printf 'Layer dependency test failed: %s\n%s\n' \
       "$description" "$matches" >&2
     return 1
@@ -31,5 +31,10 @@ assert_no_match \
   "configuration must not render UI or execute commands" \
   'ui_|executor_|workflow_' \
   "${script_root}/config"
+
+assert_no_match \
+  "application must not call private action helpers" \
+  '(^|[^[:alnum:]_])_action_[[:alnum:]_]+[[:space:]]' \
+  "${script_root}/logic/app.sh"
 
 printf 'Layer dependency validation passed.\n'

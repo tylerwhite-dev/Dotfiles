@@ -43,34 +43,33 @@ workflow_requirement_is_selected() {
 
 # Lists procedures supported by the requested platform in declaration order.
 workflow_available() {
-  local -n result_ref="$1"
-  local platform="$2"
-  local -a procedure_ids=()
-  local procedure_id
+  local -n __workflow_available_result_ref="$1"
+  local __workflow_available_platform="$2"
+  local -a __workflow_available_procedure_ids=()
+  local __workflow_available_procedure_id
 
-  result_ref=()
-  catalog_procedure_ids procedure_ids
-  for procedure_id in "${procedure_ids[@]}"; do
-    if catalog_is_available "$procedure_id" "$platform"; then
-      result_ref+=("$procedure_id")
+  __workflow_available_result_ref=()
+  catalog_procedure_ids __workflow_available_procedure_ids
+  for __workflow_available_procedure_id in "${__workflow_available_procedure_ids[@]}"; do
+    if catalog_is_available "$__workflow_available_procedure_id" "$__workflow_available_platform"; then
+      __workflow_available_result_ref+=("$__workflow_available_procedure_id")
     fi
   done
 }
 
 # Lists available procedures that are selected with satisfied prerequisites.
 workflow_selected() {
-  local -n result_ref="$1"
-  local platform="$2"
-  local -a procedure_ids=()
-  local procedure_id
+  local -n __workflow_selected_result_ref="$1"
+  local __workflow_selected_platform="$2"
+  local -a __workflow_selected_procedure_ids=()
+  local __workflow_selected_procedure_id
 
-  result_ref=()
-  catalog_procedure_ids procedure_ids
-  for procedure_id in "${procedure_ids[@]}"; do
-    if catalog_is_available "$procedure_id" "$platform" && \
-      [[ "${_WORKFLOW_SELECTIONS[$procedure_id]:-no}" == "yes" ]] && \
-      workflow_requirement_is_selected "$procedure_id"; then
-      result_ref+=("$procedure_id")
+  __workflow_selected_result_ref=()
+  workflow_available __workflow_selected_procedure_ids "$__workflow_selected_platform"
+  for __workflow_selected_procedure_id in "${__workflow_selected_procedure_ids[@]}"; do
+    if [[ "${_WORKFLOW_SELECTIONS[$__workflow_selected_procedure_id]:-no}" == "yes" ]] && \
+      workflow_requirement_is_selected "$__workflow_selected_procedure_id"; then
+      __workflow_selected_result_ref+=("$__workflow_selected_procedure_id")
     fi
   done
 }

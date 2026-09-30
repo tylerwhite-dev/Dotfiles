@@ -2,7 +2,7 @@
 
 # Downloads and runs the Homebrew installer when Homebrew is absent.
 # On macOS no system directories or root privileges are needed.
-_action_install_homebrew_binary() {
+action_install_homebrew_binary() {
   local installer
   local setup_dir=0
 
@@ -40,7 +40,7 @@ action_install_homebrew() {
   brew_bin="$(executor_brew_bin)"
 
   if [[ ! -x "$brew_bin" ]]; then
-    _action_install_homebrew_binary || return
+    action_install_homebrew_binary || return
   fi
 
   if [[ ! -x "$brew_bin" ]]; then
