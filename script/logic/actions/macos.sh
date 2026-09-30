@@ -26,3 +26,14 @@ action_install_macos_command_line_tools() {
   fi
   status_report status.macos_clt_ready
 }
+
+# Changes only the selected Finder preferences, including Home as its target.
+action_configure_macos_finder() {
+  executor_require defaults || return
+  executor_run defaults write NSGlobalDomain AppleShowAllExtensions -bool true || return
+  executor_run defaults write com.apple.finder ShowPathbar -bool true || return
+  executor_run defaults write com.apple.finder _FXSortFoldersFirst -bool true || return
+  executor_run defaults write com.apple.finder FXDefaultSearchScope -string SCcf || return
+  executor_run defaults write com.apple.finder NewWindowTarget -string PfHm || return
+  executor_restart_macos_app Finder
+}

@@ -134,6 +134,18 @@ executor_macos_developer_tools_ready() {
   xcode-select -p >/dev/null 2>&1 && xcrun clang --version >/dev/null 2>&1
 }
 
+# Restarts only the current user's running Finder or Dock process.
+executor_restart_macos_app() {
+  local app="$1"
+  case "$app" in Finder|Dock) ;; *) return 2 ;; esac
+  executor_require pgrep || return
+  executor_require killall || return
+  if pgrep -u "$(id -u)" -x "$app" >/dev/null; then
+    executor_run killall -u "$(id -un)" "$app" || return
+  fi
+  return 0
+}
+
 # Returns the Homebrew binary path for the current platform.
 executor_brew_bin() {
   case "${OSTYPE:-}" in

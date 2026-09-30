@@ -30,6 +30,11 @@ tools readiness if that question was skipped.
 Homebrew installation requests administrator access before running its non-
 interactive installer, including in the --add-optionals scenario.
 
+The Finder profile shows all filename extensions and the path bar, keeps folders
+first when sorting by name, searches the current folder, and opens new windows
+in Home. It does not change the status bar or hidden-file visibility. It restarts
+Finder for the current user. Keyboard preferences and shortcuts are not modified.
+
 These non-selectable macOS procedures also run in --yolo; installing missing
 tools still needs the system dialog and Enter.
 

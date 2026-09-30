@@ -61,13 +61,43 @@ action_install_macos_command_line_tools macos '' <<< ''
 catalog_finish_handler finish_handler macos_command_line_tools
 [[ "$finish_handler" == action_install_macos_command_line_tools ]]
 workflow_reset
-for procedure in macos_command_line_tools homebrew; do
+for procedure in macos_command_line_tools macos_finder homebrew; do
   workflow_select "$procedure" yes
 done
 workflow_selected selected macos
-[[ "${selected[*]}" == 'macos_command_line_tools homebrew' ]]
+[[ "${selected[*]}" == 'macos_command_line_tools homebrew macos_finder' ]]
 workflow_selected selected fedora
 [[ "${selected[*]}" == homebrew ]]
+
+# No preference operation may touch the status bar, shortcuts or other keys.
+declare -A preferences=(
+  ['com.apple.finder/ShowStatusBar']=existing-status-bar
+  ['com.apple.symbolichotkeys/AppleSymbolicHotKeys']=existing-shortcuts
+  ['com.apple.dock/autohide']=existing-dock-setting
+)
+executor_run() {
+  if [[ "$1" == defaults ]]; then
+    [[ "$2" == write ]]
+    preferences["$3/$4"]="$6"
+  else
+    events+=("$*")
+  fi
+}
+pgrep() { return 1; }
+action_configure_macos_finder macos ''
+[[ "${preferences[com.apple.finder/ShowStatusBar]}" == existing-status-bar ]]
+[[ "${preferences[com.apple.symbolichotkeys/AppleSymbolicHotKeys]}" == existing-shortcuts ]]
+[[ "${preferences[com.apple.dock/autohide]}" == existing-dock-setting ]]
+[[ "${preferences[com.apple.finder/NewWindowTarget]}" == PfHm ]]
+
+# Restarts must be scoped to the current user and the requested app only.
+pgrep() { [[ "$*" == "-u $(id -u) -x Finder" ]]; }
+events=()
+executor_restart_macos_app Finder
+[[ "${events[*]}" == "killall -u $(id -un) Finder" ]]
+actual=0
+executor_restart_macos_app unrelated || actual=$?
+[[ "$actual" == 2 ]]
 
 # A clean macOS Homebrew path must stop before download if tools are missing.
 OSTYPE=darwin

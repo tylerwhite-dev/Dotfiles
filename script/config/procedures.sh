@@ -92,6 +92,14 @@ message_define procedure.homebrew_casks.label \
 message_define procedure.homebrew_casks.description \
   "Some casks may request administrator access during installation."
 
+procedure_define macos_finder
+procedure_handler macos_finder action_configure_macos_finder
+procedure_platforms macos_finder macos
+message_define procedure.macos_finder.question "Configure Finder for projects?"
+message_define procedure.macos_finder.label "Configure Finder for projects"
+message_define procedure.macos_finder.description \
+  "Show extensions and the path bar, keep folders first, search the current folder, and open new windows in Home. The status bar is unchanged. Finder will restart."
+
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles
 procedure_platforms dotfiles arch debian fedora macos
