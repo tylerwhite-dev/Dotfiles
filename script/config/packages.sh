@@ -48,7 +48,7 @@ package_group brew_cask internet \
 package_group brew_cask work_media \
   obsidian libreoffice iina bitwarden veracrypt
 package_group brew_cask development \
-  android-studio intellij-idea-ce qt-creator vscodium \
+  android-studio intellij-idea qt-creator vscodium \
   docker-desktop ghostty lm-studio zed
 package_group brew_cask system \
   utm appcleaner betterdisplay coconutbattery macfuse mos raycast \
