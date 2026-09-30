@@ -21,22 +21,21 @@ action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
 installation runs with direct terminal access so password prompts stay visible.
 
-The macOS-only Command Line Tools question comes before Homebrew and preserves
-a working CLT or full Xcode selection. When tools are missing, it opens Apple's
-installer: finish installation in the system dialog, then press Enter to verify.
-An incomplete installation stops execution. Homebrew installation also checks
-tools readiness if that question was skipped.
-
-Homebrew installation requests administrator access before running its non-
-interactive installer, including in the --add-optionals scenario.
+Three additional macOS-only questions check Apple Command Line Tools, configure
+Finder, and disable automatic rearrangement of Spaces. The tools check comes
+before Homebrew and preserves a working CLT or full Xcode selection. When tools
+are missing, it opens Apple's installer: finish installation in the system
+dialog, then press Enter to verify. An incomplete installation stops execution.
+Homebrew installation also checks tools readiness if that question was skipped,
+and requests administrator access before running its non-interactive installer.
 
 The Finder profile shows all filename extensions and the path bar, keeps folders
 first when sorting by name, searches the current folder, and opens new windows
-in Home. It does not change the status bar or hidden-file visibility. It restarts
-Finder for the current user. Keyboard preferences and shortcuts are not modified.
-
-These non-selectable macOS procedures also run in --yolo; installing missing
-tools still needs the system dialog and Enter.
+in Home. It does not change the status bar or hidden-file visibility. The Spaces
+profile only disables rearrangement by most recent use. Each profile restarts
+its respective Finder or Dock process for the current user. Keyboard preferences
+and shortcut mappings are not modified. These non-selectable procedures also
+run in `--yolo`; installing missing tools still needs the system dialog and Enter.
 
 The entry point still requires Bash 5 before any procedure can run. On a clean
 Mac, prepare Command Line Tools, Homebrew and Bash first; the CLT procedure is

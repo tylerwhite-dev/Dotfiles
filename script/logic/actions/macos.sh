@@ -37,3 +37,10 @@ action_configure_macos_finder() {
   executor_run defaults write com.apple.finder NewWindowTarget -string PfHm || return
   executor_restart_macos_app Finder
 }
+
+# Keeps the existing Spaces order without changing other Dock preferences.
+action_configure_macos_spaces() {
+  executor_require defaults || return
+  executor_run defaults write com.apple.dock mru-spaces -bool false || return
+  executor_restart_macos_app Dock
+}

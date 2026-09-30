@@ -181,9 +181,9 @@ On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is
 needed, the operator completes Apple's dialog and presses Enter to verify.
-
-Finder is a separate macOS-only procedure that leaves the status bar and hidden-
-file visibility unchanged. Keyboard preferences and shortcuts are not modified.
+Finder and Spaces are separate macOS-only procedures. Finder leaves the status
+bar and hidden-file visibility unchanged; Spaces changes only `mru-spaces`.
+Keyboard preferences and shortcut mappings are not modified.
 
 ### Command execution
 
@@ -280,7 +280,7 @@ interfaces are grouped below for quick navigation.
   `action_install_homebrew_binary`, `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
   `action_install_homebrew_casks`, `action_set_zsh_default`,
   `action_prepare_macos_command_line_tools`, `action_install_macos_command_line_tools`,
-  `action_configure_macos_finder`,
+  `action_configure_macos_finder`, `action_configure_macos_spaces`,
   `action_apply_dotfiles`, `action_install_yay`, and `action_install_yay_package`.
 
 Private helpers start with `_` and stay within their module unless an internal

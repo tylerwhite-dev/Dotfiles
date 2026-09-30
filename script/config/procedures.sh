@@ -100,6 +100,14 @@ message_define procedure.macos_finder.label "Configure Finder for projects"
 message_define procedure.macos_finder.description \
   "Show extensions and the path bar, keep folders first, search the current folder, and open new windows in Home. The status bar is unchanged. Finder will restart."
 
+procedure_define macos_spaces
+procedure_handler macos_spaces action_configure_macos_spaces
+procedure_platforms macos_spaces macos
+message_define procedure.macos_spaces.question "Disable automatic rearrangement of Spaces?"
+message_define procedure.macos_spaces.label "Keep Spaces in their existing order"
+message_define procedure.macos_spaces.description \
+  "Disable rearrangement by most recent use. Other Dock settings are unchanged. Dock will restart."
+
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles
 procedure_platforms dotfiles arch debian fedora macos

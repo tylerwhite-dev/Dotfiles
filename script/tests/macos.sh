@@ -61,11 +61,11 @@ action_install_macos_command_line_tools macos '' <<< ''
 catalog_finish_handler finish_handler macos_command_line_tools
 [[ "$finish_handler" == action_install_macos_command_line_tools ]]
 workflow_reset
-for procedure in macos_command_line_tools macos_finder homebrew; do
+for procedure in macos_command_line_tools macos_finder macos_spaces homebrew; do
   workflow_select "$procedure" yes
 done
 workflow_selected selected macos
-[[ "${selected[*]}" == 'macos_command_line_tools homebrew macos_finder' ]]
+[[ "${selected[*]}" == 'macos_command_line_tools homebrew macos_finder macos_spaces' ]]
 workflow_selected selected fedora
 [[ "${selected[*]}" == homebrew ]]
 
@@ -85,10 +85,12 @@ executor_run() {
 }
 pgrep() { return 1; }
 action_configure_macos_finder macos ''
+action_configure_macos_spaces macos ''
 [[ "${preferences[com.apple.finder/ShowStatusBar]}" == existing-status-bar ]]
 [[ "${preferences[com.apple.symbolichotkeys/AppleSymbolicHotKeys]}" == existing-shortcuts ]]
 [[ "${preferences[com.apple.dock/autohide]}" == existing-dock-setting ]]
 [[ "${preferences[com.apple.finder/NewWindowTarget]}" == PfHm ]]
+[[ "${preferences[com.apple.dock/mru-spaces]}" == false ]]
 
 # Restarts must be scoped to the current user and the requested app only.
 pgrep() { [[ "$*" == "-u $(id -u) -x Finder" ]]; }
