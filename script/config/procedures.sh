@@ -44,7 +44,7 @@ message_define procedure.macos_command_line_tools.description \
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
 procedure_platforms homebrew arch debian fedora macos
-procedure_requires_root homebrew arch debian fedora
+procedure_requires_root homebrew arch debian fedora macos
 procedure_packages homebrew \
   brew extensions \
   brew cli_tools \

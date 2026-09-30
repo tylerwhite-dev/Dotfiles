@@ -76,4 +76,19 @@ events=() actual=0
 action_install_homebrew_binary || actual=$?
 [[ "$actual" == 1 && "${events[*]}" == error.macos_clt_missing ]]
 
+# Missing sudo credentials must be prepared before any installer download.
+executor_macos_developer_tools_ready() { return 0; }
+sudo() { return "$sudo_status"; }
+executor_prepare_privilege() { events+=(prepare-privilege); return "$privilege_status"; }
+executor_temp_file() { return 6; }
+sudo_status=1 privilege_status=4 events=() actual=0
+action_install_homebrew_binary || actual=$?
+[[ "$actual" == 4 && "${events[*]}" == 'status.homebrew_admin_prompt prepare-privilege' ]]
+privilege_status=0 events=() actual=0
+action_install_homebrew_binary || actual=$?
+[[ "$actual" == 6 && "${events[*]}" == 'status.homebrew_admin_prompt prepare-privilege' ]]
+sudo_status=0 events=() actual=0
+action_install_homebrew_binary || actual=$?
+[[ "$actual" == 6 && "${#events[@]}" == 0 ]]
+
 printf 'macOS procedure validation passed.\n'

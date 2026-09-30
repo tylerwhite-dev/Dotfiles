@@ -24,7 +24,7 @@ bash script/tests/macos.sh
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |
 | `process.sh` | Completion statuses, parent-shell finish handler and privilege preparation failures using fixture handlers. |
-| `macos.sh` | Mocked CLT readiness/installation and platform filtering. No installation commands run. |
+| `macos.sh` | Mocked CLT readiness/installation, platform filtering and Homebrew privilege preparation. No installation commands run. |
 
 ## Manual UI tests (interactive)
 

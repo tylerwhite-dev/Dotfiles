@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Downloads and runs the Homebrew installer when Homebrew is absent.
-# On macOS developer tools must be ready first.
+# On macOS developer tools and administrator access must be ready first.
 action_install_homebrew_binary() {
   local installer
   local setup_dir=0
@@ -10,6 +10,11 @@ action_install_homebrew_binary() {
     if ! executor_macos_developer_tools_ready; then
       error_report error.macos_clt_missing
       return 1
+    fi
+    # Normal runs authenticate in process_run; --add-optionals calls us directly.
+    if ! sudo -n -v >/dev/null 2>&1; then
+      status_report status.homebrew_admin_prompt
+      executor_prepare_privilege || return
     fi
   else
     setup_dir=1

@@ -72,6 +72,8 @@ message_define status.cask_admin_prompt \
 message_define status.macos_clt_ready "Apple developer tools are ready."
 message_define status.macos_clt_wait \
   "Complete the Command Line Tools installation in Apple's dialog, then press Enter to verify."
+message_define status.homebrew_admin_prompt \
+  "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
 message_define status.sudo_auth_prompt \
   "Administrator access for %s. Enter your sudo password if prompted."
 message_define status.retry \

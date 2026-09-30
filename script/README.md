@@ -27,6 +27,9 @@ installer: finish installation in the system dialog, then press Enter to verify.
 An incomplete installation stops execution. Homebrew installation also checks
 tools readiness if that question was skipped.
 
+Homebrew installation requests administrator access before running its non-
+interactive installer, including in the --add-optionals scenario.
+
 These non-selectable macOS procedures also run in --yolo; installing missing
 tools still needs the system dialog and Enter.
 
