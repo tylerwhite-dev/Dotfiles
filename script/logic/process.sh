@@ -10,6 +10,21 @@ _process_finish() {
   return "$status"
 }
 
+# Completes an action in the parent shell, preserving the first failed phase.
+_process_complete_action() {
+  local status="$1" finish_handler="$2" platform="$3" repository_dir="$4"
+  local label="$5" started_at="$6"
+
+  if ((status == 0)) && [[ -n "$finish_handler" ]]; then
+    if "$finish_handler" "$platform" "$repository_dir"; then
+      status=0
+    else
+      status=$?
+    fi
+  fi
+  _process_finish "$status" "$label" "$started_at"
+}
+
 # Runs one action without a coprocess or animated redraw.
 _process_run_plain() {
   local handler="$1"
@@ -31,15 +46,8 @@ _process_run_plain() {
     status=$?
   fi
 
-  if ((status == 0)) && [[ -n "$finish_handler" ]]; then
-    if "$finish_handler" "$platform" "$repository_dir"; then
-      status=0
-    else
-      status=$?
-    fi
-  fi
-
-  _process_finish "$status" "$label" "$started_at"
+  _process_complete_action "$status" "$finish_handler" "$platform" \
+    "$repository_dir" "$label" "$started_at"
 }
 
 # Redraws the active timeline while forwarding lines from an action's output.
@@ -97,10 +105,13 @@ _process_run_animated() {
 
   unset setup_procedure_process setup_procedure_process_PID 2>/dev/null || true
   coproc setup_procedure_process {
+    # Keep Bash's PID/fd variables alive until the parent owns the output fd.
+    IFS= read -r __process_ready || exit 1
     "$handler" "$platform" "$repository_dir" </dev/tty 2>&1
   }
   process_pid="$setup_procedure_process_PID"
   exec {output_fd}<&"${setup_procedure_process[0]}"
+  printf '\n' >&"${setup_procedure_process[1]}"
 
   _process_render_output \
     "$output_fd" "$current" "$total" "$label" \
@@ -112,18 +123,11 @@ _process_run_animated() {
     status=$?
   fi
 
-  exec {output_fd}<&- 2>/dev/null || true
+  { exec {output_fd}<&-; } 2>/dev/null || true
   unset setup_procedure_process setup_procedure_process_PID 2>/dev/null || true
 
-  if ((status == 0)) && [[ -n "$finish_handler" ]]; then
-    if "$finish_handler" "$platform" "$repository_dir"; then
-      status=0
-    else
-      status=$?
-    fi
-  fi
-
-  _process_finish "$status" "$label" "$started_at"
+  _process_complete_action "$status" "$finish_handler" "$platform" \
+    "$repository_dir" "$label" "$started_at"
 }
 
 # Adds privilege preparation and selects plain or animated action execution.
