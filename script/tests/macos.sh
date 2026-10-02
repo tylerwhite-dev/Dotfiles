@@ -65,7 +65,7 @@ for procedure in macos_command_line_tools macos_finder macos_spaces homebrew; do
   workflow_select "$procedure" yes
 done
 workflow_selected selected macos
-[[ "${selected[*]}" == 'macos_command_line_tools homebrew macos_finder macos_spaces' ]]
+[[ "${selected[*]}" == 'macos_command_line_tools macos_finder macos_spaces homebrew' ]]
 workflow_selected selected fedora
 [[ "${selected[*]}" == homebrew ]]
 

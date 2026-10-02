@@ -41,6 +41,22 @@ message_define procedure.macos_command_line_tools.label "Check and install Apple
 message_define procedure.macos_command_line_tools.description \
   "A working CLT or Xcode selection is preserved. If needed, complete Apple's installation dialog, then press Enter to verify."
 
+procedure_define macos_finder
+procedure_handler macos_finder action_configure_macos_finder
+procedure_platforms macos_finder macos
+message_define procedure.macos_finder.question "Configure Finder for projects?"
+message_define procedure.macos_finder.label "Configure Finder for projects"
+message_define procedure.macos_finder.description \
+  "Show extensions and the path bar, keep folders first, search the current folder, and open new windows in Home. The status bar is unchanged. Finder will restart."
+
+procedure_define macos_spaces
+procedure_handler macos_spaces action_configure_macos_spaces
+procedure_platforms macos_spaces macos
+message_define procedure.macos_spaces.question "Disable automatic rearrangement of Spaces?"
+message_define procedure.macos_spaces.label "Keep Spaces in their existing order"
+message_define procedure.macos_spaces.description \
+  "Disable rearrangement by most recent use. Other Dock settings are unchanged. Dock will restart."
+
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
 procedure_platforms homebrew arch debian fedora macos
@@ -108,22 +124,6 @@ message_define procedure.homebrew_casks.label \
   "Install selected Homebrew casks"
 message_define procedure.homebrew_casks.description \
   "Some casks may request administrator access during installation."
-
-procedure_define macos_finder
-procedure_handler macos_finder action_configure_macos_finder
-procedure_platforms macos_finder macos
-message_define procedure.macos_finder.question "Configure Finder for projects?"
-message_define procedure.macos_finder.label "Configure Finder for projects"
-message_define procedure.macos_finder.description \
-  "Show extensions and the path bar, keep folders first, search the current folder, and open new windows in Home. The status bar is unchanged. Finder will restart."
-
-procedure_define macos_spaces
-procedure_handler macos_spaces action_configure_macos_spaces
-procedure_platforms macos_spaces macos
-message_define procedure.macos_spaces.question "Disable automatic rearrangement of Spaces?"
-message_define procedure.macos_spaces.label "Keep Spaces in their existing order"
-message_define procedure.macos_spaces.description \
-  "Disable rearrangement by most recent use. Other Dock settings are unchanged. Dock will restart."
 
 procedure_define dotfiles
 procedure_handler dotfiles action_apply_dotfiles
