@@ -65,7 +65,13 @@ bash dotfiles-deploy.sh -a
   the confirmation summary. Every procedure that needs no package selection
   runs automatically; optional package sets and casks are skipped and listed as
   skipped, because they install only explicitly chosen packages.
-- `-a`, `--add-optionals` asks only for the extended Homebrew formulae.
+- `-a`, `--add-optionals` asks for extended Homebrew formulae, then Flatpak apps
+  on Linux or casks on macOS. It shows a review before executing the selection.
+  Homebrew is prepared only if selected formulae or casks need it; selecting
+  only Flatpak does not require Homebrew. Missing Homebrew is installed without
+  the core formula/font set, after confirmation. On macOS this also checks
+  Command Line Tools and opens Apple's installer if needed. Empty selections
+  perform no preparation or installation.
 - `-h`, `--help` prints usage.
 
 Any other flag exits with status 2 and an `Unknown flag` error.
@@ -156,6 +162,7 @@ bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
 bash script/tests/flatpak.sh
+bash script/tests/optionals.sh
 ```
 
 ## Manual UI tests

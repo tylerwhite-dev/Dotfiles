@@ -122,37 +122,26 @@ questionnaire_collect() {
   done
 }
 
-# Collects only the package choices for the first selectable procedure
-# (used by --add-optionals).
+# Collects every available optional package list without preparing managers.
 questionnaire_collect_optionals() {
   local platform="$1"
   local distribution_name="$2"
   local title
   local metadata
   local procedure_id
-  local is_selectable
   local current=0
   local -a available=()
 
   workflow_reset
-  workflow_available available "$platform"
-
+  workflow_available_optionals available "$platform"
+  message_format title stage.questionnaire.title
+  message_format metadata stage.questionnaire.meta "$distribution_name" "${#available[@]}"
+  ui_stage "$title" "$metadata"
   for procedure_id in "${available[@]}"; do
     ((current += 1))
-    catalog_is_selectable is_selectable "$procedure_id"
-    if [[ "$is_selectable" == "yes" ]]; then
-      message_format title stage.questionnaire.title
-      message_format metadata stage.questionnaire.meta \
-        "$distribution_name" "${#available[@]}"
-      ui_stage "$title" "$metadata"
-      _questionnaire_read_selectable_packages \
-        "$procedure_id" "$platform" "$current" "${#available[@]}" || return
-      return 0
-    fi
+    _questionnaire_read_selectable_packages \
+      "$procedure_id" "$platform" "$current" "${#available[@]}" || return
   done
-
-  status_report status.optionals_none
-  return 0
 }
 
 # Displays the review rows for all procedures available on the platform.
@@ -168,7 +157,11 @@ _questionnaire_show_summary() {
   local selection
   local -a available=()
 
-  workflow_available available "$platform"
+  if [[ "${3:-all}" == optionals ]]; then
+    workflow_available_optionals available "$platform"
+  else
+    workflow_available available "$platform"
+  fi
   message_format title stage.review.title
   message_format metadata stage.review.meta "$distribution_name"
   message_format yes_label label.yes
@@ -212,7 +205,7 @@ questionnaire_confirm() {
   local exit_option
   local selected_index
 
-  _questionnaire_show_summary "$platform" "$distribution_name"
+  _questionnaire_show_summary "$platform" "$distribution_name" "${4:-all}"
   message_format prompt prompt.action
   message_format start_option option.start
   message_format restart_option option.restart

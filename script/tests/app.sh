@@ -8,8 +8,8 @@ source "${script_root}/logic/load.sh"
 ui_is_interactive() { return "${interactive_status:-0}"; }
 catalog_validate() { return "${validation_status:-0}"; }
 environment_detect() {
-  printf -v "$1" '%s' fedora
-  printf -v "$2" '%s' Fedora
+  printf -v "$1" '%s' "${test_platform:-fedora}"
+  printf -v "$2" '%s' "${test_platform:-Fedora}"
   return "${environment_status:-0}"
 }
 message_format() { printf -v "$1" '%s' "$2"; }
@@ -29,12 +29,16 @@ questionnaire_confirm() {
 executor_brew_bin() { printf '%s\n' "${brew_path:-/bin/bash}"; }
 ui_select() { printf -v "$1" '%s' "${brew_choice:-0}"; return "${input_status:-0}"; }
 action_install_homebrew_binary() { events+=(brew-install); return "${brew_status:-0}"; }
-questionnaire_collect_optionals() { events+=(optional-collect); return "${optional_status:-0}"; }
-action_install_homebrew_extended() { events+=(optional-install); return "${install_status:-0}"; }
-workflow_selected_packages() {
-  local -n test_packages_ref="$1"
-  test_packages_ref=("${packages[@]}")
+questionnaire_collect_optionals() {
+  events+=(optional-collect)
+  workflow_reset
+  local procedure
+  for procedure in "${optional_ids[@]}"; do workflow_select "$procedure" yes; done
+  return "${optional_status:-0}"
 }
+runner_run_optionals() { events+=(optional-run); return "${install_status:-0}"; }
+action_prepare_macos_command_line_tools() { events+=(clt-check); }
+action_install_macos_command_line_tools() { events+=(clt-install); return "${clt_status:-0}"; }
 
 run_app() {
   actual=0
@@ -101,44 +105,71 @@ if ((EUID == 0)); then
   assert_events 'status.distribution_detected error.root_execution'
 else
   (
-    events=() SETUP_ADD_OPTIONALS=1 packages=(one)
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect optional-install elapsed'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 packages=()
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=()
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.optionals_none'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 packages=(one) brew_path=/missing/brew
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected brew-install optional-collect optional-install elapsed'
+    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare brew-install status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 brew_path=/missing/brew brew_choice=1
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1
     run_app 1
-    assert_events 'status.distribution_detected error.brew_not_installed'
+    assert_events 'status.distribution_detected optional-collect error.brew_not_installed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 brew_path=/missing/brew input_status=130
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130
     run_app 1
-    assert_events 'status.distribution_detected error.input_interrupted'
+    assert_events 'status.distribution_detected optional-collect error.input_interrupted'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 brew_path=/missing/brew brew_status=6
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_status=6 answers=(start) answer_index=0
     run_app 6
-    assert_events 'status.distribution_detected brew-install'
+    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare brew-install'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_status=5
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=() optional_status=5
     run_app 5
     assert_events 'status.distribution_detected optional-collect'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 packages=(one) install_status=8
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) install_status=8 answers=(start) answer_index=0
     run_app 8
-    assert_events 'status.distribution_detected optional-collect optional-install'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run'
+  )
+  (
+    # Flatpak alone never prepares Homebrew, even if it is absent.
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
+  )
+  (
+    # Exit after the review must precede every system-changing operation.
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(exit) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare status.exited'
+  )
+  (
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(restart start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect optional-collect status.settings_confirmed optional-run elapsed'
+  )
+  (
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew answers=(start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare clt-check clt-install brew-install status.settings_confirmed optional-run elapsed'
+  )
+  (
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew clt_status=9 answers=(start) answer_index=0
+    run_app 9
+    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare clt-check clt-install'
   )
 fi
 printf 'Application scenario validation passed.\n'

@@ -1,7 +1,8 @@
 # flatpak
 
 The repository setup offers these applications in a grouped checkbox list on
-Arch, Debian and Fedora. Run `bash dotfiles-deploy.sh` to choose applications.
+Arch, Debian and Fedora. Run `bash dotfiles-deploy.sh`, or use
+`bash dotfiles-deploy.sh --add-optionals` to choose optional packages only.
 Execution starts after reviewing the selection. If Flatpak applications are
 selected, setup installs Flatpak if missing and prepares system Flathub.
 On Fedora it force-removes the system `fedora` remote while retaining installed

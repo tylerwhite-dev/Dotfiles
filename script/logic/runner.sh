@@ -2,6 +2,20 @@
 
 # Runs selected procedure handlers in catalog order.
 runner_run() {
+  local -a selected=()
+  workflow_selected selected "$1"
+  _runner_run_selected "$1" "$2" "$3" "${selected[@]}"
+}
+
+# Runs optional procedures after their package managers have been prepared.
+runner_run_optionals() {
+  local -a selected=()
+  workflow_selected_optionals selected "$1"
+  _runner_run_selected "$1" "$2" "$3" "${selected[@]}"
+}
+
+# Both scenarios share privilege preparation, finish handlers and failure policy.
+_runner_run_selected() {
   local platform="$1"
   local distribution_name="$2"
   local repository_dir="$3"
@@ -14,14 +28,14 @@ runner_run() {
   local label
   local requires_root
   local current=0
-  local -a selected=()
+  shift 3
+  local -a selected=("$@")
 
   if ((EUID == 0)); then
     error_report error.root_execution
     return 1
   fi
 
-  workflow_selected selected "$platform"
   if ((${#selected[@]} == 0)); then
     message_format completion_message status.no_selection
     ui_success "$completion_message"

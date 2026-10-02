@@ -18,38 +18,59 @@ _app_print_elapsed_time() {
   ui_heading_line "$message"
 }
 
-# Runs the optionals-only scenario without entering the normal runner.
+# Collects choices first; prepares managers only after execution is confirmed.
 _app_run_optionals() {
-  local platform="$1" distribution_name="$2" started_at="$SECONDS"
-  local brew_bin prompt yes_option no_option choice
+  local platform="$1" distribution_name="$2" started_at
+  local brew_bin prompt yes_option no_option choice action procedure_id needs_brew
   local -a selected=()
 
   if ((EUID == 0)); then
     error_report error.root_execution
     return 1
   fi
-  brew_bin="$(executor_brew_bin)"
-  if [[ ! -x "$brew_bin" ]]; then
-    message_format prompt prompt.brew_install
-    message_format yes_option option.yes
-    message_format no_option option.no
-    if ! ui_select choice "$prompt" "" 0 minimal "$yes_option" "$no_option"; then
-      error_report error.input_interrupted
-      return 1
+  while true; do
+    questionnaire_collect_optionals "$platform" "$distribution_name" || return
+    workflow_selected_optionals selected "$platform"
+    if ((${#selected[@]} == 0)); then
+      status_report status.optionals_none
+      return 0
     fi
-    if ((choice != 0)); then
-      error_report error.brew_not_installed
-      return 1
+    needs_brew=0
+    for procedure_id in "${selected[@]}"; do
+      case "$procedure_id" in homebrew_extended|homebrew_casks) needs_brew=1 ;; esac
+    done
+    brew_bin="$(executor_brew_bin)"
+    if ((needs_brew)) && [[ ! -x "$brew_bin" ]]; then
+      message_format prompt prompt.brew_install
+      message_format yes_option option.yes
+      message_format no_option option.no
+      if ! ui_select choice "$prompt" "" 0 minimal "$yes_option" "$no_option"; then
+        error_report error.input_interrupted
+        return 1
+      fi
+      if ((choice != 0)); then
+        error_report error.brew_not_installed
+        return 1
+      fi
+      status_report status.optionals_brew_prepare
+    fi
+    questionnaire_confirm action "$platform" "$distribution_name" optionals || return
+    case "$action" in
+      start) break ;;
+      restart) continue ;;
+      exit) status_report status.exited; return 0 ;;
+    esac
+  done
+  started_at="$SECONDS"
+  if ((needs_brew)) && [[ ! -x "$brew_bin" ]]; then
+    if [[ "$platform" == macos ]]; then
+      action_prepare_macos_command_line_tools "$platform" || return
+      action_install_macos_command_line_tools "$platform" || return
     fi
     action_install_homebrew_binary || return
   fi
-  questionnaire_collect_optionals "$platform" "$distribution_name" || return
-  workflow_selected_packages selected homebrew_extended
-  if ((${#selected[@]} == 0)); then
-    status_report status.optionals_none
-    return 0
-  fi
-  action_install_homebrew_extended "$platform" || return
+  status_report status.settings_confirmed
+  runner_run_optionals "$platform" "$distribution_name" "$SETUP_REPOSITORY_ROOT" || return
   _app_print_elapsed_time "$((SECONDS - started_at))"
 }
 

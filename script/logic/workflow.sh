@@ -57,6 +57,36 @@ workflow_available() {
   done
 }
 
+# Lists selectable procedures supported by the requested platform.
+workflow_available_optionals() {
+  local -n __workflow_optionals_result="$1"
+  local __workflow_optionals_platform="$2" __workflow_optionals_id __workflow_optionals_selectable
+  local -a __workflow_optionals_available=()
+  workflow_available __workflow_optionals_available "$__workflow_optionals_platform"
+  __workflow_optionals_result=()
+  for __workflow_optionals_id in "${__workflow_optionals_available[@]}"; do
+    catalog_is_selectable __workflow_optionals_selectable "$__workflow_optionals_id"
+    if [[ "$__workflow_optionals_selectable" == yes ]]; then
+      __workflow_optionals_result+=("$__workflow_optionals_id")
+    fi
+  done
+}
+
+# The optionals-only scenario prepares package managers separately, so the
+# normal requirement on selecting the core Homebrew procedure does not apply.
+workflow_selected_optionals() {
+  local -n __workflow_optional_selection_result="$1"
+  local __workflow_optional_selection_id
+  local -a __workflow_optional_selection_available=()
+  workflow_available_optionals __workflow_optional_selection_available "$2"
+  __workflow_optional_selection_result=()
+  for __workflow_optional_selection_id in "${__workflow_optional_selection_available[@]}"; do
+    if [[ "${_WORKFLOW_SELECTIONS[$__workflow_optional_selection_id]:-no}" == yes ]]; then
+      __workflow_optional_selection_result+=("$__workflow_optional_selection_id")
+    fi
+  done
+}
+
 # Lists available procedures that are selected with satisfied prerequisites.
 workflow_selected() {
   local -n __workflow_selected_result_ref="$1"

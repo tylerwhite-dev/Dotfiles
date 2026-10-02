@@ -15,6 +15,7 @@ bash script/tests/app.sh
 bash script/tests/process.sh
 bash script/tests/macos.sh
 bash script/tests/flatpak.sh
+bash script/tests/optionals.sh
 ```
 
 | Script | What it verifies |
@@ -22,6 +23,7 @@ bash script/tests/flatpak.sh
 | `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, and declaration errors. |
 | `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
+| `optionals.sh` | All optional lists per platform and shared runner finish-handler dispatch. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |

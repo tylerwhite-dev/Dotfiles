@@ -184,6 +184,11 @@ Flathub in its main handler. The finish handler runs one
 for authentication. Installation confirmations are accepted automatically.
 Fedora's system `fedora` remote is deleted with `--force`, retaining installed
 refs. Existing Flathub URLs and filters are validated before remote changes.
+`--add-optionals` collects every available selectable procedure, shows a review,
+prepares missing Homebrew only for selected formulae/casks, and calls
+`runner_run_optionals`. This scenario satisfies manager prerequisites separately
+instead of selecting the core Homebrew procedure. Ordinary workflow dependency
+filtering remains unchanged. Empty optional selections make no system changes.
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is
 needed, the operator completes Apple's dialog and presses Enter to verify.
@@ -271,9 +276,11 @@ interfaces are grouped below for quick navigation.
 - Flags: `flags_parse`.
 - Workflow: `workflow_reset`, `workflow_select`, `workflow_selection`,
   `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
+  `workflow_available_optionals`, `workflow_selected_optionals`,
   `workflow_select_packages`, and `workflow_selected_packages`.
 - Questionnaire and application: `questionnaire_collect`,
-  `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`, `process_run`, and `setup_run`.
+  `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`,
+  `runner_run_optionals`, `process_run`, and `setup_run`.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, `executor_brew_bin`,
@@ -309,6 +316,7 @@ bash script/tests/app.sh
 bash script/tests/process.sh
 bash script/tests/macos.sh
 bash script/tests/flatpak.sh
+bash script/tests/optionals.sh
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit
