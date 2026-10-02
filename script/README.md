@@ -20,6 +20,18 @@ The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
 installation runs with direct terminal access so password prompts stay visible.
+On Linux, a separate grouped list offers the 20 applications from
+`guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
+
+The Flatpak procedure installs the CLI through pacman, APT or DNF if absent.
+It adds the official system Flathub remote or enables an existing official
+remote. An unexpected URL or a client-side filter stops the procedure for
+manual review. On Fedora, it removes the system `fedora` remote with `--force`:
+installed applications and runtimes remain, but stop receiving updates from
+that remote. User remotes are unchanged.
+Each selected application runs as `flatpak install -y <ID>` without sudo.
+Installation confirmations are accepted automatically; terminal access remains
+available for authentication if requested.
 
 Three additional macOS-only questions check Apple Command Line Tools, configure
 Finder, and disable automatic rearrangement of Spaces. The tools check comes
@@ -143,6 +155,7 @@ bash script/tests/config_validation.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
+bash script/tests/flatpak.sh
 ```
 
 ## Manual UI tests

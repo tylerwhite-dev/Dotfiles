@@ -42,6 +42,24 @@ package_category brew terminal "Terminal" shell_addons
 package_category brew media "Media" media_tools
 package_category brew harness "CLI Harness" cli_harness
 
+# Linux applications from guide/linux/flatpak.md.
+package_group flatpak internet \
+  org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop
+package_group flatpak work_media \
+  md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC \
+  io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate \
+  app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe
+package_group flatpak development \
+  ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
+package_group flatpak system \
+  com.belmoussaoui.Authenticator it.mijorus.gearlever \
+  com.mattjakeman.ExtensionManager com.github.tchx84.Flatseal
+
+package_category flatpak internet_apps "Internet" internet
+package_category flatpak work_apps "Work & Media" work_media
+package_category flatpak developer_apps "Dev tools" development
+package_category flatpak system_apps "System" system
+
 # Optional macOS applications from guide/macos/brew.md.
 package_group brew_cask internet \
   firefox google-chrome telegram qbittorrent amneziavpn

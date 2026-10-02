@@ -11,6 +11,14 @@ trap 'rm -f -- "$validation_error"' EXIT
 
 catalog_validate
 
+# Keep all guide IDs in the selectable Flatpak catalog, exactly once.
+flatpak_packages=()
+catalog_packages flatpak_packages flatpak_apps fedora flatpak
+mapfile -t guide_flatpaks < <(sed -n 's/^[[:space:]]*\([[:alnum:]][[:alnum:].-]*\)[[:space:]]*\\[[:space:]]*$/\1/p' "${script_root}/../guide/linux/flatpak.md" | sort)
+mapfile -t catalog_flatpaks < <(printf '%s\n' "${flatpak_packages[@]}" | sort)
+[[ "${#flatpak_packages[@]}" == 20 ]]
+[[ "${catalog_flatpaks[*]}" == "${guide_flatpaks[*]}" ]]
+
 # Grouped rows and the flat package list must stay in agreement: every item row
 # is exactly one package of the flat list, in the same order.
 rows=()

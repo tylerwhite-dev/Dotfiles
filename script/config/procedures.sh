@@ -73,6 +73,23 @@ message_define procedure.homebrew_extended.label \
 message_define procedure.homebrew_extended.description \
   "An additional tap will be added when needed. Select the packages to install:"
 
+procedure_define flatpak_apps
+procedure_handler flatpak_apps action_prepare_flatpak
+procedure_finish_handler flatpak_apps action_install_flatpak_apps
+procedure_platforms flatpak_apps arch debian fedora
+procedure_requires_root flatpak_apps arch debian fedora
+procedure_selectable flatpak_apps
+procedure_packages flatpak_apps \
+  flatpak internet_apps \
+  flatpak work_apps \
+  flatpak developer_apps \
+  flatpak system_apps
+message_define procedure.flatpak_apps.question \
+  "Select Linux applications to install with Flatpak?"
+message_define procedure.flatpak_apps.label "Install selected Flatpak applications"
+message_define procedure.flatpak_apps.description \
+  "Install Flatpak if missing, configure system Flathub, and install selected applications. On Fedora, remove the system fedora remote while retaining installed applications."
+
 procedure_define homebrew_casks
 procedure_handler homebrew_casks action_prepare_homebrew_casks
 procedure_finish_handler homebrew_casks action_install_homebrew_casks

@@ -34,6 +34,8 @@ message_define error.yay_package_missing \
   "The built yay package was not found: %s"
 message_define error.brew_not_installed \
   "Homebrew is required for --add-optionals but was not installed."
+message_define error.flathub_configuration \
+  "The system flathub remote has an unexpected URL or a filter. Review its configuration before running setup again."
 message_define error.flags_conflict \
   "Conflicting flags: --yolo and --add-optionals cannot be used together."
 message_define error.macos_clt_missing \
@@ -55,6 +57,10 @@ message_define status.no_selection \
   "No procedures were selected. Nothing to do."
 message_define status.optionals_none \
   "No optional packages were selected. Nothing to do."
+message_define status.flatpak_installed \
+  "Flatpak is installed. Log out and back in after setup if applications do not appear in the desktop menu."
+message_define status.flatpak_fedora_remove \
+  "Removing the system fedora Flatpak remote. Installed applications and runtimes remain, but can no longer receive updates from this remote."
 message_define status.selected_count \
   "%d selected"
 message_define status.all_packages_selected \
@@ -107,4 +113,4 @@ message_define ui.multiselect.resize_notice "Increase terminal size, then press 
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
 
-message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Install only optional brew packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets and casks, and it cannot be\ncombined with --add-optionals.'
+message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Install only optional brew packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks, and it cannot be\ncombined with --add-optionals.'

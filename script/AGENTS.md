@@ -178,6 +178,12 @@ no global `All` row. The checkbox menu uses a temporary screen and restores the
 previous terminal view after confirmation.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.
+On Linux, `flatpak_apps` installs a missing Flatpak CLI and configures system
+Flathub in its main handler. The finish handler runs one
+`flatpak install -y <ID>` per chosen application with direct terminal input
+for authentication. Installation confirmations are accepted automatically.
+Fedora's system `fedora` remote is deleted with `--force`, retaining installed
+refs. Existing Flathub URLs and filters are validated before remote changes.
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is
 needed, the operator completes Apple's dialog and presses Enter to verify.
@@ -277,6 +283,7 @@ interfaces are grouped below for quick navigation.
   `ui_command`, `ui_success_line`, `ui_heading_line`, `ui_timeline_active`,
   `ui_timeline_output`, `ui_timeline_finished`, and `ui_ansi_palette`.
 - Actions: `action_install_native_packages`, `action_install_homebrew`,
+  `action_install_flatpak_binary`, `action_prepare_flatpak`, `action_install_flatpak_apps`,
   `action_install_homebrew_binary`, `action_install_homebrew_extended`, `action_prepare_homebrew_casks`,
   `action_install_homebrew_casks`, `action_set_zsh_default`,
   `action_prepare_macos_command_line_tools`, `action_install_macos_command_line_tools`,
@@ -301,6 +308,7 @@ bash script/tests/layer_dependencies.sh
 bash script/tests/app.sh
 bash script/tests/process.sh
 bash script/tests/macos.sh
+bash script/tests/flatpak.sh
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit
