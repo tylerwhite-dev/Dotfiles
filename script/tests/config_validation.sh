@@ -54,9 +54,9 @@ for ((index = 0; index < ${#cask_rows[@]}; index++)); do
   fi
 done
 [[ "${cask_items[*]}" == "${cask_flat[*]}" ]]
-[[ "${#cask_flat[@]}" -eq 29 ]]
+[[ "${#cask_flat[@]}" -eq 31 ]]
 [[ "${cask_categories[*]}" == 'Internet Work & Media Dev tools System Games' ]]
-[[ "${cask_rows[*]}" == 'Internet firefox google-chrome telegram qbittorrent amneziavpn Work & Media obsidian libreoffice iina bitwarden veracrypt Dev tools android-studio intellij-idea qt-creator vscodium docker-desktop ghostty lm-studio zed System utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager Games playcover-community steam' ]]
+[[ "${cask_rows[*]}" == 'Internet firefox google-chrome telegram qbittorrent amneziavpn Work & Media obsidian libreoffice iina bitwarden veracrypt Dev tools zed visual-studio-code vscodium ghostty hermes-desktop docker-desktop lm-studio android-studio intellij-idea qt-creator System utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager Games playcover-community steam' ]]
 
 # A procedure without category references renders a plain item list.
 plain_rows=()

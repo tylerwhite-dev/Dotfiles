@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 declare -ag _CATALOG_PROCEDURE_IDS=()
+declare -ag _CATALOG_PROCEDURE_ORDER=()
 declare -Ag _CATALOG_PROCEDURE_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_FINISH_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_PLATFORMS=()
@@ -180,10 +181,37 @@ procedure_packages() {
   done
 }
 
-# Copies the declaration-order procedure IDs into a caller-owned array.
+# Sets the execution queue independently of feature declaration order.
+procedure_order() {
+  _CATALOG_PROCEDURE_ORDER=("$@")
+}
+
+# Copies queued IDs, omitting procedures whose requirements are not enabled.
 catalog_procedure_ids() {
-  local -n result_ref="$1"
-  result_ref=("${_CATALOG_PROCEDURE_IDS[@]}")
+  local -n __catalog_ids_result="$1"
+  local __catalog_ids_id __catalog_ids_requirement
+  local -A __catalog_ids_enabled=()
+
+  __catalog_ids_result=()
+  for __catalog_ids_id in "${_CATALOG_PROCEDURE_ORDER[@]}"; do
+    __catalog_ids_requirement="${_CATALOG_PROCEDURE_REQUIREMENT[$__catalog_ids_id]:-}"
+    if [[ -n "$__catalog_ids_requirement" && ! -v "__catalog_ids_enabled[$__catalog_ids_requirement]" ]]; then
+      continue
+    fi
+    __catalog_ids_result+=("$__catalog_ids_id")
+    __catalog_ids_enabled["$__catalog_ids_id"]=1
+  done
+}
+
+# Checks whether a procedure is enabled by the queue and its requirements.
+catalog_is_enabled() {
+  local id
+  local -a enabled=()
+  catalog_procedure_ids enabled
+  for id in "${enabled[@]}"; do
+    [[ "$id" == "$1" ]] && return 0
+  done
+  return 1
 }
 
 # Returns the action handler registered for a procedure.
@@ -408,7 +436,6 @@ catalog_validate() {
   local finish_handler
   local requirement
   local platform
-  local -A seen=()
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then
     printf 'No setup procedures were declared.\n' >&2
@@ -444,8 +471,8 @@ catalog_validate() {
       printf 'Procedure %s has no supported platforms.\n' "$id" >&2
       return 1
     fi
-    if [[ -n "$requirement" && ! -v "seen[$requirement]" ]]; then
-      printf 'Procedure %s requires a procedure that is missing or declared later: %s\n' \
+    if [[ -n "$requirement" && ! -v "_CATALOG_PROCEDURE_HANDLER[$requirement]" ]]; then
+      printf 'Procedure %s requires an unknown procedure: %s\n' \
         "$id" "$requirement" >&2
       return 1
     fi
@@ -464,6 +491,35 @@ catalog_validate() {
 
     _catalog_validate_messages "$id" || return
     _catalog_validate_package_references "$id" || return
+  done
+
+  _catalog_validate_order
+}
+
+# Rejects unknown IDs, duplicates and requirements placed after their dependants.
+# Missing queue entries disable their dependants instead of enabling them.
+_catalog_validate_order() {
+  local id requirement
+  local -A queued=() seen=()
+
+  for id in "${_CATALOG_PROCEDURE_ORDER[@]}"; do
+    if [[ ! "$id" =~ ^[a-z][a-z0-9_]*$ || ! -v "_CATALOG_PROCEDURE_HANDLER[$id]" ]]; then
+      printf 'Procedure order references an unknown procedure: %s\n' "$id" >&2
+      return 1
+    fi
+    if [[ -v "queued[$id]" ]]; then
+      printf 'Procedure order contains a duplicate: %s\n' "$id" >&2
+      return 1
+    fi
+    queued["$id"]=1
+  done
+
+  for id in "${_CATALOG_PROCEDURE_ORDER[@]}"; do
+    requirement="${_CATALOG_PROCEDURE_REQUIREMENT[$id]}"
+    if [[ -n "$requirement" && -v "queued[$requirement]" && ! -v "seen[$requirement]" ]]; then
+      printf 'Procedure order must place %s before %s.\n' "$requirement" "$id" >&2
+      return 1
+    fi
     seen["$id"]=1
   done
 }

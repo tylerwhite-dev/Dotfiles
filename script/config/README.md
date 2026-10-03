@@ -1,23 +1,95 @@
 # Configuration
 
-The four files here declare data. They do not render UI, run commands, or
-contain logic — each file only calls the declaration interfaces listed in
-`../AGENTS.md`. The catalog validates everything at startup, before the
-questionnaire asks a single question.
+Each file in `features/` contains one complete procedure: package groups,
+checkbox categories, messages, handler functions and declarations. Add or
+extend a function by editing its feature file. To enable a new procedure,
+add its ID to `procedure-order.sh`. No changes to `logic/` or `ui/` are needed.
 
-| File | Declares |
-| --- | --- |
-| `settings.sh` | Plain shell variables: the Homebrew path, retry count, retry delay. |
-| `messages.sh` | Every user-facing string, under `message_define <key> "<text>"`. |
-| `packages.sh` | `package_group` lists and `package_category` sections. |
-| `procedures.sh` | One block per procedure, plus the questions and labels for it. |
+`settings.sh` contains shared settings; `messages.sh` contains shared messages.
+Feature-specific errors and statuses belong in the owning feature file.
 
-Keys in `messages.sh` are namespaced: `error.*`, `status.*`, `stage.*`,
-`option.*`, `label.*`, `prompt.*`, `question.*`, `flags.*`, `ui.multiselect.*`, and the single
-`package_category_other` fallback label. The per-procedure strings
-(`procedure.<id>.question`, `.label`, `.description`) are declared next to the
-procedure itself in `procedures.sh`, not here. Logic picks a key, the UI prints
-what logic hands it.
+## Adding a feature
+
+Create `features/network-tools.sh`, for example:
+
+```bash
+#!/usr/bin/env bash
+
+package_group native network_tools_packages curl wget
+
+message_define error.network_tools_dnf_missing "DNF is required for network tools."
+
+action_install_network_tools() {
+  local platform="$1"
+  local -a packages=()
+
+  catalog_packages packages network_tools "$platform" native || return
+  if ! command -v dnf >/dev/null 2>&1; then
+    error_report error.network_tools_dnf_missing
+    return 1
+  fi
+  executor_run_as_root \
+    dnf config-manager setopt fedora-cisco-openh264.enabled=0 || return
+  executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
+    dnf install -y --refresh "${packages[@]}"
+}
+
+procedure_define network_tools
+procedure_handler network_tools action_install_network_tools
+procedure_platforms network_tools fedora
+procedure_requires_root network_tools fedora
+procedure_packages network_tools native network_tools_packages
+message_define procedure.network_tools.question "Install network tools?"
+message_define procedure.network_tools.label "Install network tools"
+message_define procedure.network_tools.description "Install curl and wget."
+```
+
+The file is discovered automatically. Then put `network_tools` in the array in
+`procedure-order.sh`, at the position where it should appear:
+
+```bash
+setup_procedure_order=(
+  native_packages
+  network_tools
+  # yay
+  homebrew
+  homebrew_extended
+  dotfiles
+)
+procedure_order "${setup_procedure_order[@]}"
+unset setup_procedure_order
+```
+
+File names no longer need numeric prefixes. The array controls both the
+questionnaire and execution. Remove or comment out an ID to disable it without
+deleting its feature file. A file not listed in the queue is loaded and
+validated, but its procedure is unavailable in standard, `--yolo` and
+`--add-optionals` workflows. An empty array enables no procedures.
+
+Put a prerequisite before its dependant in the queue. If a prerequisite is
+omitted, its dependants are omitted too, including transitive dependants.
+Unknown IDs, duplicate IDs and prerequisites placed after their dependants
+are configuration errors. Feature declaration order does not constrain
+procedure dependencies. Group/category declaration order within a file still
+applies. Use the procedure ID in new handler, group and message names because
+all loaded files share their namespaces.
+
+Top-level code only defines functions and calls declaration interfaces. It must
+not run commands or inspect system state while loading. Put checks and steps
+inside the handler. Add a step by editing that handler in the same file, using
+`executor_run`, `executor_run_as_root` or retry helpers, and propagate failures
+with `|| return` before starting the next step.
+
+Handlers receive `(platform, repository_dir)`. Use `procedure_finish_handler`
+for a second handler requiring direct terminal input after the main handler
+succeeds. Both handlers belong in the same feature file. They may use
+`error_report` and `status_report`, but must not call UI or `message_format`.
+Shared helpers already provided by the executor remain available.
+
+Only `procedure_define`, `procedure_handler`, `procedure_platforms` and the
+three procedure messages are required. Packages, categories, requirements,
+root requirements and finish handlers are optional. The catalog validates
+all loaded declarations before the questionnaire starts.
 
 ## Adding a package to an existing section
 
@@ -38,16 +110,16 @@ Three steps, in this order. The order is required: a category checks that its
 member groups already exist, so it cannot be declared before them.
 
 ```bash
-# 1. packages.sh — the group. It must not be empty to be a category member.
+# 1. In the feature file — the group. It must not be empty to be a category member.
 package_group brew network \
   mtr nmap
 
-# 2. packages.sh — the category. Members are groups, never other categories.
+# 2. In the same file — the category. Members are groups, never other categories.
 package_category brew networking "Network" network
 ```
 
 ```bash
-# 3. procedures.sh — the link from a procedure to the category.
+# 3. In the same file — the link from a procedure to the category.
 procedure_packages homebrew_extended \
   brew dev_tools \
   brew terminal \
@@ -87,8 +159,8 @@ same name as either a group or a category — the catalog resolves it.
 ## What the questionnaire shows
 
 Only procedures marked with `procedure_selectable` render a checkbox list.
-The selectable procedures are `homebrew_extended` and, on macOS,
-`homebrew_casks`. Other procedures install their package sets after a yes/no question.
+The selectable procedures are `homebrew_extended`, `flatpak_apps` on Linux,
+and `homebrew_casks` on macOS. Other procedures install their package sets after a yes/no question.
 
 That flag is what makes categories visible. A category referenced from a
 non-selectable procedure still works — `catalog_packages` flattens it — but
@@ -115,6 +187,8 @@ The catalog validates itself on every run, and the same check runs standalone:
 
 ```bash
 /opt/homebrew/bin/bash script/tests/config_validation.sh
+/opt/homebrew/bin/bash script/tests/features.sh
+bash script/tests/procedure_order.sh
 ```
 
 Common errors and what they mean:
@@ -136,7 +210,7 @@ Common errors and what they mean:
 - **No de-duplication.** If a procedure reaches the same group twice —
   directly and through a category — its packages are listed twice and
   installed twice. Keep a procedure's references disjoint.
-- **Declaration order inside `packages.sh` is always groups first, categories
+- **Declaration order inside each feature file is groups first, categories
   second.** A category declared before one of its members is rejected.
 - **Members must be groups, not categories.** Categories do not nest.
 - **A category is referenced by its own name**, not by the groups it contains.

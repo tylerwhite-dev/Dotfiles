@@ -82,86 +82,55 @@ Any other flag exits with status 2 and an `Unknown flag` error.
 
 ## Layout
 
-- `dotfiles-deploy.sh` (at the repository root) loads the application logic and
-  calls `setup_run`. It parses CLI flags first.
-- `config/` contains settings, messages, package groups, and procedure
-  declarations. It does not render UI or execute system commands.
-- `ui/` renders menus, stages, messages, commands, and the execution timeline.
-  UI functions receive their text from callers and do not know about procedures.
-  Checkbox widgets receive an explicit associative text array. Their output
-  and input variable names must not use the reserved `__ui_` prefix.
+- `config/features/*.sh` contains one file per procedure. Each file owns its
+  packages, categories, messages, handlers and procedure declarations.
+- `config/procedure-order.sh` sets the enabled procedures and their order.
+- `config/settings.sh` and `config/messages.sh` contain shared settings and
+  shared UI/error messages.
 - `logic/` controls the questionnaire, dependencies, execution order, processes,
-  errors, and environment detection.
-- `logic/actions/` contains the system changes for each procedure.
-- `logic/executor.sh` prints and executes commands and provides privilege,
-  retry, download, temporary-file, and Homebrew helpers.
-
-The main dependency direction is `config -> declaration interfaces`,
-`logic -> config interfaces and UI`, and `actions -> catalog and executor`.
-Files under `ui/` never read configuration or call actions.
+  errors and environment detection. `logic/executor.sh` provides command,
+  privilege, retry, download and Homebrew helpers.
+- `ui/` renders values passed by callers. It does not read feature configurations.
 
 ## Adding a procedure
 
-Add a block to `config/procedures.sh`:
+Create one file such as `config/features/example.sh`. Put its package
+lists, categories, messages, handler functions and procedure declaration in
+that file. Then add its procedure ID to `config/procedure-order.sh`.
+No edit to `logic/` or `ui/` is needed.
+See [config/README.md](config/README.md) for a complete example.
 
-```bash
-procedure_define example
-procedure_handler example action_run_example
-procedure_platforms example arch debian fedora macos
-procedure_requires_root example arch debian fedora
-procedure_packages example native example_packages
-message_define procedure.example.question "Run the example?"
-message_define procedure.example.label "Run the example"
-message_define procedure.example.description "These packages will be installed:"
-```
+The loader discovers all `config/features/*.sh` in C lexicographic order.
+Loading order does not control execution. The queue in `procedure-order.sh`
+sets questionnaire and execution order. Remove or comment out an ID to disable
+it in standard, YOLO and optional flows. Omitted prerequisites disable their
+dependants too. An empty queue runs nothing; unknown IDs, duplicates and a
+queued prerequisite after its dependant are errors. Package groups must precede
+categories that use them, and a procedure must precede its settings.
 
-Only `procedure_define`, `procedure_handler`, and `procedure_platforms` are
-required. Use `procedure_requires`, `procedure_requires_root` (lists the
-platforms that need sudo), and `procedure_packages` when the procedure needs
-them. Put package groups in `config/packages.sh`. Mark a procedure with
-`procedure_selectable` to present its packages as a checkbox list and install
-only the chosen items. `procedure_finish_handler` runs after the main action
-succeeds, with direct terminal output for commands that may ask for input.
+Feature loading only registers data and defines functions. Commands and system
+checks belong inside handlers, which run after the user selects and confirms
+procedures. Handlers receive `(platform, repository_dir)`, return a shell status,
+and use executor helpers. They must not render UI or format messages. Use
+`error_report` and `status_report` with messages defined in the same feature
+file, or a shared message when several features use it.
 
-Group the checkbox list by registering categories that name existing groups and
-carry a display label, then reference a category from the procedure:
+`procedure_selectable` enables package checkboxes. Its handler reads
+`workflow_selected_packages`; ordinary handlers read `catalog_packages`.
+`procedure_finish_handler` runs after a successful main handler with direct
+terminal access for authentication and other input. Grouping changes only
+presentation; the flat and grouped package lists retain declaration order.
 
-```bash
-package_category brew extended "Dev tools" extended_dev_tools extended_terminal
-procedure_packages homebrew_extended brew extended
-```
-
-Grouping only changes how the questionnaire renders the list. An action still
-calls `catalog_packages` to get the flat package list, and
-`catalog_package_rows` is what the questionnaire uses to draw the groups.
-
-Add the action to a file under `logic/actions/`:
-
-```bash
-action_run_example() {
-  local platform="$1"
-  local repository_dir="$2"
-  local -a packages=()
-
-  catalog_packages packages example "$platform" native || return
-  executor_run_as_root example-package-manager install "${packages[@]}"
-}
-```
-
-Actions receive the platform and repository directory, return zero on success,
-and use the executor functions for commands. The loader discovers every `*.sh`
-file under `logic/actions/`. The catalog validates handlers, messages,
-dependencies, platforms, and package references before the questionnaire starts.
-
-Use `error_report` with a key from `config/messages.sh` instead of putting
-user-facing text in an action. Use `executor_run`, `executor_run_as_root`,
-`executor_retry`, `executor_retry_as_root`, `executor_download`, and
-`executor_brew` so commands remain visible during execution.
+Existing declarations and handler names remain available. Feature-specific
+helpers can be reused by other features without duplicating their definition;
+all files finish loading before handlers execute.
 
 Validate declarations and dependency behavior with:
 
 ```bash
 bash script/tests/config_validation.sh
+bash script/tests/features.sh
+bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh

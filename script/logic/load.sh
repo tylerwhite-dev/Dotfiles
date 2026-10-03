@@ -33,29 +33,49 @@ source "${SETUP_SCRIPT_ROOT}/logic/process.sh"
 # shellcheck source=runner.sh
 source "${SETUP_SCRIPT_ROOT}/logic/runner.sh"
 
-# Configuration declarations.
+# Shared configuration.
 # shellcheck source=../config/settings.sh
 source "${SETUP_SCRIPT_ROOT}/config/settings.sh"
 # shellcheck source=../config/messages.sh
 source "${SETUP_SCRIPT_ROOT}/config/messages.sh"
-# shellcheck source=../config/packages.sh
-source "${SETUP_SCRIPT_ROOT}/config/packages.sh"
+# Feature files own packages, messages, handlers and procedure declarations.
+_setup_load_features() {
+  # Loading order is deterministic; procedure-order.sh controls execution.
+  local LC_ALL=C
+  local -a files=("${SETUP_SCRIPT_ROOT}"/config/features/*.sh)
+  local file status previous_error_trap
 
-# Procedure actions. New files are loaded automatically.
-setup_action_files=("${SETUP_SCRIPT_ROOT}"/logic/actions/*.sh)
-if [[ ! -e "${setup_action_files[0]}" ]]; then
-  printf 'No procedure actions were found.\n' >&2
-  return 1 2>/dev/null || exit 1
+  if [[ ! -f "${files[0]}" ]]; then
+    printf 'No setup feature configurations were found.\n' >&2
+    return 1
+  fi
+
+  previous_error_trap="$(trap -p ERR)"
+  # Report the file even when errexit stops the caller inside source.
+  trap 'printf "Could not load setup feature configuration: %s\n" "$file" >&2' ERR
+  for file in "${files[@]}"; do
+    # shellcheck source=/dev/null
+    source "$file"
+    status=$?
+    if ((status != 0)); then
+      if [[ -n "$previous_error_trap" ]]; then eval "$previous_error_trap"; else trap - ERR; fi
+      return "$status"
+    fi
+  done
+  if [[ -n "$previous_error_trap" ]]; then eval "$previous_error_trap"; else trap - ERR; fi
+}
+
+_setup_load_features
+setup_feature_status=$?
+unset -f _setup_load_features
+if ((setup_feature_status != 0)); then
+  return "$setup_feature_status" 2>/dev/null || exit "$setup_feature_status"
 fi
-for setup_action_file in "${setup_action_files[@]}"; do
-  # shellcheck source=/dev/null
-  source "$setup_action_file"
-done
-unset setup_action_file setup_action_files
+unset setup_feature_status
 
-# Procedure declarations reference the loaded action names.
-# shellcheck source=../config/procedures.sh
-source "${SETUP_SCRIPT_ROOT}/config/procedures.sh"
+# Feature IDs are known before the execution queue is declared.
+# shellcheck source=../config/procedure-order.sh
+source "${SETUP_SCRIPT_ROOT}/config/procedure-order.sh"
 
 # Top-level application flow.
 # shellcheck source=app.sh

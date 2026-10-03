@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+package_group native yay_prerequisites \
+  go
+
+message_define error.home_unknown \
+  "Could not determine the user's home directory."
+
+message_define error.yay_missing \
+  "The yay build completed, but yay was not found in PATH."
+
+message_define error.yay_package_missing \
+  "The built yay package was not found: %s"
+
+message_define status.yay_installed \
+  "yay is already installed."
+
+message_define status.yay_install_password \
+  "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
+
 # Installs yay prerequisites, updates or clones its AUR checkout, and builds it.
 action_install_yay() {
   local platform="$1"
@@ -83,3 +101,14 @@ action_install_yay_package() {
     return 1
   fi
 }
+
+procedure_define yay
+procedure_handler yay action_install_yay
+procedure_finish_handler yay action_install_yay_package
+procedure_platforms yay arch
+procedure_requires_root yay arch
+procedure_packages yay native yay_prerequisites
+message_define procedure.yay.question "Install yay?"
+message_define procedure.yay.label "Install yay"
+message_define procedure.yay.description \
+  "Build dependencies are installed first. Then yay is built from the AUR and installed with sudo, which may ask for your password."

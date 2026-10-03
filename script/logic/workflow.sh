@@ -3,11 +3,13 @@
 declare -Ag _WORKFLOW_SELECTIONS=()
 declare -Ag _WORKFLOW_PACKAGE_SELECTIONS=()
 
-# Resets every declared procedure to an unselected state.
+# Clears selections, including procedures removed from the execution queue.
 workflow_reset() {
   local -a procedure_ids=()
   local procedure_id
 
+  _WORKFLOW_SELECTIONS=()
+  _WORKFLOW_PACKAGE_SELECTIONS=()
   catalog_procedure_ids procedure_ids
   for procedure_id in "${procedure_ids[@]}"; do
     _WORKFLOW_SELECTIONS["$procedure_id"]="no"
@@ -41,7 +43,7 @@ workflow_requirement_is_selected() {
   [[ -z "$requirement" || "${_WORKFLOW_SELECTIONS[$requirement]:-no}" == "yes" ]]
 }
 
-# Lists procedures supported by the requested platform in declaration order.
+# Lists enabled procedures supported by the platform in configured queue order.
 workflow_available() {
   local -n __workflow_available_result_ref="$1"
   local __workflow_available_platform="$2"

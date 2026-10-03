@@ -48,7 +48,7 @@ The application flow is:
 6. `questionnaire_confirm` renders the selected procedures and waits for
    `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
    `--yolo` mode this step is skipped and execution starts immediately.
-7. `runner_run` filters selected procedures and runs them in declaration order.
+7. `runner_run` filters selected procedures and runs them in configured queue order.
 8. `process_run` adds privilege preparation, timeline rendering, output capture,
    and final status handling around each action.
 9. `_app_print_elapsed_time` reports the duration measured from the execution
@@ -60,9 +60,9 @@ The application flow is:
 | --- | --- |
 | `dotfiles-deploy.sh` | Thin executable entry point at the repository root. |
 | `config/settings.sh` | Retry counts, retry delay, and the Homebrew path. |
-| `config/messages.sh` | All user-facing message templates, labels, and stage text. |
-| `config/packages.sh` | Named package groups for native package managers and Homebrew. |
-| `config/procedures.sh` | Declarative procedure records and their message keys. |
+| `config/messages.sh` | Shared message templates, labels, and stage text. |
+| `config/procedure-order.sh` | Enabled procedure IDs in questionnaire and execution order. |
+| `config/features/*.sh` | One file per procedure: packages, categories, texts, handlers, and declarations. |
 | `logic/load.sh` | Loads interfaces, implementations, declarations, actions, and the application in dependency order. |
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
@@ -73,7 +73,6 @@ The application flow is:
 | `logic/process.sh` | Runs one action with plain or animated output and records its status. |
 | `logic/runner.sh` | Orchestrates the selected procedures in catalog order. |
 | `logic/executor.sh` | Command, privilege, retry, download, temporary-file, and Homebrew helpers. |
-| `logic/actions/*.sh` | System-changing implementations for individual procedures. |
 | `logic/errors.sh` | Converts message keys into error and status output through the UI. |
 | `logic/app.sh` | Top-level application lifecycle and elapsed-time reporting. |
 | `ui/theme.sh` | Color variables, timeline frames, and animation interval. |
@@ -96,7 +95,7 @@ question, label, and description live in the message registry under
 `procedure.<id>.question`, `procedure.<id>.label`, and
 `procedure.<id>.description`.
 
-Declare procedures in `config/procedures.sh` with this order:
+Declare a procedure in its own `config/features/name.sh` file with this order:
 
 ```bash
 procedure_define example
@@ -108,8 +107,10 @@ procedure_packages example native example_packages
 ```
 
 Only the first three declarations are required. The procedure ID must be a
-lowercase identifier. A requirement must refer to a procedure declared earlier;
-when it is not selected, the dependent procedure is omitted from execution.
+lowercase identifier. Requirements may be declared in any feature loading order.
+When both IDs are queued, the requirement must precede its dependant in
+`config/procedure-order.sh`. Omitted requirements disable their dependants;
+unselected requirements skip dependants in the standard execution flow.
 `procedure_requires_root` lists the platforms that need root privileges; a
 procedure whose platforms are not listed runs without sudo.
 `procedure_finish_handler` is optional. It runs only after the main handler
@@ -214,10 +215,18 @@ successful process ends with `●`; a failure ends with `×`.
 
 ## Layer rules
 
-- `config/` declares data through catalog and message interfaces. It must not
-  call UI, workflow, executor, or system commands. A category label is
-  display text passed to the UI as a row, so it belongs in
-  `config/packages.sh` rather than in a message key.
+- `config/features/*.sh` owns one procedure per file, including package groups,
+  categories, messages and handler functions. Top-level code only calls
+  declaration interfaces and defines functions; it must not execute system
+  commands, check system state or call UI/workflow/executor functions.
+  Files load automatically in C lexicographic order, independently of execution.
+  `config/procedure-order.sh` sets enabled IDs and execution order. Omitted
+  IDs and their dependants are unavailable in all workflow modes. Unknown IDs,
+  duplicates and prerequisites queued after dependants are rejected.
+  An empty queue is valid. All loaded feature definitions remain validated.
+- Shared `config/settings.sh` and `config/messages.sh` declare only common
+  settings and messages. A category label belongs next to its package category
+  in the owning feature file.
 - `ui/` renders values passed by callers. It must not know procedure IDs,
   package groups, workflow state, executors, or message keys.
   `catalog_package_rows` returns display rows and row kinds as parallel arrays;
@@ -225,11 +234,11 @@ successful process ends with `●`; a failure ends with `×`.
   without learning package sources, procedure IDs, or workflow state.
 - `logic/` owns ordering, validation, selection, environment, and process
   behavior. It may call catalog, message, UI, and executor interfaces.
-- `logic/actions/` owns system changes for one procedure. Actions receive
+- Handler functions in feature files own system changes. Actions receive
   `(platform, repository_dir)`, use catalog/executor helpers, and return a
   shell status. They do not format messages or render UI directly.
-- `config/` owns user-facing text: shared messages in `messages.sh`, procedure
-  text in `procedures.sh`, and category labels in `packages.sh`. Errors in
+- Feature files own procedure text, category labels and feature-specific
+  error/status text. Shared messages stay in `config/messages.sh`. Errors in
   actions should use `error_report <message-key>`.
 - UI output variables and named inputs must be direct identifiers, not nameref
   aliases. The `__ui_` prefix is reserved for UI implementation variables.
@@ -255,9 +264,11 @@ successful process ends with `●`; a failure ends with `×`.
 - Workflow stores package names as whitespace-separated text, so package names
   must not contain whitespace. Repeated names are preserved.
 
-Keep interfaces narrow. When a new procedure is needed, add one declaration
-block, its messages, its package groups if any, and one action file. Avoid
-putting procedure-specific branching into the runner or UI.
+Keep interfaces narrow. Add a new procedure in one `config/features/` file,
+with its declarations, messages, packages and handlers. Then add its ID to
+`config/procedure-order.sh`. Do not edit logic or UI for a new procedure. Use the procedure ID in new
+handler, group and message names to avoid collisions in the shared namespace.
+Extend a procedure by editing its handler steps in that same file.
 
 ## Function map
 
@@ -267,7 +278,8 @@ interfaces are grouped below for quick navigation.
 - Catalog: `package_group`, `package_category`, `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
-  `procedure_selectable`, `procedure_packages`, `catalog_procedure_ids`,
+  `procedure_selectable`, `procedure_packages`, `procedure_order`,
+  `catalog_procedure_ids`, `catalog_is_enabled`,
   `catalog_handler`, `catalog_finish_handler`, `catalog_requirement`, `catalog_requires_root`,
   `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`,
   `catalog_package_rows`, and
@@ -309,6 +321,8 @@ Homebrew bash first (`brew install bash`) and run it with
 
 ```bash
 bash script/tests/config_validation.sh
+bash script/tests/features.sh
+bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh

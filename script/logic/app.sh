@@ -63,7 +63,7 @@ _app_run_optionals() {
   done
   started_at="$SECONDS"
   if ((needs_brew)) && [[ ! -x "$brew_bin" ]]; then
-    if [[ "$platform" == macos ]]; then
+    if [[ "$platform" == macos ]] && catalog_is_enabled macos_command_line_tools; then
       action_prepare_macos_command_line_tools "$platform" || return
       action_install_macos_command_line_tools "$platform" || return
     fi

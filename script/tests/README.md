@@ -1,5 +1,7 @@
 # UI manual tests
 
+For real Debian WSL installation checks, follow the [Linux checklist](linux.md).
+
 ## Automated tests (non-interactive)
 
 The suite requires bash 5. Run from the repository root. On macOS install
@@ -8,6 +10,8 @@ Homebrew bash first (`brew install bash`) and run with
 
 ```bash
 bash script/tests/config_validation.sh
+bash script/tests/features.sh
+bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
@@ -21,6 +25,8 @@ bash script/tests/optionals.sh
 | Script | What it verifies |
 | --- | --- |
 | `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, and declaration errors. |
+| `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, caller trap preservation, and configuration load failures in a temporary copy. |
+| `procedure_order.sh` | Queue order, disabled procedures and dependants, YOLO/optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
 | `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
 | `optionals.sh` | All optional lists per platform and shared runner finish-handler dispatch. |

@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+package_group brew extensions \
+  starship zsh-autosuggestions zsh-syntax-highlighting \
+  pfetch-rs fastfetch
+
+package_group brew cli_tools \
+  herdr superfile neovim zip zoxide fzf eza stow
+
+package_group brew_cask fonts \
+  font-jetbrains-mono-nerd-font font-hack-nerd-font
+
+message_define status.homebrew_admin_prompt \
+  "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
+
 # Downloads and runs the Homebrew installer when Homebrew is absent.
 # On macOS developer tools and administrator access must be ready first.
 action_install_homebrew_binary() {
@@ -65,41 +78,17 @@ action_install_homebrew() {
   executor_brew install --cask "${packages[@]}"
 }
 
-# Installs the user-selected extended Homebrew packages.
-action_install_homebrew_extended() {
-  local platform="$1"
-  local -a selected=()
-
-  workflow_selected_packages selected homebrew_extended || return
-  if ((${#selected[@]} == 0)); then
-    return 0
-  fi
-
-  if [[ " ${selected[*]} " == *" sdkman-cli "* ]]; then
-    executor_brew tap sdkman/tap || return
-    executor_brew trust --tap sdkman/tap || return
-  fi
-
-  executor_brew install "${selected[@]}"
-}
-
-# Checks Homebrew before the direct-input cask installation phase.
-action_prepare_homebrew_casks() {
-  local brew_bin
-  brew_bin="$(executor_brew_bin)"
-  if [[ ! -x "$brew_bin" ]]; then
-    error_report error.homebrew_missing "$brew_bin"
-    return 1
-  fi
-  executor_run "$brew_bin" --version
-}
-
-# Runs in the parent shell so Homebrew and macOS can display password prompts.
-action_install_homebrew_casks() {
-  local -a selected=()
-  workflow_selected_packages selected homebrew_casks || return
-  ((${#selected[@]} > 0)) || return 0
-
-  status_report status.cask_admin_prompt
-  executor_brew install --cask "${selected[@]}"
-}
+procedure_define homebrew
+procedure_handler homebrew action_install_homebrew
+procedure_platforms homebrew arch debian fedora macos
+procedure_requires_root homebrew arch debian fedora macos
+procedure_packages homebrew \
+  brew extensions \
+  brew cli_tools \
+  brew_cask fonts
+message_define procedure.homebrew.question \
+  "Install Homebrew, core CLI tools, and fonts?"
+message_define procedure.homebrew.label \
+  "Install Homebrew, core CLI tools, and fonts"
+message_define procedure.homebrew.description \
+  "Homebrew will be installed, followed by these packages:"

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 message_define error.interactive_required \
   "An interactive terminal is required."
 message_define error.config_invalid \
@@ -16,33 +15,16 @@ message_define error.command_missing \
   "Required command not found: %s"
 message_define error.input_interrupted \
   "Input was interrupted. No changes were applied."
-message_define error.repository_marker_missing \
-  "Repository marker not found: %s"
 message_define error.homebrew_missing \
   "Homebrew was not installed at %s"
 message_define error.native_packages_unsupported \
   "Native package installation is not implemented for: %s"
-message_define error.current_user_unknown \
-  "Could not determine the current user."
-message_define error.zsh_missing \
-  "Zsh is not installed at /bin/zsh."
-message_define error.home_unknown \
-  "Could not determine the user's home directory."
-message_define error.yay_missing \
-  "The yay build completed, but yay was not found in PATH."
-message_define error.yay_package_missing \
-  "The built yay package was not found: %s"
 message_define error.brew_not_installed \
   "Homebrew is required for the selected packages but was not installed."
-message_define error.flathub_configuration \
-  "The system flathub remote has an unexpected URL or a filter. Review its configuration before running setup again."
 message_define error.flags_conflict \
   "Conflicting flags: --yolo and --add-optionals cannot be used together."
 message_define error.macos_clt_missing \
   "Apple developer tools are not ready. Complete the Command Line Tools installation or select a working Xcode, then run setup again."
-message_define error.macos_clt_wait_interrupted \
-  "Waiting for Apple developer tools was interrupted. The system installer may still be running."
-
 message_define status.distribution_detected \
   "Detected system: %s"
 message_define status.settings_confirmed \
@@ -59,10 +41,6 @@ message_define status.optionals_none \
   "No optional packages were selected. Nothing to do."
 message_define status.optionals_brew_prepare \
   "Execution will prepare Homebrew for the selected packages; on macOS it will also check Apple Command Line Tools."
-message_define status.flatpak_installed \
-  "Flatpak is installed. Log out and back in after setup if applications do not appear in the desktop menu."
-message_define status.flatpak_fedora_remove \
-  "Removing the system fedora Flatpak remote. Installed applications and runtimes remain, but can no longer receive updates from this remote."
 message_define status.selected_count \
   "%d selected"
 message_define status.all_packages_selected \
@@ -71,17 +49,6 @@ message_define status.no_packages_selected \
   "no packages selected"
 message_define status.setup_complete \
   "Setup completed successfully."
-message_define status.yay_installed \
-  "yay is already installed."
-message_define status.yay_install_password \
-  "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
-message_define status.cask_admin_prompt \
-  "Installing selected casks. Enter your administrator password in the terminal or macOS dialog if prompted."
-message_define status.macos_clt_ready "Apple developer tools are ready."
-message_define status.macos_clt_wait \
-  "Complete the Command Line Tools installation in Apple's dialog, then press Enter to verify."
-message_define status.homebrew_admin_prompt \
-  "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
 message_define status.sudo_auth_prompt \
   "Administrator access for %s. Enter your sudo password if prompted."
 message_define status.retry \
@@ -90,7 +57,6 @@ message_define status.elapsed.minutes \
   "Completed in %dm %02ds."
 message_define status.elapsed.seconds \
   "Completed in %ds."
-
 message_define stage.questionnaire.title "SYSTEM SETUP"
 message_define stage.questionnaire.meta "%s · %d procedures available"
 message_define stage.review.title "REVIEW SELECTION"
@@ -98,7 +64,6 @@ message_define stage.review.meta "%s · selected setup procedures"
 message_define stage.execution.title "START RUN"
 message_define stage.execution.meta "%s · %d procedures selected"
 message_define question.progress "◉  %02d / %02d  %s"
-
 message_define option.yes "Yes"
 message_define option.no "No"
 message_define option.start "Start execution"
@@ -114,5 +79,4 @@ message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space
 message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it?"
-
 message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks,\nand it cannot be combined with --add-optionals.'

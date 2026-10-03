@@ -1,5 +1,31 @@
 #!/usr/bin/env bash
 
+package_group flatpak internet \
+  org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop
+package_group flatpak work_media \
+  md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC \
+  io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate \
+  app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe
+package_group flatpak development \
+  ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
+package_group flatpak system \
+  com.belmoussaoui.Authenticator it.mijorus.gearlever \
+  com.mattjakeman.ExtensionManager com.github.tchx84.Flatseal
+
+package_category flatpak internet_apps "Internet" internet
+package_category flatpak work_apps "Work & Media" work_media
+package_category flatpak developer_apps "Dev tools" development
+package_category flatpak system_apps "System" system
+
+message_define error.flathub_configuration \
+  "The system flathub remote has an unexpected URL or a filter. Review its configuration before running setup again."
+
+message_define status.flatpak_installed \
+  "Flatpak is installed. Log out and back in after setup if applications do not appear in the desktop menu."
+
+message_define status.flatpak_fedora_remove \
+  "Removing the system fedora Flatpak remote. Installed applications and runtimes remain, but can no longer receive updates from this remote."
+
 # Installs the CLI only when absent, independently of the base package choice.
 action_install_flatpak_binary() {
   local platform="$1"
@@ -86,3 +112,20 @@ action_install_flatpak_apps() {
     executor_run flatpak install -y "$package" || return
   done
 }
+
+procedure_define flatpak_apps
+procedure_handler flatpak_apps action_prepare_flatpak
+procedure_finish_handler flatpak_apps action_install_flatpak_apps
+procedure_platforms flatpak_apps arch debian fedora
+procedure_requires_root flatpak_apps arch debian fedora
+procedure_selectable flatpak_apps
+procedure_packages flatpak_apps \
+  flatpak internet_apps \
+  flatpak work_apps \
+  flatpak developer_apps \
+  flatpak system_apps
+message_define procedure.flatpak_apps.question \
+  "Select Linux applications to install with Flatpak?"
+message_define procedure.flatpak_apps.label "Install selected Flatpak applications"
+message_define procedure.flatpak_apps.description \
+  "Install Flatpak if missing, configure system Flathub, and install selected applications. On Fedora, remove the system fedora remote while retaining installed applications."

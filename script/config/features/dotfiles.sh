@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+message_define error.repository_marker_missing \
+  "Repository marker not found: %s"
+
 # Applies the repository's Stow packages after checking its marker file.
 action_apply_dotfiles() {
   local platform="$1"
@@ -31,3 +34,13 @@ action_apply_dotfiles() {
     done
   )
 }
+
+procedure_define dotfiles
+procedure_handler dotfiles action_apply_dotfiles
+procedure_platforms dotfiles arch debian fedora macos
+message_define procedure.dotfiles.question \
+  "Apply dotfiles, Zsh configuration, and wallpapers with GNU Stow?"
+message_define procedure.dotfiles.label \
+  "Apply dotfiles, Zsh config and wallpapers"
+message_define procedure.dotfiles.description \
+  "Stow will apply .configs, zsh_common, wallpaper, and the platform-specific zsh configuration from the Dotfiles directory."

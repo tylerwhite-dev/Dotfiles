@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Runs selected procedure handlers in catalog order.
+# Runs selected procedure handlers in configured queue order.
 runner_run() {
   local -a selected=()
   workflow_selected selected "$1"
