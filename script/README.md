@@ -24,6 +24,10 @@ On Linux, a separate grouped list offers the 20 applications from
 `guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
 
 The Flatpak procedure installs the CLI through pacman, APT or DNF if absent.
+Before installing native packages or a missing Flatpak CLI on Fedora, the setup
+disables `fedora-cisco-openh264` with
+`dnf config-manager setopt fedora-cisco-openh264.enabled=0` as root.
+If disabling the repository fails, the installation stops.
 It adds the official system Flathub remote or enables an existing official
 remote. An unexpected URL or a client-side filter stops the procedure for
 manual review. On Fedora, it removes the system `fedora` remote with `--force`:

@@ -25,6 +25,8 @@ action_install_native_packages() {
       ;;
     fedora)
       executor_require dnf || return
+      executor_run_as_root \
+        dnf config-manager setopt fedora-cisco-openh264.enabled=0 || return
       executor_retry_as_root \
         "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
         dnf install -y --refresh "${packages[@]}"

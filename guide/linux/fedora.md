@@ -3,6 +3,7 @@
 ## full upgrade
 
 ```bash
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0 && \
 sudo dnf upgrade -y && brew upgrade -y && flatpak update -y
 ```
 

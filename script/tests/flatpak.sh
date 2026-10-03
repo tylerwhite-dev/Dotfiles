@@ -40,7 +40,7 @@ for platform in arch debian fedora; do
   case "$platform" in
     arch) expected='require pacman root pacman -Syu --needed --noconfirm flatpak' ;;
     debian) expected='require apt root apt update root apt install -y flatpak' ;;
-    fedora) expected='require dnf root dnf install -y flatpak' ;;
+    fedora) expected='require dnf root dnf config-manager setopt fedora-cisco-openh264.enabled=0 root dnf install -y flatpak' ;;
   esac
   [[ "${events[*]}" == "$expected require flatpak status.flatpak_installed root flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo" ]]
 done
