@@ -11,7 +11,7 @@
   "git_panel": { "dock": "left" },
   "outline_panel": { "dock": "right" },
   "collaboration_panel": { "dock": "right", "button": false },
-  "agent": { "sidebar_side": "right", "dock": "right" },
+  "agent": { "threads_sidebar": { "position": "right" }, "dock": "right" },
 
   // TERMINAL
   "terminal": {
