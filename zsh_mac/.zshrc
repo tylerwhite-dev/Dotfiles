@@ -3,3 +3,6 @@ __HOMEBREW=/opt/homebrew
 
 # <-- common part -->
 source $HOME/.common.zshrc
+
+# Hermes Agent command
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
