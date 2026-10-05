@@ -4,14 +4,16 @@
 .DS_Store
 .crush
 .vscode
-README.md
-script
 
+script
 guide
 agents
 nix
 
 wallpaper
+
+README.md
+IDEAS.md
 
 dotfiles-deploy.sh
 zsh_linux
