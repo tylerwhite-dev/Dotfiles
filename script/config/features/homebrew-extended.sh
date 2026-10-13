@@ -42,10 +42,10 @@ procedure_platforms homebrew_extended arch debian fedora macos
 procedure_requires homebrew_extended homebrew
 procedure_selectable homebrew_extended
 procedure_packages homebrew_extended \
-  brew dev_tools \
   brew terminal \
-  brew media \
-  brew harness
+  brew dev_tools \
+  brew harness \
+  brew media
 message_define procedure.homebrew_extended.question \
   "Select the extended Homebrew packages to install?"
 message_define procedure.homebrew_extended.label \
