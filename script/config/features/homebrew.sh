@@ -7,9 +7,6 @@ package_group brew extensions \
 package_group brew cli_tools \
   herdr superfile neovim zip zoxide fzf eza stow
 
-package_group brew_cask fonts \
-  font-jetbrains-mono-nerd-font font-hack-nerd-font
-
 message_define status.homebrew_admin_prompt \
   "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
 
@@ -54,7 +51,7 @@ action_install_homebrew_binary() {
   executor_run rm -f -- "$installer"
 }
 
-# Installs Homebrew, core formulae, and font casks for the current platform.
+# Installs Homebrew and core formulae for the current platform.
 action_install_homebrew() {
   local platform="$1"
   local -a packages=()
@@ -73,9 +70,7 @@ action_install_homebrew() {
 
   executor_run "$brew_bin" --version || return
   catalog_packages packages homebrew "$platform" brew || return
-  executor_brew install "${packages[@]}" || return
-  catalog_packages packages homebrew "$platform" brew_cask || return
-  executor_brew install --cask "${packages[@]}"
+  executor_brew install "${packages[@]}"
 }
 
 procedure_define homebrew
@@ -84,11 +79,10 @@ procedure_platforms homebrew arch debian fedora macos
 procedure_requires_root homebrew arch debian fedora macos
 procedure_packages homebrew \
   brew extensions \
-  brew cli_tools \
-  brew_cask fonts
+  brew cli_tools
 message_define procedure.homebrew.question \
-  "Install Homebrew, core CLI tools, and fonts?"
+  "Install Homebrew and core CLI tools?"
 message_define procedure.homebrew.label \
-  "Install Homebrew, core CLI tools, and fonts"
+  "Install Homebrew and core CLI tools"
 message_define procedure.homebrew.description \
   "Homebrew will be installed, followed by these packages:"

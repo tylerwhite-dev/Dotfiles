@@ -12,6 +12,7 @@ setup_procedure_order=(
   macos_finder
   macos_spaces
   homebrew
+  homebrew_fonts
   homebrew_extended
   flatpak_apps
   homebrew_casks

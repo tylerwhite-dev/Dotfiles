@@ -50,7 +50,7 @@ mv -- "${fixture_dir}/queue" "${fixture_dir}/script/config/procedure-order.sh"
   catalog_validate
   ids=()
   catalog_procedure_ids ids
-  [[ "${ids[*]}" == 'native_packages yay zsh_default macos_command_line_tools macos_finder macos_spaces homebrew homebrew_extended flatpak_apps homebrew_casks dotfiles feature_fixture' ]]
+  [[ "${ids[*]}" == 'native_packages yay zsh_default macos_command_line_tools macos_finder macos_spaces homebrew homebrew_fonts homebrew_extended flatpak_apps homebrew_casks dotfiles feature_fixture' ]]
   packages=(); rows=(); kinds=()
   catalog_packages packages feature_fixture fedora fixture
   catalog_package_rows rows kinds feature_fixture fedora fixture
