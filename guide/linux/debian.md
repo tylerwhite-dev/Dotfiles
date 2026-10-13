@@ -7,7 +7,7 @@ sudo nala upgrade -y && brew upgrade -y && flatpak update -y
 
 ## cleanup system
 ```bash
-sudo nala autoremove -y && sudo nala autoclean && brew cleanup && flatpak uninstall --unused -y
+sudo nala autoremove -y && sudo nala clean && brew autoremove && brew cleanup --prune=all && flatpak uninstall --unused -y
 ```
 
 ## WSL fast setup

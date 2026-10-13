@@ -9,7 +9,7 @@ sudo dnf upgrade -y && brew upgrade -y && flatpak update -y
 ## cleanup system
 
 ```bash
-sudo dnf autoremove -y && brew cleanup && flatpak uninstall --unused -y
+sudo dnf autoremove -y && sudo dnf clean all && brew autoremove && brew cleanup --prune=all && flatpak uninstall --unused -y
 ```
 
 ## WSL fast setup

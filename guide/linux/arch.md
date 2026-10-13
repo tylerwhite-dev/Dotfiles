@@ -9,7 +9,7 @@ yay -Syyu && brew upgrade -y && flatpak update -y
 
 ## cleanup system
 ```bash
-yay -Scc && brew cleanup && flatpak uninstall --unused -y
+yay -Yc && yay -Scc && brew autoremove && brew cleanup --prune=all && flatpak uninstall --unused -y
 ```
 
 ## WSL fast setup
