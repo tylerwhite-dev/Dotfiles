@@ -5,7 +5,7 @@ package_group brew extensions \
   pfetch-rs fastfetch
 
 package_group brew cli_tools \
-  herdr superfile neovim zip zoxide fzf eza stow
+  herdr superfile zip zoxide fzf eza stow
 
 message_define status.homebrew_admin_prompt \
   "Installing Homebrew requires administrator access. Enter your sudo password if prompted."

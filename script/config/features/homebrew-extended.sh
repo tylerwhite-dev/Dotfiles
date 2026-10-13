@@ -5,7 +5,7 @@ package_group brew toolchains \
   cmake ninja tio
 
 package_group brew shell_addons \
-  lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy
+  neovim fresh lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy
 
 package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
