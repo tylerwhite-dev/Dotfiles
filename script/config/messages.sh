@@ -17,6 +17,8 @@ message_define error.input_interrupted \
   "Input was interrupted. No changes were applied."
 message_define error.homebrew_missing \
   "Homebrew was not installed at %s"
+message_define error.installed_packages_probe_failed \
+  "Could not read installed packages. No changes were applied."
 message_define error.native_packages_unsupported \
   "Native package installation is not implemented for: %s"
 message_define error.brew_not_installed \

@@ -67,6 +67,13 @@ for kind in "${plain_kinds[@]}"; do
   [[ "$kind" == "i" ]]
 done
 
+# The installed-package probe is registered per procedure.
+installed_probe=""
+catalog_installed_probe installed_probe homebrew_extended
+[[ "$installed_probe" == "homebrew_extended_installed_packages" ]]
+catalog_installed_probe installed_probe homebrew
+[[ -z "$installed_probe" ]]
+
 # Loose groups stay in declaration order under consecutive fallback headings.
 # A subshell keeps these
 # declarations out of the shared catalog.
@@ -165,6 +172,26 @@ done
     exit 1
   fi
   grep -Fq 'group name is already used by a category: neg_source:shared' "$validation_error"
+)
+(
+  if procedure_installed_probe unknown_probe missing_probe 2>"$validation_error"; then
+    exit 1
+  fi
+  grep -Fq 'Unknown procedure: unknown_probe' "$validation_error"
+)
+(
+  package_group probe_source present alpha
+  procedure_define probe_procedure
+  procedure_handler probe_procedure action_install_native_packages
+  procedure_platforms probe_procedure macos
+  procedure_installed_probe probe_procedure missing_probe_function
+  message_define procedure.probe_procedure.question "Probe?"
+  message_define procedure.probe_procedure.label "Probe"
+  message_define procedure.probe_procedure.description "Probe packages"
+  if catalog_validate 2>"$validation_error"; then
+    exit 1
+  fi
+  grep -Fq 'references an unknown installed probe: missing_probe_function' "$validation_error"
 )
 
 printf 'Configuration validation passed.\n'

@@ -124,3 +124,19 @@ workflow_selected_packages() {
     read -r -a result_ref <<< "${_WORKFLOW_PACKAGE_SELECTIONS[$procedure_id]}"
   fi
 }
+
+# Reports which of the given packages a procedure already has installed.
+workflow_installed_packages() {
+  local -n __workflow_installed_result="$1"
+  local __workflow_installed_id="$2"
+  shift 2
+
+  local __workflow_installed_probe
+  local -a __workflow_installed_found=()
+
+  __workflow_installed_result=()
+  catalog_installed_probe __workflow_installed_probe "$__workflow_installed_id"
+  [[ -n "$__workflow_installed_probe" ]] || return 0
+  "$__workflow_installed_probe" __workflow_installed_found "$@" || return
+  __workflow_installed_result=("${__workflow_installed_found[@]}")
+}

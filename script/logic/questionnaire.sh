@@ -29,15 +29,22 @@ _questionnaire_read_selectable_packages() {
   local prompt
   local -a rows=()
   local -a kinds=()
+  local -a packages=()
+  local -a presets=()
   local -a selected=()
   local -A texts=()
 
   _questionnaire_procedure_text question "$procedure_id" question
   message_format prompt question.progress "$current" "$total" "$question"
   catalog_package_rows rows kinds "$procedure_id" "$platform" || return
+  catalog_packages packages "$procedure_id" "$platform" || return
+  if ! workflow_installed_packages presets "$procedure_id" "${packages[@]}"; then
+    error_report error.installed_packages_probe_failed
+    return 1
+  fi
   questionnaire_multiselect_texts texts || return
 
-  if ! ui_multiselect_grouped selected "$prompt" texts rows kinds; then
+  if ! ui_multiselect_grouped selected "$prompt" texts rows kinds presets; then
     error_report error.input_interrupted
     return 1
   fi

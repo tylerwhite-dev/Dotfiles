@@ -117,6 +117,8 @@ file, or a shared message when several features use it.
 
 `procedure_selectable` enables package checkboxes. Its handler reads
 `workflow_selected_packages`; ordinary handlers read `catalog_packages`.
+`procedure_installed_probe` reports the packages of a procedure that are
+installed already, so the checkbox list starts with them marked.
 `procedure_finish_handler` runs after a successful main handler with direct
 terminal access for authentication and other input. Grouping changes only
 presentation; the flat and grouped package lists retain declaration order.

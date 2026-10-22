@@ -13,6 +13,7 @@ bash script/tests/config_validation.sh
 bash script/tests/features.sh
 bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh
+bash script/tests/homebrew.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
 bash script/tests/app.sh
@@ -24,12 +25,13 @@ bash script/tests/optionals.sh
 
 | Script | What it verifies |
 | --- | --- |
-| `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, and declaration errors. |
-| `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, caller trap preservation, and configuration load failures in a temporary copy. |
+| `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, installed-package probes, and declaration errors. |
+| `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, installed-package probes, caller trap preservation, and configuration load failures in a temporary copy. |
 | `procedure_order.sh` | Queue order, disabled procedures and dependants, YOLO/optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
 | `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
+| `homebrew.sh` | Installed-package probes with a mock Homebrew executable, missing Homebrew, empty results, command failures and diagnostics, and install policy passed through the real executor. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
-| `optionals.sh` | All optional lists per platform and shared runner finish-handler dispatch. |
+| `optionals.sh` | All optional lists per platform, installed-package presets, collection failure before list display, and shared runner finish-handler dispatch. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |
@@ -79,7 +81,7 @@ bash script/tests/manual/dynamic_ui.sh --list      # list available components
 | --- | --- |
 | `ui_select` | Single-choice menu: keyboard navigation, default highlight, detail text, the yes/no questionnaire question (2 options), many options, exit codes. |
 | `ui_multiselect` | Checkbox list: Space toggle, All shortcut, count line, resulting selection, duplicates, exit codes. |
-| `ui_multiselect_grouped` | Grouped checkbox list: temporary screen, bounded columns, repeated group headings, `[-]` partial state, Space on a group header, no global All row, and the real `homebrew_extended` catalog. |
+| `ui_multiselect_grouped` | Grouped checkbox list: temporary screen, bounded columns, repeated group headings, `[-]` partial state, Space on a group header, no global All row, the real `homebrew_extended` catalog, and the optional preset list that starts packages marked. |
 
 Note: the questionnaire's yes/no questions are not a separate element — they
 are `ui_select` with two options (`Yes`/`No`), covered in the `ui_select` suite.

@@ -34,6 +34,11 @@ package_category brew_cask gaming "Games" games
 message_define status.cask_admin_prompt \
   "Installing selected casks. Enter your administrator password in the terminal or macOS dialog if prompted."
 
+# Reports which of the given casks Homebrew already has installed.
+homebrew_casks_installed_packages() {
+  executor_brew_installed "$1" cask "${@:2}"
+}
+
 # Checks Homebrew before the direct-input cask installation phase.
 action_prepare_homebrew_casks() {
   local brew_bin
@@ -52,7 +57,8 @@ action_install_homebrew_casks() {
   ((${#selected[@]} > 0)) || return 0
 
   status_report status.cask_admin_prompt
-  executor_brew install --cask "${selected[@]}"
+  HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    executor_brew install --cask "${selected[@]}"
 }
 
 procedure_define homebrew_casks
@@ -61,6 +67,7 @@ procedure_finish_handler homebrew_casks action_install_homebrew_casks
 procedure_platforms homebrew_casks macos
 procedure_requires homebrew_casks homebrew
 procedure_selectable homebrew_casks
+procedure_installed_probe homebrew_casks homebrew_casks_installed_packages
 procedure_packages homebrew_casks \
   brew_cask internet_apps \
   brew_cask work_apps \

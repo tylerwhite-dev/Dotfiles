@@ -8,6 +8,7 @@ declare -Ag _CATALOG_PROCEDURE_PLATFORMS=()
 declare -Ag _CATALOG_PROCEDURE_REQUIREMENT=()
 declare -Ag _CATALOG_PROCEDURE_REQUIRES_ROOT=()
 declare -Ag _CATALOG_PROCEDURE_SELECTABLE=()
+declare -Ag _CATALOG_PROCEDURE_INSTALLED_PROBE=()
 declare -Ag _CATALOG_PROCEDURE_PACKAGE_REFS=()
 declare -Ag _CATALOG_PACKAGE_GROUPS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_LABELS=()
@@ -95,6 +96,7 @@ procedure_define() {
   _CATALOG_PROCEDURE_REQUIREMENT["$id"]=""
   _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]=""
   _CATALOG_PROCEDURE_SELECTABLE["$id"]="no"
+  _CATALOG_PROCEDURE_INSTALLED_PROBE["$id"]=""
   _CATALOG_PROCEDURE_PACKAGE_REFS["$id"]=""
 }
 
@@ -154,6 +156,12 @@ procedure_requires_root() {
 procedure_selectable() {
   _catalog_require_procedure "$1" || return
   _CATALOG_PROCEDURE_SELECTABLE["$1"]="yes"
+}
+
+# Assigns the function that reports which of a procedure's packages exist already.
+procedure_installed_probe() {
+  _catalog_require_procedure "$1" || return
+  _CATALOG_PROCEDURE_INSTALLED_PROBE["$1"]="$2"
 }
 
 # Attaches one or more source and package-group references to a procedure.
@@ -222,6 +230,11 @@ catalog_handler() {
 # Returns the optional direct-output handler for a procedure.
 catalog_finish_handler() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_FINISH_HANDLER[$2]}"
+}
+
+# Returns the installed-package probe registered for a procedure.
+catalog_installed_probe() {
+  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_INSTALLED_PROBE[$2]:-}"
 }
 
 # Returns the procedure ID required by another procedure, if any.
@@ -436,6 +449,7 @@ catalog_validate() {
   local finish_handler
   local requirement
   local platform
+  local installed_probe
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then
     printf 'No setup procedures were declared.\n' >&2
@@ -487,6 +501,15 @@ catalog_validate() {
       "${_CATALOG_PROCEDURE_SELECTABLE[$id]}" != "no" ]]; then
       printf 'Procedure %s has an invalid selectable flag.\n' "$id" >&2
       return 1
+    fi
+    installed_probe="${_CATALOG_PROCEDURE_INSTALLED_PROBE[$id]}"
+    if [[ -n "$installed_probe" ]]; then
+      if [[ ! "$installed_probe" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
+        ! declare -F "$installed_probe" >/dev/null; then
+        printf 'Procedure %s references an unknown installed probe: %s\n' \
+          "$id" "$installed_probe" >&2
+        return 1
+      fi
     fi
 
     _catalog_validate_messages "$id" || return

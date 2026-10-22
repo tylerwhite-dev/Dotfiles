@@ -26,6 +26,11 @@ package_category brew dev_tools "Dev tools" dev_tooling
 package_category brew media "Media" media_tools
 package_category brew harness "CLI Harness" cli_harness
 
+# Reports which of the given packages Homebrew already has installed.
+homebrew_extended_installed_packages() {
+  executor_brew_installed "$1" formula "${@:2}"
+}
+
 # Installs the user-selected extended Homebrew packages.
 action_install_homebrew_extended() {
   local platform="$1"
@@ -41,7 +46,8 @@ action_install_homebrew_extended() {
     executor_brew trust --tap sdkman/tap || return
   fi
 
-  executor_brew install "${selected[@]}"
+  HOMEBREW_NO_INSTALL_UPGRADE=1 \
+    executor_brew install "${selected[@]}"
 }
 
 procedure_define homebrew_extended
@@ -49,6 +55,7 @@ procedure_handler homebrew_extended action_install_homebrew_extended
 procedure_platforms homebrew_extended arch debian fedora macos
 procedure_requires homebrew_extended homebrew
 procedure_selectable homebrew_extended
+procedure_installed_probe homebrew_extended homebrew_extended_installed_packages
 procedure_packages homebrew_extended \
   brew shell \
   brew utils \

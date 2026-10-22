@@ -178,3 +178,41 @@ executor_brew() {
     HOMEBREW_CURL_RETRIES=3 \
     "$brew_bin" "$@"
 }
+
+# Prints the installed Homebrew formulae or casks, one name per line.
+# Missing Homebrew is a successful empty list; command failures propagate.
+_executor_brew_list() {
+  local kind="$1"
+  local brew_bin
+
+  brew_bin="$(executor_brew_bin)" || return
+  [[ -x "$brew_bin" ]] || return 0
+  env \
+    HOMEBREW_NO_ANALYTICS=1 \
+    HOMEBREW_NO_ASK=1 \
+    HOMEBREW_NO_AUTO_UPDATE=1 \
+    "$brew_bin" list "--$kind"
+}
+
+# Collects the requested packages that Homebrew already has installed.
+executor_brew_installed() {
+  local -n __executor_installed_result="$1"
+  local __executor_installed_kind="$2"
+  shift 2
+
+  local __executor_installed_name __executor_installed_package __executor_installed_output
+  local -A __executor_installed_set=()
+
+  __executor_installed_result=()
+  __executor_installed_output="$(_executor_brew_list "$__executor_installed_kind")" || return
+  while IFS= read -r __executor_installed_name; do
+    [[ -n "$__executor_installed_name" ]] || continue
+    __executor_installed_set["$__executor_installed_name"]=1
+  done <<< "$__executor_installed_output"
+  for __executor_installed_package in "$@"; do
+    if [[ -v "__executor_installed_set[$__executor_installed_package]" ]]; then
+      __executor_installed_result+=("$__executor_installed_package")
+    fi
+  done
+  return 0
+}

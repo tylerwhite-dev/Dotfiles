@@ -156,6 +156,26 @@ _ui_ms_layout() {
   printf -v "$6" '%d' "$((__ui_layout_column+1))"
 }
 
+# Marks the items named by the preset array, so they start selected.
+# Values that the list does not show are ignored.
+_ui_ms_seed_preset() {
+  local __ui_seed_preset_name="$1"
+  local -n __ui_seed_preset_rows_ref="$2" __ui_seed_preset_kinds_ref="$3" __ui_seed_preset_marked_ref="$4"
+  local __ui_seed_preset_index __ui_seed_preset_value
+
+  [[ -n "$__ui_seed_preset_name" ]] || return 0
+  local -n __ui_seed_preset_values_ref="$__ui_seed_preset_name"
+  for ((__ui_seed_preset_index=0; __ui_seed_preset_index<${#__ui_seed_preset_rows_ref[@]}; __ui_seed_preset_index++)); do
+    [[ "${__ui_seed_preset_kinds_ref[__ui_seed_preset_index]}" == i ]] || continue
+    for __ui_seed_preset_value in "${__ui_seed_preset_values_ref[@]}"; do
+      if [[ "${__ui_seed_preset_rows_ref[__ui_seed_preset_index]}" == "$__ui_seed_preset_value" ]]; then
+        __ui_seed_preset_marked_ref[$__ui_seed_preset_index]=1
+        break
+      fi
+    done
+  done
+}
+
 _ui_ms_fit() {
   local __ui_fit_value __ui_fit_limit="$2"
   _ui_truncate __ui_fit_value "$1" "$__ui_fit_limit"
@@ -338,7 +358,7 @@ _ui_ms_selected() {
 # Owns one screen session; geometry and navigation helpers remain internal.
 _ui_ms_run() {
   local __ui_run_result_name="$1" __ui_run_prompt="$2" __ui_run_texts_name="$3" __ui_run_rows_name="$4" \
-    __ui_run_kinds_name="$5" __ui_run_with_all="$6"
+    __ui_run_kinds_name="$5" __ui_run_with_all="$6" __ui_run_preset_name="${7:-}"
   _ui_ms_validate "$__ui_run_texts_name" "$__ui_run_rows_name" "$__ui_run_kinds_name" || return
   local -n __ui_run_input_rows_ref="$__ui_run_rows_name" __ui_run_input_kinds_ref="$__ui_run_kinds_name" \
     __ui_run_texts_ref="$__ui_run_texts_name"
@@ -351,6 +371,7 @@ _ui_ms_run() {
     __ui_run_kinds=("${__ui_run_input_kinds_ref[@]}")
   fi
   local -A __ui_run_marked=() __ui_run_cells=()
+  _ui_ms_seed_preset "$__ui_run_preset_name" __ui_run_rows __ui_run_kinds __ui_run_marked
   local __ui_run_cursor=0 __ui_run_first=0 __ui_run_height __ui_run_width __ui_run_limit __ui_run_cell_width \
     __ui_run_visible __ui_run_column_count __ui_run_key __ui_run_status=0 __ui_run_frame
   _ui_ms_screen_open || return
@@ -400,16 +421,25 @@ ui_multiselect() {
   for ((__ui_flat_index=0; __ui_flat_index<${#__ui_flat_rows[@]}; __ui_flat_index++)); do
     __ui_flat_kinds+=(i)
   done
-  _ui_ms_run "$__ui_flat_result" "$__ui_flat_prompt" "$__ui_flat_texts" __ui_flat_rows __ui_flat_kinds yes
+  _ui_ms_run "$__ui_flat_result" "$__ui_flat_prompt" "$__ui_flat_texts" __ui_flat_rows __ui_flat_kinds yes ""
 }
 
 # g/i rows are presentation data; only original item values are returned.
+# An optional preset array names the items that start marked as selected.
 ui_multiselect_grouped() {
-  (($# == 5)) || return 2
-  _ui_ms_distinct "$1" "$3" "$4" "$5" || return
+  (($# == 5 || $# == 6)) || return 2
+  if (($# == 6)); then
+    _ui_ms_distinct "$1" "$3" "$4" "$5" "$6" || return
+  else
+    _ui_ms_distinct "$1" "$3" "$4" "$5" || return
+  fi
   _ui_output_name "$1" || return
   _ui_valid_name "$3" || return
   _ui_valid_name "$4" || return
   _ui_valid_name "$5" || return
-  _ui_ms_run "$1" "$2" "$3" "$4" "$5" no
+  if (($# == 6)); then
+    _ui_valid_name "$6" || return
+    _ui_array_type "$6" a || return
+  fi
+  _ui_ms_run "$1" "$2" "$3" "$4" "$5" no "${6:-}"
 }

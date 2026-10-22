@@ -90,12 +90,41 @@ catalog_finish_handler finish_handler homebrew_casks
 [[ "$finish_handler" == action_install_homebrew_casks ]] || \
   fail "cask installation must use the direct-input finish handler"
 cask_command="$(
-  executor_brew() { printf '%s\n' "$*"; }
+  executor_brew() {
+    [[ "${HOMEBREW_NO_INSTALL_UPGRADE:-}" == 1 ]] || return 1
+    printf '%s\n' "$*"
+  }
   status_report() { :; }
   workflow_select_packages homebrew_casks firefox bitwarden
   action_install_homebrew_casks macos ''
 )"
 [[ "$cask_command" == 'install --cask firefox bitwarden' ]] || \
   fail "cask installation must use only selected packages"
+
+formula_command="$(
+  executor_brew() {
+    [[ "${HOMEBREW_NO_INSTALL_UPGRADE:-}" == 1 ]] || return 1
+    printf '%s\n' "$*"
+  }
+  workflow_select_packages homebrew_extended tmux fzf
+  action_install_homebrew_extended fedora ''
+)"
+[[ "$formula_command" == 'install tmux fzf' ]] || \
+  fail "formula installation must use only selected packages"
+
+# Failed probes must not publish partial results or retain stale values.
+(
+  failing_installed_probe() {
+    local -n found_ref="$1"
+    found_ref=(tmux)
+    return 9
+  }
+  procedure_installed_probe homebrew_extended failing_installed_probe
+  installed=(stale)
+  actual=0
+  workflow_installed_packages installed homebrew_extended tmux || actual=$?
+  [[ "$actual" == 9 && "${#installed[@]}" == 0 ]] || \
+    fail "failed probes must propagate status and discard partial results"
+)
 
 printf 'Workflow validation passed.\n'

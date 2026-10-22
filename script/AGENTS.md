@@ -35,7 +35,8 @@ The application flow is:
 4. `environment_detect` maps `/etc/os-release` or `sw_vers` to `arch`,
    `debian`, `fedora`, or `macos`.
 5. `questionnaire_collect` resets selections and asks one question per available
-   procedure. It does not execute commands. In `--yolo` mode every available
+   procedure. It may query installed packages, but does not change the system.
+   In `--yolo` mode every available
    procedure that is not marked `procedure_selectable` is selected without
    prompting, and the skipped ones are listed through
    `status.yolo_skipped_optionals`. A procedure marked with
@@ -154,6 +155,24 @@ that run. A later loose group starts a new fallback heading.
 Neither function de-duplicates: referencing the same group twice lists its
 packages twice. Keep a procedure's references disjoint.
 
+### Installed-package probe
+
+`procedure_installed_probe` registers a feature function that reports which of a
+procedure's packages are already installed. The probe is declared next to the
+procedure and is validated by `catalog_validate`: its name must be a plain
+identifier and the function must exist. `catalog_installed_probe` reads the
+registered probe back for a procedure.
+
+A probe receives the caller-owned result array name first and the candidate
+packages after it, and fills the array with the subset that is installed. The
+contract is `probe <result_array_name> <package>...`; an empty result means
+nothing is installed. `workflow_installed_packages` calls the probe of a
+procedure and returns the installed subset of the given packages.
+A successful empty result means nothing is installed. Missing Homebrew is also
+a successful empty result. Other probe failures propagate through the workflow,
+discard partial results, and stop the questionnaire with an error before opening
+the checkbox list or running procedures. Homebrew diagnostics remain on stderr.
+
 ### Message template
 
 `message_define` registers immutable text by key. `message_format` expands a
@@ -177,6 +196,14 @@ array prepared by `questionnaire_multiselect_texts`. It returns the checked
 item rows only; group rows are never part of the result. The grouped menu has
 no global `All` row. The checkbox menu uses a temporary screen and restores the
 previous terminal view after confirmation.
+The questionnaire passes the packages that are installed already as a preset
+list, so they start checked and the operator only confirms the rest. A preset
+package that is not part of the list is ignored. A procedure without an
+installed-package probe starts with an empty selection.
+The optional Homebrew formula and cask handlers use
+`HOMEBREW_NO_INSTALL_UPGRADE=1` for installation, so confirming installed packages
+does not upgrade them automatically. New packages may still affect dependencies.
+Clearing a package checkbox excludes it from installation and never uninstalls it.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.
 On Linux, `flatpak_apps` installs a missing Flatpak CLI and configures system
@@ -246,14 +273,19 @@ successful process ends with `●`; a failure ends with `×`.
   must not use those internal names as outputs.
 - Checkbox array roles must have different names. `ui_multiselect` takes
   `(result_name, prompt, texts_name, item...)`; `ui_multiselect_grouped` takes
-  `(result_name, prompt, texts_name, rows_name, kinds_name)`.
+  `(result_name, prompt, texts_name, rows_name, kinds_name)` and an optional
+  sixth `preset_name` with the packages that start checked. The preset array is
+  an indexed array whose values match item rows; its name must differ from the
+  other roles.
 - `texts_name` is an associative array with `all_label`, `status_format`,
   `navigation_hint`, and `resize_notice`. The status format receives four
   integers: first visible column, last visible column, total columns, selected
   item count. Configuration escapes conversions as `%%d` so `message_format`
   leaves `%d` for the widget. UI never reads message keys.
 - Invalid checkbox input is rejected before opening the screen. Aliased role
-  names return 1; empty lists, invalid names/types/rows return 2. Row arrays are
+  names return 1; empty lists, invalid names/types/rows return 2. A preset list
+  must be an indexed array of a valid name, and its values must differ from the
+  other role names. Row arrays are
   dense indexed arrays of equal length, with g/i kinds and at least one item
   per heading. Outputs change only after confirmation. EOF returns 130;
   INT/TERM restore the screen and terminate with 130/143.
@@ -278,24 +310,26 @@ interfaces are grouped below for quick navigation.
 - Catalog: `package_group`, `package_category`, `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
-  `procedure_selectable`, `procedure_packages`, `procedure_order`,
+  `procedure_selectable`, `procedure_installed_probe`, `procedure_packages`, `procedure_order`,
   `catalog_procedure_ids`, `catalog_is_enabled`,
   `catalog_handler`, `catalog_finish_handler`, `catalog_requirement`, `catalog_requires_root`,
   `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`,
-  `catalog_package_rows`, and
+  `catalog_package_rows`, `catalog_installed_probe`, and
   `catalog_validate`.
 - Messages: `message_define`, `message_format`, `message_exists`.
 - Flags: `flags_parse`.
 - Workflow: `workflow_reset`, `workflow_select`, `workflow_selection`,
   `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
   `workflow_available_optionals`, `workflow_selected_optionals`,
-  `workflow_select_packages`, and `workflow_selected_packages`.
+  `workflow_select_packages`, `workflow_selected_packages`, and
+  `workflow_installed_packages`.
 - Questionnaire and application: `questionnaire_collect`,
   `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`,
   `runner_run_optionals`, `process_run`, and `setup_run`.
 - Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, `executor_brew_bin`,
+  `executor_brew_installed`,
   `executor_macos_developer_tools_ready`, and `executor_restart_macos_app`.
 - UI: `ui_select`, `ui_multiselect`, `ui_multiselect_grouped`, `ui_stage`, `ui_summary_item`,
   `ui_summary_item_packages`, `ui_detail`,
@@ -324,6 +358,7 @@ bash script/tests/config_validation.sh
 bash script/tests/features.sh
 bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh
+bash script/tests/homebrew.sh
 bash script/tests/ui.sh
 bash script/tests/layer_dependencies.sh
 bash script/tests/app.sh

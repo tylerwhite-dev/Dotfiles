@@ -156,6 +156,37 @@ Groups and categories share one namespace per source. A name may not be declared
 twice, and a group may not reuse a category name. A procedure may reference the
 same name as either a group or a category — the catalog resolves it.
 
+## Reporting packages that are installed already
+
+A selectable procedure can tell which of its packages exist already, so the
+checkbox list starts with those packages marked:
+
+| Entity | What it is |
+| --- | --- |
+| `procedure_installed_probe <id> <function>` | Registers the probe of a procedure. |
+
+The probe is a function in the same feature file:
+
+```bash
+homebrew_extended_installed_packages() {
+  executor_brew_installed "$1" formula "${@:2}"
+}
+
+procedure_installed_probe homebrew_extended homebrew_extended_installed_packages
+```
+
+The probe receives the result array name first and the candidate packages after
+it, and fills the array with the installed ones. `homebrew_extended` checks
+formulae, `homebrew_casks` checks casks. A procedure without a probe starts with
+an empty selection. The probe name must be a plain identifier, and the function
+must exist — the catalog rejects the configuration otherwise.
+
+A successful empty result means nothing is installed. Missing Homebrew also
+returns an empty result, allowing its installation after confirmation. If an
+installed-package probe fails, its partial result is discarded and the
+questionnaire stops with an error before opening the checkbox list or running
+any procedures. Homebrew command diagnostics remain visible on stderr.
+
 ## What the questionnaire shows
 
 Only procedures marked with `procedure_selectable` render a checkbox list.
@@ -176,6 +207,13 @@ array, and item rows match it in declaration order. Selectable actions use
 `workflow_selected_packages` to install only the chosen items. Ordinary groups
 appear at their declared position under `Other` when categories are present;
 adjacent ordinary groups share that heading, and later runs repeat it.
+
+Packages that are installed already start marked, so the list shows what the
+machine has and the operator only confirms the rest. Marked packages stay in the
+result. The optional Homebrew formula and cask handlers pass them to `brew install`
+with `HOMEBREW_NO_INSTALL_UPGRADE=1`, preventing automatic upgrades of packages
+that are already installed. Installing new packages can still affect dependencies.
+Clearing a checkbox excludes that package from installation; it does not uninstall it.
 
 `--yolo` mode never selects a selectable procedure. Optional package sets and
 casks are reported as skipped and install nothing, so their contents change

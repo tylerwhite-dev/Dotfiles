@@ -19,12 +19,18 @@ action_feature_fixture() {
 action_feature_fixture_finish() {
   printf 'finish:%s:%s\n' "$1" "$2" >> "$FEATURE_EVENTS"
 }
+feature_fixture_installed_packages() {
+  local -n result_ref="$1"
+  shift
+  result_ref=()
+}
 procedure_define feature_fixture
 procedure_handler feature_fixture action_feature_fixture
 procedure_finish_handler feature_fixture action_feature_fixture_finish
 procedure_platforms feature_fixture fedora
 procedure_requires feature_fixture dotfiles
 procedure_selectable feature_fixture
+procedure_installed_probe feature_fixture feature_fixture_installed_packages
 procedure_packages feature_fixture fixture feature_fixture_category
 message_define procedure.feature_fixture.question "Fixture?"
 message_define procedure.feature_fixture.label "Fixture"
@@ -57,6 +63,9 @@ mv -- "${fixture_dir}/queue" "${fixture_dir}/script/config/procedure-order.sh"
   [[ "${packages[*]}" == 'alpha beta' ]]
   [[ "${rows[*]}" == 'Fixture packages alpha beta' ]]
   [[ "${kinds[*]}" == 'g i i' ]]
+  installed_probe=""
+  catalog_installed_probe installed_probe feature_fixture
+  [[ "$installed_probe" == 'feature_fixture_installed_packages' ]]
   workflow_reset
   workflow_select dotfiles yes
   workflow_select feature_fixture yes

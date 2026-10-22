@@ -135,6 +135,24 @@ ui_multiselect_grouped bare_selection "Prompt" checkbox_texts bare_rows bare_kin
 [[ "${bare_selection[*]}" == one ]]
 if grep -Fq '[ ] All' "$menu_output"; then exit 1; fi
 
+# Preset items start marked, and values the list does not show are ignored.
+preset_values=(two absent)
+preset_selection=()
+ui_multiselect_grouped preset_selection "Prompt" checkbox_texts grouped_rows grouped_kinds preset_values \
+  <<< $'\n' >"$menu_output"
+[[ "${preset_selection[*]}" == 'two' ]]
+grep -Fq '[x] two' "$menu_output"
+grep -Fq '[ ] one' "$menu_output"
+grep -Fq '[-] Tools' "$menu_output"
+grep -Fq '1 selected' "$menu_output"
+if grep -Fq '[x] absent' "$menu_output"; then exit 1; fi
+
+# A preset item can still be toggled off by the user.
+preset_selection=()
+ui_multiselect_grouped preset_selection "Prompt" checkbox_texts grouped_rows grouped_kinds preset_values \
+  <<< "$down$down $'\n'" >"$menu_output"
+[[ "${#preset_selection[@]}" -eq 0 ]]
+
 # A list without group rows behaves like a plain checkbox list.
 plain_selection=()
 ui_multiselect plain_selection "Prompt" checkbox_texts one two three <<< "$down $'\n'" \
@@ -317,6 +335,11 @@ bad_rows=(Heading); bad_kinds=(g)
 expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts bad_rows bad_kinds
 bad_rows=([1]=one); bad_kinds=([1]=i)
 expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts bad_rows bad_kinds
+declare -A preset_assoc=([first]=one)
+expect_invalid 1 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds saved
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds preset_assoc
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds 'bad[name]'
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds missing_preset
 empty_texts=()
 expect_invalid 2 ui_multiselect saved Prompt empty_texts one
 declare -A incomplete_texts=([all_label]=All)
