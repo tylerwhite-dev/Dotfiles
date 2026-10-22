@@ -14,7 +14,9 @@ export BREW_FIXTURE_CALLS="${fixture_dir}/calls"
 cat > "${fixture_dir}/brew" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
-[[ "$HOMEBREW_NO_ANALYTICS" == 1 && "$HOMEBREW_NO_AUTO_UPDATE" == 1 ]]
+if [[ "$1" != --version ]]; then
+  [[ "$HOMEBREW_NO_ANALYTICS" == 1 && "$HOMEBREW_NO_AUTO_UPDATE" == 1 ]]
+fi
 printf '%s\n' "$*" >> "$BREW_FIXTURE_CALLS"
 case "$1" in
   list)
@@ -23,8 +25,9 @@ case "$1" in
     [[ -z "$BREW_FIXTURE_ERROR" ]] || printf '%s\n' "$BREW_FIXTURE_ERROR" >&2
     exit "$BREW_FIXTURE_STATUS"
     ;;
+  --version) ;;
   install)
-    [[ "$HOMEBREW_NO_INSTALL_UPGRADE" == 1 ]]
+    [[ "${HOMEBREW_NO_INSTALL_UPGRADE:-0}" == "${BREW_FIXTURE_UPGRADE_POLICY:-1}" ]]
     ;;
   *) exit 2 ;;
 esac
@@ -77,5 +80,26 @@ workflow_select_packages homebrew_casks firefox
 action_install_homebrew_casks macos '' >/dev/null
 [[ "$HOMEBREW_NO_INSTALL_UPGRADE" == 0 ]]
 [[ "$(tail -n 2 "$BREW_FIXTURE_CALLS")" == $'install tmux\ninstall --cask firefox' ]]
+
+# Homebrew preparation never installs formulae; the core step owns the base set.
+: > "$BREW_FIXTURE_CALLS"
+action_install_homebrew macos '' >/dev/null
+[[ "$(cat "$BREW_FIXTURE_CALLS")" == --version ]]
+BREW_FIXTURE_UPGRADE_POLICY=0 action_install_core_cli_tools macos '' >/dev/null
+[[ "$(tail -n 1 "$BREW_FIXTURE_CALLS")" == 'install starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs herdr superfile zip zoxide fzf eza stow' ]]
+
+# Core tools require Homebrew, while other Brew procedures remain independent.
+workflow_reset
+workflow_select core_cli_tools yes
+workflow_selected selected fedora
+[[ "${#selected[@]}" == 0 ]]
+workflow_select homebrew yes
+workflow_selected selected fedora
+[[ "${selected[*]}" == 'homebrew core_cli_tools' ]]
+workflow_select core_cli_tools no
+workflow_select homebrew_fonts yes
+workflow_select homebrew_extended yes
+workflow_selected selected fedora
+[[ "${selected[*]}" == 'homebrew homebrew_fonts homebrew_extended' ]]
 
 printf 'Homebrew probe and install policy validation passed.\n'

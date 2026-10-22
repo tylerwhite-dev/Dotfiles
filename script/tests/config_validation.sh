@@ -61,7 +61,7 @@ done
 # A procedure without category references renders a plain item list.
 plain_rows=()
 plain_kinds=()
-catalog_package_rows plain_rows plain_kinds homebrew macos brew
+catalog_package_rows plain_rows plain_kinds core_cli_tools macos brew
 ((${#plain_kinds[@]} == ${#plain_rows[@]}))
 for kind in "${plain_kinds[@]}"; do
   [[ "$kind" == "i" ]]

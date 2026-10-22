@@ -23,6 +23,11 @@ installation runs with direct terminal access so password prompts stay visible.
 On Linux, a separate grouped list offers the 20 applications from
 `guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
 
+Homebrew and core CLI tools have separate yes/no questions and execution steps.
+The core tools step requires Homebrew and installs the base formula set and shell
+extensions. Fonts, extended formulae and casks require Homebrew independently,
+so they remain available when core CLI tools are skipped.
+
 The Flatpak procedure installs the CLI through pacman, APT or DNF if absent.
 Before installing native packages or a missing Flatpak CLI on Fedora, the setup
 disables `fedora-cisco-openh264` with

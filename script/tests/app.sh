@@ -94,7 +94,7 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
   run_app 0
   assert_events 'status.distribution_detected status.yolo_mode status.yolo_skipped_optionals status.settings_confirmed run elapsed'
   workflow_selected selected fedora
-  [[ "${selected[*]}" == 'native_packages zsh_default homebrew homebrew_fonts dotfiles' ]]
+  [[ "${selected[*]}" == 'native_packages zsh_default homebrew core_cli_tools homebrew_fonts dotfiles' ]]
   workflow_selection optional_selection homebrew_extended
   [[ "$optional_selection" == no ]]
 )

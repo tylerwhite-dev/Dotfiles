@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-package_group brew extensions \
-  starship zsh-autosuggestions zsh-syntax-highlighting \
-  pfetch-rs
-
-package_group brew cli_tools \
-  herdr superfile zip zoxide fzf eza stow
-
 message_define status.homebrew_admin_prompt \
   "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
 
@@ -51,10 +44,8 @@ action_install_homebrew_binary() {
   executor_run rm -f -- "$installer"
 }
 
-# Installs Homebrew and core formulae for the current platform.
+# Installs Homebrew when absent and verifies the executable.
 action_install_homebrew() {
-  local platform="$1"
-  local -a packages=()
   local brew_bin
 
   brew_bin="$(executor_brew_bin)"
@@ -68,21 +59,16 @@ action_install_homebrew() {
     return 1
   fi
 
-  executor_run "$brew_bin" --version || return
-  catalog_packages packages homebrew "$platform" brew || return
-  executor_brew install "${packages[@]}"
+  executor_run "$brew_bin" --version
 }
 
 procedure_define homebrew
 procedure_handler homebrew action_install_homebrew
 procedure_platforms homebrew arch debian fedora macos
 procedure_requires_root homebrew arch debian fedora macos
-procedure_packages homebrew \
-  brew extensions \
-  brew cli_tools
 message_define procedure.homebrew.question \
-  "Install Homebrew and core CLI tools?"
+  "Install Homebrew?"
 message_define procedure.homebrew.label \
-  "Install Homebrew and core CLI tools"
+  "Install Homebrew"
 message_define procedure.homebrew.description \
-  "Homebrew will be installed, followed by these packages:"
+  "Homebrew will be installed if missing and its executable verified."
