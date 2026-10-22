@@ -213,8 +213,32 @@ _ui_ms_cell() {
     if ((__ui_cell_index == __ui_cell_cursor)); then __ui_cell_prefix="    › $__ui_cell_mark "; __ui_cell_color="$ui_color_selected"
     else __ui_cell_prefix="      $__ui_cell_mark "; fi
   fi
-  printf '%s%s%s' "$__ui_cell_prefix" "$__ui_cell_color" "$(_ui_ms_fit "$__ui_cell_label" "$((__ui_cell_width-10))")"
+  printf '%s%s' "$__ui_cell_prefix" "$__ui_cell_color"
+  _ui_ms_fit "$__ui_cell_label" "$((__ui_cell_width-10))"
   printf '%s' "$ui_color_reset"
+}
+
+# Prints one physical grid row; -1 is the flat menu's separate All row.
+_ui_ms_draw_row() {
+  local -n __ui_row_cells_ref="$4"
+  local __ui_row_cursor="$5" __ui_row_first="$6" __ui_row_visible="$7" __ui_row_width="$8" __ui_row_index="$9"
+  local __ui_row_col __ui_row_cell
+  printf '\033[2K'
+  if ((__ui_row_index == -1)); then
+    _ui_ms_cell "$1" "$2" "$3" 0 "$__ui_row_cursor" "$__ui_row_width"
+    printf '\n'
+    return
+  fi
+  for ((__ui_row_col=0; __ui_row_col<__ui_row_visible; __ui_row_col++)); do
+    if ((__ui_row_col > 0)); then printf '  '; fi
+    __ui_row_cell="${__ui_row_cells_ref[$((__ui_row_first+__ui_row_col)),$__ui_row_index]:-}"
+    if [[ -n "$__ui_row_cell" ]]; then
+      _ui_ms_cell "$1" "$2" "$3" "$__ui_row_cell" "$__ui_row_cursor" "$__ui_row_width"
+    else
+      printf '%*s' "$__ui_row_width" ''
+    fi
+  done
+  printf '\n'
 }
 
 _ui_ms_draw() {
@@ -225,42 +249,34 @@ _ui_ms_draw() {
   local __ui_grid_prompt="$5" __ui_grid_cursor="$6" __ui_grid_height="$7" __ui_grid_width="$8" __ui_grid_first="$9"
   local __ui_grid_visible="${10}" __ui_grid_cell_width="${11}" __ui_grid_column_count="${12}"
   local -n __ui_grid_texts_ref="${13}"
-  local __ui_grid_row __ui_grid_col __ui_grid_cell __ui_grid_selected=0 __ui_grid_heading __ui_grid_count_line \
+  local __ui_grid_row __ui_grid_selected=0 __ui_grid_heading __ui_grid_count_line \
     __ui_grid_left_indicator=' ' __ui_grid_right_indicator=' '
   for ((__ui_grid_row=0; __ui_grid_row<${#__ui_grid_kinds_ref[@]}; __ui_grid_row++)); do
     [[ "${__ui_grid_kinds_ref[__ui_grid_row]}" == i && "${__ui_grid_marked_ref[$__ui_grid_row]:-0}" == 1 ]] && ((__ui_grid_selected+=1))
   done
-  printf '\033[2K%s%s%s\n' "$ui_color_question" "$(_ui_ms_fit "$__ui_grid_prompt" "$((__ui_grid_width-1))")" "$ui_color_reset"
+  printf '\033[2K%s' "$ui_color_question"
+  _ui_ms_fit "$__ui_grid_prompt" "$((__ui_grid_width-1))"
+  printf '%s\n' "$ui_color_reset"
   printf -v __ui_grid_count_line "${__ui_grid_texts_ref[status_format]}" \
     "$((__ui_grid_first+1))" "$((__ui_grid_first+__ui_grid_visible))" "$__ui_grid_column_count" "$__ui_grid_selected"
   ((__ui_grid_first > 0)) && __ui_grid_left_indicator='←'
   ((__ui_grid_first+__ui_grid_visible < __ui_grid_column_count)) && __ui_grid_right_indicator='→'
-  printf '\033[2K%s%s%s %s %s%s%s\n' \
-    "$ui_color_selected" "$__ui_grid_left_indicator" "$ui_color_hint" \
-    "$(_ui_ms_fit "$__ui_grid_count_line" "$((__ui_grid_width-5))")" \
-    "$ui_color_selected" "$__ui_grid_right_indicator" "$ui_color_reset"
+  printf '\033[2K%s%s%s ' "$ui_color_selected" "$__ui_grid_left_indicator" "$ui_color_hint"
+  _ui_ms_fit "$__ui_grid_count_line" "$((__ui_grid_width-5))"
+  printf ' %s%s%s\n' "$ui_color_selected" "$__ui_grid_right_indicator" "$ui_color_reset"
   if [[ "${__ui_grid_kinds_ref[0]}" == a ]]; then
-    printf '\033[2K'
-    _ui_ms_cell "$1" "$2" "$3" 0 "$__ui_grid_cursor" "$__ui_grid_cell_width"
-    printf '\n\033[2K\n'
+    _ui_ms_draw_row "$1" "$2" "$3" "$4" "$__ui_grid_cursor" "$__ui_grid_first" "$__ui_grid_visible" "$__ui_grid_cell_width" -1
+    printf '\033[2K\n'
   else
     printf '\033[2K\n'
   fi
   for ((__ui_grid_row=0; __ui_grid_row<__ui_grid_height; __ui_grid_row++)); do
-    printf '\033[2K'
-    for ((__ui_grid_col=0; __ui_grid_col<__ui_grid_visible; __ui_grid_col++)); do
-      if ((__ui_grid_col > 0)); then printf '  '; fi
-      __ui_grid_cell="${__ui_grid_cells_ref[$((__ui_grid_first+__ui_grid_col)),$__ui_grid_row]:-}"
-      if [[ -n "$__ui_grid_cell" ]]; then
-        _ui_ms_cell "$1" "$2" "$3" "$__ui_grid_cell" "$__ui_grid_cursor" "$__ui_grid_cell_width"
-      else
-        printf '%*s' "$__ui_grid_cell_width" ''
-      fi
-    done
-    printf '\n'
+    _ui_ms_draw_row "$1" "$2" "$3" "$4" "$__ui_grid_cursor" "$__ui_grid_first" "$__ui_grid_visible" "$__ui_grid_cell_width" "$__ui_grid_row"
   done
   __ui_grid_heading="${__ui_grid_texts_ref[navigation_hint]}"
-  printf '\033[2K%s%s%s' "$ui_color_hint" "$(_ui_ms_fit "$__ui_grid_heading" "$((__ui_grid_width-1))")" "$ui_color_reset"
+  printf '\033[2K%s' "$ui_color_hint"
+  _ui_ms_fit "$__ui_grid_heading" "$((__ui_grid_width-1))"
+  printf '%s' "$ui_color_reset"
 }
 
 # Checks role aliasing before any nameref or terminal state is created.
@@ -374,6 +390,10 @@ _ui_ms_run() {
   _ui_ms_seed_preset "$__ui_run_preset_name" __ui_run_rows __ui_run_kinds __ui_run_marked
   local __ui_run_cursor=0 __ui_run_first=0 __ui_run_height __ui_run_width __ui_run_limit __ui_run_cell_width \
     __ui_run_visible __ui_run_column_count __ui_run_key __ui_run_status=0 __ui_run_frame
+  local __ui_run_layout_height=0 __ui_run_layout_width=0 __ui_run_full_redraw=1
+  local __ui_run_painted_cursor=-1 __ui_run_painted_first=-1 __ui_run_grid_top=4
+  local __ui_delta_row __ui_delta_previous __ui_delta_line
+  [[ "$__ui_run_with_all" == yes ]] && __ui_run_grid_top=5
   _ui_ms_screen_open || return
   while true; do
     _ui_ms_size __ui_run_height __ui_run_width
@@ -383,22 +403,48 @@ _ui_ms_run() {
       __ui_run_limit=$((__ui_run_height-4)); ((__ui_run_limit > 24)) && __ui_run_limit=24
     fi
     if ((__ui_run_limit < 2 || __ui_run_width < 16)); then
+      __ui_run_full_redraw=1
       printf '\033[H\033[2J%s' "${__ui_run_texts_ref[resize_notice]}"
       _ui_read_key __ui_run_key || { __ui_run_status=$?; break; }
       continue
     fi
-    _ui_ms_layout __ui_run_kinds "$__ui_run_limit" __ui_run_cells __ui_run_cols __ui_run_positions __ui_run_column_count
-    _ui_ms_measure __ui_run_rows __ui_run_kinds "$__ui_run_width" "$__ui_run_column_count" __ui_run_cell_width __ui_run_visible
+    if ((__ui_run_height != __ui_run_layout_height || __ui_run_width != __ui_run_layout_width)); then
+      _ui_ms_layout __ui_run_kinds "$__ui_run_limit" __ui_run_cells __ui_run_cols __ui_run_positions __ui_run_column_count
+      _ui_ms_measure __ui_run_rows __ui_run_kinds "$__ui_run_width" "$__ui_run_column_count" __ui_run_cell_width __ui_run_visible
+      __ui_run_layout_height=$__ui_run_height
+      __ui_run_layout_width=$__ui_run_width
+      __ui_run_full_redraw=1
+    fi
     ((__ui_run_first > __ui_run_cols[__ui_run_cursor])) && __ui_run_first=${__ui_run_cols[__ui_run_cursor]}
     ((__ui_run_cols[__ui_run_cursor] >= __ui_run_first+__ui_run_visible)) && __ui_run_first=$((__ui_run_cols[__ui_run_cursor]-__ui_run_visible+1))
     ((__ui_run_first > __ui_run_column_count-__ui_run_visible)) && __ui_run_first=$((__ui_run_column_count-__ui_run_visible))
-    __ui_run_frame="$(_ui_ms_draw __ui_run_rows __ui_run_kinds __ui_run_marked __ui_run_cells "$__ui_run_prompt" "$__ui_run_cursor" \
-      "$__ui_run_limit" "$__ui_run_width" "$__ui_run_first" "$__ui_run_visible" "$__ui_run_cell_width" "$__ui_run_column_count" "$__ui_run_texts_name")"
-    printf '\033[H%s\033[J' "$__ui_run_frame"
+    if ((__ui_run_full_redraw || __ui_run_first != __ui_run_painted_first)); then
+      __ui_run_frame="$(_ui_ms_draw __ui_run_rows __ui_run_kinds __ui_run_marked __ui_run_cells "$__ui_run_prompt" "$__ui_run_cursor" \
+        "$__ui_run_limit" "$__ui_run_width" "$__ui_run_first" "$__ui_run_visible" "$__ui_run_cell_width" "$__ui_run_column_count" "$__ui_run_texts_name")"
+      printf '\033[H%s\033[J' "$__ui_run_frame"
+    elif ((__ui_run_cursor != __ui_run_painted_cursor)); then
+      # Both focus positions are in the unchanged viewport. Repaint each row once.
+      __ui_run_frame="$(
+        __ui_delta_previous=-2
+        for __ui_delta_row in "${__ui_run_positions[__ui_run_painted_cursor]}" "${__ui_run_positions[__ui_run_cursor]}"; do
+          [[ "$__ui_delta_row" == "$__ui_delta_previous" ]] && continue
+          __ui_delta_previous=$__ui_delta_row
+          if ((__ui_delta_row == -1)); then __ui_delta_line=3
+          else __ui_delta_line=$((__ui_run_grid_top+__ui_delta_row)); fi
+          printf '\033[%d;1H' "$__ui_delta_line"
+          _ui_ms_draw_row __ui_run_rows __ui_run_kinds __ui_run_marked __ui_run_cells \
+            "$__ui_run_cursor" "$__ui_run_first" "$__ui_run_visible" "$__ui_run_cell_width" "$__ui_delta_row"
+        done
+      )"
+      printf '%s' "$__ui_run_frame"
+    fi
+    __ui_run_full_redraw=0
+    __ui_run_painted_cursor=$__ui_run_cursor
+    __ui_run_painted_first=$__ui_run_first
     _ui_read_key __ui_run_key || { __ui_run_status=$?; break; }
     case "$__ui_run_key" in
       enter) break ;;
-      space) _ui_ms_toggle __ui_run_kinds __ui_run_marked "$__ui_run_cursor" ;;
+      space) _ui_ms_toggle __ui_run_kinds __ui_run_marked "$__ui_run_cursor"; __ui_run_full_redraw=1 ;;
       up) __ui_run_cursor=$(((__ui_run_cursor-1+${#__ui_run_rows[@]})%${#__ui_run_rows[@]})) ;;
       down) __ui_run_cursor=$(((__ui_run_cursor+1)%${#__ui_run_rows[@]})) ;;
       left|right) _ui_ms_neighbor __ui_run_cursor "$__ui_run_cursor" "$__ui_run_key" __ui_run_cols __ui_run_positions "$__ui_run_column_count" ;;

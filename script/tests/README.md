@@ -94,6 +94,34 @@ y/n/s/q. Empty-list rejection cases do not open a screen and need no extra pause
 
 ## Animated process contract (real TTY)
 
+Checkbox navigation also needs a visual check in a real terminal: hold Up/Down,
+release, switch direction, then press Space and Enter. Confirm that only one
+focus marker remains, All and category checkboxes update, and resize redraws
+the viewport on the next key. The automated UI suite checks cached layout,
+partial-row repaint coordinates, input ordering and cell subshell depth.
+
+For a repeatable navigation timing check, run this from the repository root
+in Bash 5 before and after a rendering change on the same machine:
+
+```bash
+(
+  source script/logic/load.sh
+  rows=(); kinds=(); selected=()
+  declare -A texts=()
+  catalog_package_rows rows kinds homebrew_extended fedora
+  questionnaire_multiselect_texts texts
+  keys=''
+  for ((i=0; i<20; i++)); do keys+=$'\033[B'; done
+  export LINES=28 COLUMNS=120
+  TIMEFORMAT='20 arrows plus Enter: %3R seconds'
+  time ui_multiselect_grouped selected Prompt texts rows kinds <<< "$keys" >/dev/null
+)
+```
+
+This measures script processing with redirected output. It does not measure
+terminal painting or physical key-repeat latency, and is not a timing assertion
+for the automated suite. The original Git Bash measurement was 14.819 seconds.
+
 ```bash
 bash script/tests/manual/process.sh
 bash script/tests/manual/ui_contracts.sh

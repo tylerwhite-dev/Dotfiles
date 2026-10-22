@@ -410,4 +410,96 @@ bash -c 'source "$1"; _ui_ms_screen_open; kill -TERM "$$"' \
 [[ "$status" == 143 ]]
 grep -Fq $'\033[?1049l' "$menu_output"
 
+# Rendering work is bounded without dropping or reordering input events.
+(
+  render_trace="$(mktemp)"
+  trap 'rm -f -- "$render_trace"' EXIT
+  render_depth=$BASH_SUBSHELL
+  eval "$(declare -f _ui_ms_layout | sed '1s/_ui_ms_layout/_test_layout/')"
+  eval "$(declare -f _ui_ms_measure | sed '1s/_ui_ms_measure/_test_measure/')"
+  eval "$(declare -f _ui_ms_draw | sed '1s/_ui_ms_draw/_test_draw/')"
+  eval "$(declare -f _ui_ms_draw_row | sed '1s/_ui_ms_draw_row/_test_row/')"
+  eval "$(declare -f _ui_ms_fit | sed '1s/_ui_ms_fit/_test_fit/')"
+  _ui_ms_layout() { printf 'layout\n' >> "$render_trace"; _test_layout "$@"; }
+  _ui_ms_measure() { printf 'measure\n' >> "$render_trace"; _test_measure "$@"; }
+  _ui_ms_draw() {
+    local test_full_frame=1
+    printf 'full\n' >> "$render_trace"
+    _test_draw "$@"
+  }
+  _ui_ms_draw_row() {
+    if [[ "${test_full_frame:-0}" == 0 ]]; then printf 'row:%s\n' "$9" >> "$render_trace"; fi
+    _test_row "$@"
+  }
+  _ui_ms_fit() {
+    if ((BASH_SUBSHELL > render_depth+1)); then
+      printf 'nested-subshell\n' >> "$render_trace"
+      return 99
+    fi
+    _test_fit "$@"
+  }
+  # Moving between columns on the same screen row repaints that row once.
+  LINES=28 COLUMNS=120 ui_multiselect_grouped selected Prompt checkbox_texts \
+    three_rows three_kinds <<< $'\033[C\n' > "$menu_output"
+  [[ "$(cat "$render_trace")" == $'layout\nmeasure\nfull\nrow:0' ]]
+  grep -Fq $'\033[4;1H' "$menu_output"
+
+  : > "$render_trace"
+  # Unknown input and a left arrow at the first column do not repaint.
+  LINES=28 COLUMNS=120 ui_multiselect_grouped selected Prompt checkbox_texts \
+    three_rows three_kinds <<< $'x\033[D\n' > "$menu_output"
+  [[ "$(cat "$render_trace")" == $'layout\nmeasure\nfull' ]]
+
+  : > "$render_trace"
+  LINES=28 COLUMNS=120 ui_multiselect selected Prompt checkbox_texts one two \
+    <<< $'\033[B\033[A\n' > "$menu_output"
+  [[ "$(cat "$render_trace")" == $'layout\nmeasure\nfull\nrow:-1\nrow:0\nrow:0\nrow:-1' ]]
+  grep -Fq $'\033[3;1H' "$menu_output"
+  grep -Fq $'\033[5;1H' "$menu_output"
+
+  : > "$render_trace"
+  LINES=28 COLUMNS=18 ui_multiselect_grouped selected Prompt checkbox_texts \
+    three_rows three_kinds <<< $'\033[C\n' > "$menu_output"
+  [[ "$(cat "$render_trace")" == $'layout\nmeasure\nfull\nfull' ]]
+
+  # All repeats count, including a direction change immediately before Space.
+  repeat_keys=''
+  for ((i=0; i<40; i++)); do repeat_keys+=$'\033[B'; done
+  for ((i=0; i<17; i++)); do repeat_keys+=$'\033[A'; done
+  repeat_keys+=$' \n'
+  LINES=28 COLUMNS=120 ui_multiselect_grouped selected Prompt checkbox_texts \
+    three_rows three_kinds <<< "$repeat_keys" > "$menu_output"
+  [[ "${selected[*]}" == three ]]
+
+  : > "$render_trace"
+  size_calls=0
+  _ui_ms_size() {
+    ((size_calls+=1))
+    if ((size_calls == 2)); then printf -v "$1" '%s' 5
+    else printf -v "$1" '%s' 28; fi
+    printf -v "$2" '%s' 120
+  }
+  ui_multiselect_grouped selected Prompt checkbox_texts three_rows three_kinds \
+    <<< $'\033[Bx\n' > "$menu_output"
+  [[ "$(grep -c '^layout$' "$render_trace")" == 1 ]]
+  [[ "$(grep -c '^full$' "$render_trace")" == 2 ]]
+  grep -Fq 'Increase terminal size' "$menu_output"
+
+  : > "$render_trace"
+  size_calls=0
+  _ui_ms_size() {
+    ((size_calls+=1))
+    printf -v "$1" '%s' 28
+    if ((size_calls == 1)); then printf -v "$2" '%s' 120
+    else printf -v "$2" '%s' 80; fi
+  }
+  ui_multiselect_grouped selected Prompt checkbox_texts three_rows three_kinds \
+    <<< $'\033[B \n' > "$menu_output"
+  [[ "${selected[*]}" == one ]]
+  [[ "$(grep -c '^layout$' "$render_trace")" == 2 ]]
+  [[ "$(grep -c '^measure$' "$render_trace")" == 2 ]]
+  [[ "$(grep -c '^full$' "$render_trace")" == 3 ]]
+  if grep -q '^nested-subshell$' "$render_trace"; then exit 1; fi
+)
+
 printf 'UI interface validation passed.\n'

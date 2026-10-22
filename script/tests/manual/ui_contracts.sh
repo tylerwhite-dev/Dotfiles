@@ -7,11 +7,12 @@ ui_is_interactive || { printf 'This check requires a real TTY.\n' >&2; exit 2; }
 
 # Scripted keys exercise the actual TTY geometry and screen session.
 read -r original_height original_width < <(stty size </dev/tty)
-frames="$(mktemp)"; geometry="$(mktemp)"
-trap 'stty rows "$original_height" cols "$original_width" </dev/tty; rm -f -- "$frames" "$geometry"' EXIT
+frames="$(mktemp)"; geometry="$(mktemp)"; row_updates="$(mktemp)"
+trap 'stty rows "$original_height" cols "$original_width" </dev/tty; rm -f -- "$frames" "$geometry" "$row_updates"' EXIT
 declare -A checkbox_texts=()
 questionnaire_multiselect_texts checkbox_texts
 eval "$(declare -f _ui_ms_draw | sed '1s/_ui_ms_draw/_test_draw/')"
+eval "$(declare -f _ui_ms_draw_row | sed '1s/_ui_ms_draw_row/_test_draw_row/')"
 eval "$(declare -f _ui_read_key | sed '1s/_ui_read_key/_test_key/')"
 
 test_resize() {
@@ -25,11 +26,17 @@ test_resize() {
 }
 
 _ui_ms_draw() {
-  local test_frame
+  local test_frame test_full_frame=1
   test_frame="$(_test_draw "$@")"
   printf '%s\n' "$test_frame" >>"$frames"
   printf '%s,%s\n' "$7" "$8" >>"$geometry"
   printf '%s' "$test_frame"
+}
+_ui_ms_draw_row() {
+  if [[ "${test_full_frame:-0}" == 0 ]]; then
+    printf '%s\n' "$9" >> "$row_updates"
+  fi
+  _test_draw_row "$@"
 }
 _ui_read_key() {
   _test_key "$1" || return
@@ -45,6 +52,10 @@ key_count=0 resize_on_key=no
 choice=''
 ui_select choice Prompt '' 0 minimal one two <<< $'\033[B\n'
 [[ "$choice" == 1 ]]
+
+# Flat-menu focus moves between All (screen line 3) and item zero (line 5).
+ui_multiselect selected Prompt checkbox_texts one two <<< $'\033[B\033[A\n'
+[[ "$(cat "$row_updates")" == $'-1\n0\n0\n-1' ]]
 
 rows=(First one Second two Third three); kinds=(g i g i g i); selected=()
 ui_multiselect_grouped selected Prompt checkbox_texts rows kinds <<< $'\033[C \n'

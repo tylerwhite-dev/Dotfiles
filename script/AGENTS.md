@@ -293,6 +293,11 @@ successful process ends with `●`; a failure ends with `×`.
   traps. Existing EXIT cleanup is preserved. Shared `_ui_*` terminal helpers
   are an internal support interface for widgets; other private helpers remain
   local to their module.
+- Checkbox layout is cached within `_ui_ms_run` until terminal dimensions change.
+  Cursor moves within the viewport repaint only the old and new physical rows.
+  Opening, resize, viewport shifts and checkbox toggles redraw the full frame.
+  Frame capture owns one subshell; cell formatting must not create more.
+  Keyboard events are processed individually in order, without flushing repeats.
 - Workflow stores package names as whitespace-separated text, so package names
   must not contain whitespace. Repeated names are preserved.
 
