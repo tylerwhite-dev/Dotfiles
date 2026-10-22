@@ -298,6 +298,11 @@ successful process ends with `●`; a failure ends with `×`.
   Opening, resize, viewport shifts and checkbox toggles redraw the full frame.
   Frame capture owns one subshell; cell formatting must not create more.
   Keyboard events are processed individually in order, without flushing repeats.
+  Grouped checkbox columns have a one-character separator; flat checkbox columns
+  retain two. Measurement and row rendering must use the same separator width.
+- Single-choice menus repaint only the old and new option rows after navigation.
+  The terminal cursor returns below the menu after each update. A width change
+  redraws all options using the existing truncation rules.
 - Workflow stores package names as whitespace-separated text, so package names
   must not contain whitespace. Repeated names are preserved.
 

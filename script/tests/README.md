@@ -99,6 +99,10 @@ release, switch direction, then press Space and Enter. Confirm that only one
 focus marker remains, All and category checkboxes update, and resize redraws
 the viewport on the next key. The automated UI suite checks cached layout,
 partial-row repaint coordinates, input ordering and cell subshell depth.
+Grouped checkbox columns use one separator character. Flat checkbox lists share
+the optimized renderer and retain their two-character separator. Single-choice
+menus update only the old and new focus rows; check wraparound and long labels
+as well as ordinary Up/Down navigation in a real terminal.
 
 For a repeatable navigation timing check, run this from the repository root
 in Bash 5 before and after a rendering change on the same machine:

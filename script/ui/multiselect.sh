@@ -221,8 +221,10 @@ _ui_ms_cell() {
 # Prints one physical grid row; -1 is the flat menu's separate All row.
 _ui_ms_draw_row() {
   local -n __ui_row_cells_ref="$4"
+  local -n __ui_row_kinds_ref="$2"
   local __ui_row_cursor="$5" __ui_row_first="$6" __ui_row_visible="$7" __ui_row_width="$8" __ui_row_index="$9"
-  local __ui_row_col __ui_row_cell
+  local __ui_row_col __ui_row_cell __ui_row_gap=1
+  [[ "${__ui_row_kinds_ref[0]}" == a ]] && __ui_row_gap=2
   printf '\033[2K'
   if ((__ui_row_index == -1)); then
     _ui_ms_cell "$1" "$2" "$3" 0 "$__ui_row_cursor" "$__ui_row_width"
@@ -230,7 +232,7 @@ _ui_ms_draw_row() {
     return
   fi
   for ((__ui_row_col=0; __ui_row_col<__ui_row_visible; __ui_row_col++)); do
-    if ((__ui_row_col > 0)); then printf '  '; fi
+    if ((__ui_row_col > 0)); then printf '%*s' "$__ui_row_gap" ''; fi
     __ui_row_cell="${__ui_row_cells_ref[$((__ui_row_first+__ui_row_col)),$__ui_row_index]:-}"
     if [[ -n "$__ui_row_cell" ]]; then
       _ui_ms_cell "$1" "$2" "$3" "$__ui_row_cell" "$__ui_row_cursor" "$__ui_row_width"
@@ -318,7 +320,8 @@ _ui_ms_validate() {
 _ui_ms_measure() {
   local -n __ui_measure_rows_ref="$1" __ui_measure_kinds_ref="$2"
   local __ui_measure_width="$3" __ui_measure_column_count="$4" __ui_measure_index __ui_measure_candidate \
-    __ui_measure_max_label=0 __ui_measure_cell_width __ui_measure_visible
+    __ui_measure_max_label=0 __ui_measure_cell_width __ui_measure_visible __ui_measure_gap=1
+  [[ "${__ui_measure_kinds_ref[0]}" == a ]] && __ui_measure_gap=2
   for ((__ui_measure_index=0; __ui_measure_index<${#__ui_measure_rows_ref[@]}; __ui_measure_index++)); do
     __ui_measure_candidate=${#__ui_measure_rows_ref[__ui_measure_index]}
     [[ "${__ui_measure_kinds_ref[__ui_measure_index]}" == g ]] && ((__ui_measure_candidate+=2))
@@ -326,7 +329,7 @@ _ui_ms_measure() {
   done
   __ui_measure_cell_width=$((__ui_measure_max_label+10))
   ((__ui_measure_cell_width > __ui_measure_width-1)) && __ui_measure_cell_width=$((__ui_measure_width-1))
-  __ui_measure_visible=$(((__ui_measure_width+1)/(__ui_measure_cell_width+2)))
+  __ui_measure_visible=$(((__ui_measure_width-1+__ui_measure_gap)/(__ui_measure_cell_width+__ui_measure_gap)))
   ((__ui_measure_visible < 1)) && __ui_measure_visible=1
   ((__ui_measure_visible > __ui_measure_column_count)) && __ui_measure_visible="$__ui_measure_column_count"
   printf -v "$5" '%d' "$__ui_measure_cell_width"

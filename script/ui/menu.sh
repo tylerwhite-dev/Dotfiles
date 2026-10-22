@@ -1,21 +1,27 @@
 #!/usr/bin/env bash
 
+# Prints one option with the same width and focus style in every render path.
+_ui_draw_menu_option() {
+  local __ui_option_label
+  _ui_truncate __ui_option_label "$3" "$4"
+  if (($1 == $2)); then
+    printf '\r\033[2K    %s› %s%s\n' "$ui_color_selected" "$__ui_option_label" "$ui_color_reset"
+  else
+    printf '\r\033[2K      %s\n' "$__ui_option_label"
+  fi
+}
+
 # Draws all menu options while reserving space for the active marker.
 _ui_draw_menu_options() {
   local __ui_draw_selected="$1"
   shift
-  local __ui_draw_index __ui_draw_label __ui_draw_columns="${COLUMNS:-80}"
+  local __ui_draw_index __ui_draw_columns="${COLUMNS:-80}"
   local -a __ui_draw_options=("$@")
   [[ "$__ui_draw_columns" =~ ^[1-9][0-9]*$ ]] || __ui_draw_columns=80
   local __ui_draw_width=$((10#$__ui_draw_columns-7))
   ((__ui_draw_width < 1)) && __ui_draw_width=1
   for ((__ui_draw_index=0; __ui_draw_index<${#__ui_draw_options[@]}; __ui_draw_index++)); do
-    _ui_truncate __ui_draw_label "${__ui_draw_options[__ui_draw_index]}" "$__ui_draw_width"
-    if ((__ui_draw_index == __ui_draw_selected)); then
-      printf '\r\033[2K    %s› %s%s\n' "$ui_color_selected" "$__ui_draw_label" "$ui_color_reset"
-    else
-      printf '\r\033[2K      %s\n' "$__ui_draw_label"
-    fi
+    _ui_draw_menu_option "$__ui_draw_index" "$__ui_draw_selected" "${__ui_draw_options[__ui_draw_index]}" "$__ui_draw_width"
   done
 }
 
@@ -24,17 +30,39 @@ _ui_read_menu_choice() {
   local __ui_choice_result="$1" __ui_choice_cursor="$2"
   shift 2
   local -a __ui_choice_options=("$@")
-  local __ui_choice_count="${#__ui_choice_options[@]}" __ui_choice_key
+  local __ui_choice_count="${#__ui_choice_options[@]}" __ui_choice_key __ui_choice_old __ui_choice_row
+  local __ui_choice_columns __ui_choice_width __ui_choice_down
+  local __ui_choice_painted_columns="${COLUMNS:-80}"
+  [[ "$__ui_choice_painted_columns" =~ ^[1-9][0-9]*$ ]] || __ui_choice_painted_columns=80
   while true; do
     _ui_read_key __ui_choice_key || return
+    __ui_choice_old=$__ui_choice_cursor
     case "$__ui_choice_key" in
       enter) printf -v "$__ui_choice_result" '%d' "$__ui_choice_cursor"; return 0 ;;
       up) __ui_choice_cursor=$(((__ui_choice_cursor-1+__ui_choice_count)%__ui_choice_count)) ;;
       down) __ui_choice_cursor=$(((__ui_choice_cursor+1)%__ui_choice_count)) ;;
       *) continue ;;
     esac
-    printf '\033[%dA' "$__ui_choice_count"
-    _ui_draw_menu_options "$__ui_choice_cursor" "${__ui_choice_options[@]}"
+    __ui_choice_columns="${COLUMNS:-80}"
+    [[ "$__ui_choice_columns" =~ ^[1-9][0-9]*$ ]] || __ui_choice_columns=80
+    if [[ "$__ui_choice_columns" != "$__ui_choice_painted_columns" ]]; then
+      printf '\033[%dA' "$__ui_choice_count"
+      _ui_draw_menu_options "$__ui_choice_cursor" "${__ui_choice_options[@]}"
+      __ui_choice_painted_columns=$__ui_choice_columns
+      continue
+    fi
+    ((__ui_choice_old != __ui_choice_cursor)) || continue
+    __ui_choice_width=$((10#$__ui_choice_columns-7))
+    ((__ui_choice_width < 1)) && __ui_choice_width=1
+    # Keep the terminal cursor below the menu between events.
+    for __ui_choice_row in "$__ui_choice_old" "$__ui_choice_cursor"; do
+      printf '\033[%dA' "$((__ui_choice_count-__ui_choice_row))"
+      _ui_draw_menu_option "$__ui_choice_row" "$__ui_choice_cursor" \
+        "${__ui_choice_options[__ui_choice_row]}" "$__ui_choice_width"
+      __ui_choice_down=$((__ui_choice_count-__ui_choice_row-1))
+      if ((__ui_choice_down > 0)); then printf '\033[%dB' "$__ui_choice_down"; fi
+      printf '\r'
+    done
   done
 }
 

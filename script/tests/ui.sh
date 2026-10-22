@@ -502,4 +502,35 @@ grep -Fq $'\033[?1049l' "$menu_output"
   if grep -q '^nested-subshell$' "$render_trace"; then exit 1; fi
 )
 
+# Grouped menus use one separator cell, flat checkbox menus retain two.
+gap_rows=(one two); gap_kinds=(i i)
+_ui_ms_measure gap_rows gap_kinds 28 2 gap_width gap_visible
+[[ "$gap_width" == 13 && "$gap_visible" == 2 ]]
+declare -A gap_cells=([0,0]=0 [1,0]=1) gap_marked=()
+gap_output="$(_ui_ms_draw_row gap_rows gap_kinds gap_marked gap_cells -1 0 2 13 0)"
+[[ "$gap_output" == *'one       [ ] two'* ]]
+gap_rows=(All one two); gap_kinds=(a i i)
+_ui_ms_measure gap_rows gap_kinds 28 2 gap_width gap_visible
+[[ "$gap_width" == 13 && "$gap_visible" == 1 ]]
+
+# Single-choice navigation redraws only old/new rows, including wraparound.
+(
+  option_trace="$(mktemp)"
+  trap 'rm -f -- "$option_trace"' EXIT
+  eval "$(declare -f _ui_draw_menu_option | sed '1s/_ui_draw_menu_option/_test_option/')"
+  _ui_draw_menu_option() {
+    printf '%s:%s\n' "$1" "$2" >> "$option_trace"
+    _test_option "$@"
+  }
+  ui_select choice Prompt '' 0 minimal one two three \
+    <<< $'\033[A\033[B\033[B\n' > "$menu_output"
+  [[ "$choice" == 1 ]]
+  [[ "$(cat "$option_trace")" == $'0:0\n1:0\n2:0\n0:2\n2:2\n2:0\n0:0\n0:1\n1:1' ]]
+  # No zero-distance CSI movement: terminals interpret a zero as one.
+  if grep -Eq $'\033\\[0[AB]' "$menu_output"; then exit 1; fi
+  : > "$option_trace"
+  ui_select choice Prompt '' 0 minimal one <<< $'\033[B\n' > "$menu_output"
+  [[ "$choice" == 0 && "$(cat "$option_trace")" == '0:0' ]]
+)
+
 printf 'UI interface validation passed.\n'
