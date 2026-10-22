@@ -24,8 +24,8 @@ mapfile -t catalog_flatpaks < <(printf '%s\n' "${flatpak_packages[@]}" | sort)
 rows=()
 kinds=()
 catalog_package_rows rows kinds homebrew_extended macos brew
-[[ "${rows[*]}" == 'Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja tio Terminal lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full CLI Harness opencode hermes-agent openclaw' ]]
-[[ "${kinds[*]}" == 'g i i i i i i i i i i g i i i i i i i i i i i g i i i i i g i i i' ]]
+[[ "${rows[*]}" == 'Shell starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij Utils lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja neovim fresh-editor CLI Harness opencode hermes-agent openclaw Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full' ]]
+[[ "${kinds[*]}" == 'g i i i i i i i i i i i i g i i i i i i i i i i i i g i i i i i i i i i i i g i i i g i i i i i' ]]
 
 flat=()
 items=()

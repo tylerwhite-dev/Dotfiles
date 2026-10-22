@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
-package_group brew toolchains \
-  go nvm rustup uv sdkman-cli zig bun \
-  cmake ninja tio
+package_group brew shell_tools \
+  starship zoxide fzf eza \
+  zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch \
+  taproom herdr tmux zellij
 
-package_group brew shell_addons \
-  neovim fresh-editor lazygit lazyjournal lazydocker nvtop btop macmon taproom tmux zellij yazi mailsy
+package_group brew util_tools \
+  lazygit lazyjournal lazydocker mailsy tio \
+  yazi superfile zip stow \
+  nvtop btop macmon
+
+package_group brew dev_tooling \
+  go nvm rustup uv sdkman-cli zig bun \
+  cmake ninja neovim fresh-editor
 
 package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
@@ -13,8 +20,9 @@ package_group brew media_tools \
 package_group brew cli_harness \
   opencode hermes-agent openclaw
 
-package_category brew dev_tools "Dev tools" toolchains
-package_category brew terminal "Terminal" shell_addons
+package_category brew shell "Shell" shell_tools
+package_category brew utils "Utils" util_tools
+package_category brew dev_tools "Dev tools" dev_tooling
 package_category brew media "Media" media_tools
 package_category brew harness "CLI Harness" cli_harness
 
@@ -42,7 +50,8 @@ procedure_platforms homebrew_extended arch debian fedora macos
 procedure_requires homebrew_extended homebrew
 procedure_selectable homebrew_extended
 procedure_packages homebrew_extended \
-  brew terminal \
+  brew shell \
+  brew utils \
   brew dev_tools \
   brew harness \
   brew media

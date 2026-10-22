@@ -2,7 +2,7 @@
 
 package_group brew extensions \
   starship zsh-autosuggestions zsh-syntax-highlighting \
-  pfetch-rs fastfetch
+  pfetch-rs
 
 package_group brew cli_tools \
   herdr superfile zip zoxide fzf eza stow

@@ -327,7 +327,7 @@ run_ui_multiselect_grouped() {
     _multiselect_group_mixed
   _case_screen "Long grouped list: navigate columns and see a repeated group heading" \
     _multiselect_group_scroll
-  _case_screen "Real catalog (homebrew_extended): four groups render with the production package names" \
+  _case_screen "Real catalog (homebrew_extended): five groups render with the production package names" \
     _multiselect_group_real
   _series_end
 }
