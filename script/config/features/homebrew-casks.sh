@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 
 package_group brew_cask internet \
-  firefox google-chrome telegram qbittorrent amneziavpn
+  firefox google-chrome librewolf zen ungoogled-chromium tor-browser \
+  telegram whatsapp discord slack zoom \
+  qbittorrent amneziavpn
 package_group brew_cask work_media \
-  obsidian libreoffice iina bitwarden veracrypt
+  obsidian libreoffice \
+  bitwarden veracrypt \
+  iina vlc spotify
+package_group brew_cask create \
+  figma inkscape blender \
+  audacity obs
 package_group brew_cask development \
-  zed visual-studio-code vscodium ghostty \
-  hermes-desktop docker-desktop lm-studio \
-  android-studio intellij-idea qt-creator
+  visual-studio-code vscodium zed \
+  android-studio intellij-idea intellij-idea-ce qt-creator \
+  iterm2 ghostty cmux warp kitty wezterm alacritty \
+  docker-desktop hermes-desktop lm-studio
 package_group brew_cask system \
-  utm appcleaner betterdisplay coconutbattery macfuse mos raycast \
-  balenaetcher raspberry-pi-imager
+  raycast maccy rectangle alt-tab jordanbaird-ice \
+  betterdisplay mos linearmouse karabiner-elements hammerspoon \
+  stats coconutbattery appcleaner \
+  macfuse balenaetcher raspberry-pi-imager utm
 package_group brew_cask games \
-  playcover-community steam
+  steam playcover-community
 
 package_category brew_cask internet_apps "Internet" internet
 package_category brew_cask work_apps "Work & Media" work_media
+package_category brew_cask create_apps "create" create
 package_category brew_cask developer_apps "Dev tools" development
 package_category brew_cask system_apps "System" system
 package_category brew_cask gaming "Games" games
@@ -53,6 +64,7 @@ procedure_selectable homebrew_casks
 procedure_packages homebrew_casks \
   brew_cask internet_apps \
   brew_cask work_apps \
+  brew_cask create_apps \
   brew_cask developer_apps \
   brew_cask system_apps \
   brew_cask gaming

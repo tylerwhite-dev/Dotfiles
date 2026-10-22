@@ -14,7 +14,7 @@ package groups below for you; see [`script/README.md`](../../script/README.md).
 ## casks
 
 ```bash
-brew install --cask amneziavpn appcleaner balenaetcher betterdisplay bitwarden coconutbattery docker-desktop firefox ghostty google-chrome iina libreoffice lm-studio macfuse mos obsidian playcover-community qbittorrent raspberry-pi-imager raycast steam telegram utm veracrypt zed android-studio intellij-idea qt-creator vscodium
+brew install --cask firefox google-chrome telegram qbittorrent amneziavpn brave-browser microsoft-edge chromium librewolf arc zen ungoogled-chromium tor-browser discord slack zoom whatsapp microsoft-teams signal bluebubbles wechat thunderbird obsidian libreoffice iina bitwarden veracrypt vlc spotify blender inkscape obs gimp figma audacity handbrake-app zed visual-studio-code vscodium ghostty hermes-desktop docker-desktop lm-studio android-studio intellij-idea qt-creator iterm2 warp cmux kitty wezterm alacritty termius wave tabby cursor sublime-text emacs-app intellij-idea-ce coteditor utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager stats rectangle maccy alt-tab karabiner-elements jordanbaird-ice hammerspoon linearmouse playcover-community steam
 ```
 
 ## utilities

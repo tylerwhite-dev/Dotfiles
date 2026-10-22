@@ -54,9 +54,9 @@ for ((index = 0; index < ${#cask_rows[@]}; index++)); do
   fi
 done
 [[ "${cask_items[*]}" == "${cask_flat[*]}" ]]
-[[ "${#cask_flat[@]}" -eq 31 ]]
-[[ "${cask_categories[*]}" == 'Internet Work & Media Dev tools System Games' ]]
-[[ "${cask_rows[*]}" == 'Internet firefox google-chrome telegram qbittorrent amneziavpn Work & Media obsidian libreoffice iina bitwarden veracrypt Dev tools zed visual-studio-code vscodium ghostty hermes-desktop docker-desktop lm-studio android-studio intellij-idea qt-creator System utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager Games playcover-community steam' ]]
+[[ "${#cask_flat[@]}" -eq 61 ]]
+[[ "${cask_categories[*]}" == 'Internet Work & Media create Dev tools System Games' ]]
+[[ "${cask_rows[*]}" == 'Internet firefox google-chrome librewolf zen ungoogled-chromium tor-browser telegram whatsapp discord slack zoom qbittorrent amneziavpn Work & Media obsidian libreoffice bitwarden veracrypt iina vlc spotify create figma inkscape blender audacity obs Dev tools visual-studio-code vscodium zed android-studio intellij-idea intellij-idea-ce qt-creator iterm2 ghostty cmux warp kitty wezterm alacritty docker-desktop hermes-desktop lm-studio System raycast maccy rectangle alt-tab jordanbaird-ice betterdisplay mos linearmouse karabiner-elements hammerspoon stats coconutbattery appcleaner macfuse balenaetcher raspberry-pi-imager utm Games steam playcover-community' ]]
 
 # A procedure without category references renders a plain item list.
 plain_rows=()
