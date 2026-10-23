@@ -156,6 +156,25 @@ Groups and categories share one namespace per source. A name may not be declared
 twice, and a group may not reuse a category name. A procedure may reference the
 same name as either a group or a category — the catalog resolves it.
 
+## Display names for packages
+
+Keep package IDs in groups and optionally declare a display alias in the same
+feature file:
+
+```bash
+package_group flatpak internet org.telegram.desktop com.mattermost.Desktop
+package_alias flatpak org.telegram.desktop "Telegram"
+package_alias flatpak com.mattermost.Desktop "Mattermost"
+```
+
+`package_alias <source> <package_id> <label>` applies to every occurrence of
+that ID under the specified source. Labels may contain spaces, but must be
+nonblank single-line text without tabs. IDs must be nonempty and contain no
+whitespace. A repeated alias declaration for the same source and ID is an error.
+Different IDs may share a label. Without an alias the menu displays the ID.
+Checkbox selection, installed-package presets, workflow state and installation
+always use IDs. Aliases work for any package source, including Homebrew.
+
 ## Reporting packages that are installed already
 
 A selectable procedure can tell which of its packages exist already, so the

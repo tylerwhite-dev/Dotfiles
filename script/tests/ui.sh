@@ -341,6 +341,37 @@ expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows
 expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds 'bad[name]'
 expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds missing_preset
 empty_texts=()
+# Optional labels must be separate dense indexed arrays matching the row count.
+label_presets=()
+bad_labels=(only)
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds label_presets bad_labels
+expect_invalid 1 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds label_presets saved
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds label_presets preset_assoc
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds label_presets missing_labels
+bad_labels=([1]=one)
+expect_invalid 2 ui_multiselect_grouped saved Prompt checkbox_texts grouped_rows grouped_kinds label_presets bad_labels
+
+# Equal display names remain separate choices, and presets still use values.
+alias_rows=(Applications org.example.First org.example.Second org.example.Third)
+alias_kinds=(g i i i)
+alias_labels=(Applications 'Shared name' 'Shared name' 'Third app')
+alias_presets=(org.example.Second)
+alias_selection=()
+COLUMNS=120 ui_multiselect_grouped alias_selection Prompt checkbox_texts \
+  alias_rows alias_kinds alias_presets alias_labels <<< $'\n' >"$menu_output"
+[[ "${alias_selection[*]}" == org.example.Second ]]
+grep -Fq 'Shared name' "$menu_output"
+if grep -Fq org.example "$menu_output"; then exit 1; fi
+# Deselect the second item and choose the first with the same label.
+COLUMNS=120 ui_multiselect_grouped alias_selection Prompt checkbox_texts \
+  alias_rows alias_kinds alias_presets alias_labels <<< $'\033[B \033[B \n' >"$menu_output"
+[[ "${alias_selection[*]}" == org.example.First ]]
+# Toggling the heading returns all IDs, including both equal labels.
+alias_presets=()
+COLUMNS=120 ui_multiselect_grouped alias_selection Prompt checkbox_texts \
+  alias_rows alias_kinds alias_presets alias_labels <<< $' \n' >"$menu_output"
+[[ "${alias_selection[*]}" == 'org.example.First org.example.Second org.example.Third' ]]
+
 expect_invalid 2 ui_multiselect saved Prompt empty_texts one
 declare -A incomplete_texts=([all_label]=All)
 expect_invalid 2 ui_multiselect saved Prompt incomplete_texts one

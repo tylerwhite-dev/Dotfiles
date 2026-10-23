@@ -379,6 +379,10 @@ _ui_ms_run() {
   local __ui_run_result_name="$1" __ui_run_prompt="$2" __ui_run_texts_name="$3" __ui_run_rows_name="$4" \
     __ui_run_kinds_name="$5" __ui_run_with_all="$6" __ui_run_preset_name="${7:-}"
   _ui_ms_validate "$__ui_run_texts_name" "$__ui_run_rows_name" "$__ui_run_kinds_name" || return
+  if [[ -n "${8:-}" ]]; then
+    _ui_ms_validate "$__ui_run_texts_name" "$8" "$__ui_run_kinds_name" || return
+    local -n __ui_run_labels_ref="$8"
+  fi
   local -n __ui_run_input_rows_ref="$__ui_run_rows_name" __ui_run_input_kinds_ref="$__ui_run_kinds_name" \
     __ui_run_texts_ref="$__ui_run_texts_name"
   local -a __ui_run_rows=() __ui_run_kinds=() __ui_run_cols=() __ui_run_positions=()
@@ -389,8 +393,12 @@ _ui_ms_run() {
     __ui_run_rows=("${__ui_run_input_rows_ref[@]}")
     __ui_run_kinds=("${__ui_run_input_kinds_ref[@]}")
   fi
+  local -a __ui_run_values=("${__ui_run_rows[@]}")
+  if [[ -n "${8:-}" ]]; then
+    __ui_run_rows=("${__ui_run_labels_ref[@]}")
+  fi
   local -A __ui_run_marked=() __ui_run_cells=()
-  _ui_ms_seed_preset "$__ui_run_preset_name" __ui_run_rows __ui_run_kinds __ui_run_marked
+  _ui_ms_seed_preset "$__ui_run_preset_name" __ui_run_values __ui_run_kinds __ui_run_marked
   local __ui_run_cursor=0 __ui_run_first=0 __ui_run_height __ui_run_width __ui_run_limit __ui_run_cell_width \
     __ui_run_visible __ui_run_column_count __ui_run_key __ui_run_status=0 __ui_run_frame
   local __ui_run_layout_height=0 __ui_run_layout_width=0 __ui_run_full_redraw=1
@@ -455,7 +463,7 @@ _ui_ms_run() {
   done
   _ui_ms_screen_close
   ((__ui_run_status == 0)) || return "$__ui_run_status"
-  _ui_ms_selected "$__ui_run_result_name" __ui_run_rows __ui_run_kinds __ui_run_marked
+  _ui_ms_selected "$__ui_run_result_name" __ui_run_values __ui_run_kinds __ui_run_marked
 }
 
 # Explicit text array, then item values. Outputs change only on confirmation.
@@ -473,22 +481,22 @@ ui_multiselect() {
   _ui_ms_run "$__ui_flat_result" "$__ui_flat_prompt" "$__ui_flat_texts" __ui_flat_rows __ui_flat_kinds yes ""
 }
 
-# g/i rows are presentation data; only original item values are returned.
-# An optional preset array names the items that start marked as selected.
+# g/i rows contain values; only original item values are returned.
+# Optional presets name values to mark; optional parallel labels affect display.
 ui_multiselect_grouped() {
-  (($# == 5 || $# == 6)) || return 2
-  if (($# == 6)); then
-    _ui_ms_distinct "$1" "$3" "$4" "$5" "$6" || return
-  else
-    _ui_ms_distinct "$1" "$3" "$4" "$5" || return
-  fi
+  (($# >= 5 && $# <= 7)) || return 2
+  _ui_ms_distinct "$1" "$3" "${@:4}" || return
   _ui_output_name "$1" || return
   _ui_valid_name "$3" || return
   _ui_valid_name "$4" || return
   _ui_valid_name "$5" || return
-  if (($# == 6)); then
+  if (($# >= 6)); then
     _ui_valid_name "$6" || return
     _ui_array_type "$6" a || return
   fi
-  _ui_ms_run "$1" "$2" "$3" "$4" "$5" no "${6:-}"
+  if (($# == 7)); then
+    _ui_valid_name "$7" || return
+    _ui_array_type "$7" a || return
+  fi
+  _ui_ms_run "$1" "$2" "$3" "$4" "$5" no "${6:-}" "${7:-}"
 }

@@ -117,4 +117,20 @@ action_install_flatpak_apps fedora ''
 catalog_finish_handler finish_handler flatpak_apps
 [[ "$finish_handler" == action_install_flatpak_apps ]]
 
+# Real catalog, menu and workflow hand IDs to the installer despite aliases.
+(
+  menu_output="$(mktemp)"
+  trap 'rm -f -- "$menu_output"' EXIT
+  _questionnaire_read_selectable_packages flatpak_apps fedora 1 1 \
+    <<< $' \n' >"$menu_output"
+  grep -Fq Telegram "$menu_output"
+  if grep -Fq org.telegram.desktop "$menu_output"; then exit 1; fi
+  chosen=()
+  workflow_selected_packages chosen flatpak_apps
+  [[ "${chosen[*]}" == 'org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop org.mozilla.firefox com.discordapp.Discord com.google.Chrome' ]]
+  events=() failure=''
+  action_install_flatpak_apps fedora ''
+  [[ "${events[*]}" == 'flatpak install -y org.telegram.desktop flatpak install -y org.qbittorrent.qBittorrent flatpak install -y com.mattermost.Desktop flatpak install -y org.mozilla.firefox flatpak install -y com.discordapp.Discord flatpak install -y com.google.Chrome' ]]
+)
+
 printf 'Flatpak procedure validation passed.\n'

@@ -158,6 +158,20 @@ that run. A later loose group starts a new fallback heading.
 Neither function de-duplicates: referencing the same group twice lists its
 packages twice. Keep a procedure's references disjoint.
 
+### Package alias
+
+`package_alias <source> <package_id> <label>` declares an optional display name
+in a feature file. Aliases are scoped by source and ID; duplicate declarations
+are rejected. Labels must be nonblank single-line text without tabs, and may
+contain spaces. Different IDs may share a label. Without an alias the ID is
+displayed. Aliases affect presentation only: selection, presets, workflow and
+installation continue to use IDs.
+
+`catalog_package_rows rows kinds procedure platform [source] [labels]` keeps
+value rows unchanged and optionally fills a separate parallel label array,
+including unchanged category headings. Pass an empty source to include all
+sources while requesting labels. Output arrays must have distinct names.
+
 ### Installed-package probe
 
 `procedure_installed_probe` registers a feature function that reports which of a
@@ -280,7 +294,11 @@ successful process ends with `●`; a failure ends with `×`.
 - Checkbox array roles must have different names. `ui_multiselect` takes
   `(result_name, prompt, texts_name, item...)`; `ui_multiselect_grouped` takes
   `(result_name, prompt, texts_name, rows_name, kinds_name)` and an optional
-  sixth `preset_name` with the packages that start checked. The preset array is
+  sixth `preset_name` with the packages that start checked. An optional seventh
+  `labels_name` supplies a dense indexed array parallel to rows. Rendering and
+  width measurement use labels; presets and returned choices use row values.
+  To supply labels without presets, pass an empty indexed preset array.
+  All array role names must be distinct. The preset array is
   an indexed array whose values match item rows; its name must differ from the
   other roles.
 - `texts_name` is an associative array with `all_label`, `status_format`,
@@ -323,7 +341,7 @@ Extend a procedure by editing its handler steps in that same file.
 The source comments give the local contract for every function. The main
 interfaces are grouped below for quick navigation.
 
-- Catalog: `package_group`, `package_category`, `procedure_define`, `procedure_handler`,
+- Catalog: `package_group`, `package_category`, `package_alias`, `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
   `procedure_selectable`, `procedure_installed_probe`, `procedure_packages`, `procedure_order`,

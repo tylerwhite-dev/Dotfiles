@@ -16,8 +16,41 @@ flatpak_packages=()
 catalog_packages flatpak_packages flatpak_apps fedora flatpak
 mapfile -t guide_flatpaks < <(sed -n 's/^[[:space:]]*\([[:alnum:]][[:alnum:].-]*\)[[:space:]]*\\[[:space:]]*$/\1/p' "${script_root}/../guide/linux/flatpak.md" | sort)
 mapfile -t catalog_flatpaks < <(printf '%s\n' "${flatpak_packages[@]}" | sort)
-[[ "${#flatpak_packages[@]}" == 20 ]]
+[[ "${#flatpak_packages[@]}" == 26 ]]
 [[ "${catalog_flatpaks[*]}" == "${guide_flatpaks[*]}" ]]
+
+# Display aliases preserve IDs, source scoping, headings and fallback labels.
+alias_rows=(); alias_kinds=(); alias_labels=()
+catalog_package_rows alias_rows alias_kinds flatpak_apps fedora flatpak alias_labels
+[[ "${alias_rows[1]}" == org.telegram.desktop && "${alias_labels[1]}" == Telegram ]]
+[[ "${alias_labels[0]}" == Internet && "${#alias_labels[@]}" == "${#alias_rows[@]}" ]]
+for ((index=0; index<${#alias_rows[@]}; index++)); do
+  if [[ "${alias_kinds[index]}" == i ]]; then
+    [[ "${alias_labels[index]}" != "${alias_rows[index]}" ]]
+  fi
+done
+(
+  package_group alias_source apps first second third
+  package_group another_source apps first
+  package_alias alias_source first "Shared name"
+  package_alias alias_source second "Shared name"
+  package_alias another_source first "Other name"
+  procedure_define alias_fixture
+  procedure_packages alias_fixture alias_source apps another_source apps
+  catalog_package_rows alias_rows alias_kinds alias_fixture macos '' alias_labels
+  [[ "${alias_rows[*]}" == 'first second third first' ]]
+  [[ "${alias_labels[*]}" == 'Shared name Shared name third Other name' ]]
+  catalog_package_rows alias_rows alias_kinds alias_fixture macos another_source alias_labels
+  [[ "${alias_rows[*]}" == first && "${alias_labels[*]}" == 'Other name' ]]
+  if package_alias alias_source first Replacement 2>"$validation_error"; then exit 1; fi
+  grep -Fq 'Package alias declared more than once' "$validation_error"
+  [[ "${_CATALOG_PACKAGE_ALIASES[alias_source:first]}" == 'Shared name' ]]
+  for invalid_label in '' '   ' $'two\nlines' $'two\rrows' $'tab\tlabel'; do
+    if package_alias alias_source invalid "$invalid_label" 2>"$validation_error"; then exit 1; fi
+    grep -Fq 'Invalid package alias' "$validation_error"
+  done
+  if package_alias alias_source 'invalid id' Label 2>"$validation_error"; then exit 1; fi
+)
 
 # Grouped rows and the flat package list must stay in agreement: every item row
 # is exactly one package of the flat list, in the same order.

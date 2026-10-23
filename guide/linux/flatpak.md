@@ -21,6 +21,12 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 ```bash
 flatpak install -y \
 org.telegram.desktop \
+org.mozilla.firefox \
+com.discordapp.Discord \
+com.google.Chrome \
+org.libreoffice.LibreOffice \
+com.obsproject.Studio \
+com.spotify.Client \
 md.obsidian.Obsidian \
 com.bitwarden.desktop \
 org.qbittorrent.qBittorrent \

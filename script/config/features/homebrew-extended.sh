@@ -5,6 +5,9 @@ package_group brew shell_tools \
   zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch \
   taproom herdr tmux zellij
 
+package_alias brew zsh-autosuggestions "zsh suggestions"
+package_alias brew zsh-syntax-highlighting "zsh syntax"
+
 package_group brew util_tools \
   lazygit lazyjournal lazydocker mailsy tio \
   yazi superfile zip stow \

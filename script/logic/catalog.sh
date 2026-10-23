@@ -13,6 +13,23 @@ declare -Ag _CATALOG_PROCEDURE_PACKAGE_REFS=()
 declare -Ag _CATALOG_PACKAGE_GROUPS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_LABELS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_REFS=()
+declare -Ag _CATALOG_PACKAGE_ALIASES=()
+
+# Registers an optional display name; package identity remains source and ID.
+package_alias() {
+  (($# == 3)) || return 2
+  local source="$1" package="$2" label="$3" key="$1:$2"
+  if [[ ! "$source" =~ ^[a-z][a-z0-9_]*$ || -z "$package" || "$package" == *[[:space:]]* ||
+    -z "${label//[[:space:]]/}" || "$label" == *[$'\n\r\t']* ]]; then
+    printf 'Invalid package alias: %s\n' "$key" >&2
+    return 1
+  fi
+  if [[ -v "_CATALOG_PACKAGE_ALIASES[$key]" ]]; then
+    printf 'Package alias declared more than once: %s\n' "$key" >&2
+    return 1
+  fi
+  _CATALOG_PACKAGE_ALIASES["$key"]="$label"
+}
 
 # Registers a package list under a unique source and group name.
 package_group() {
@@ -354,7 +371,8 @@ catalog_packages() {
   fi
 }
 
-# Projects references to g/i display rows in the same order as catalog_packages.
+# Projects references to g/i value rows in the same order as catalog_packages.
+# An optional sixth output provides parallel display labels with aliases.
 # Consecutive loose groups share Other; categories end that run. Without any
 # category, only item rows are emitted. Headings are presentation data only.
 catalog_package_rows() {
@@ -364,6 +382,11 @@ catalog_package_rows() {
   local __catalog_rows_other __catalog_rows_has_category=no __catalog_rows_other_open=no
   local __catalog_rows_matched=no
   local -a __catalog_rows_groups=() __catalog_rows_items=()
+  # Optional sixth output carries labels parallel to the unchanged value rows.
+  if [[ -n "${6:-}" ]]; then
+    local -n __catalog_rows_labels="$6"
+    __catalog_rows_labels=()
+  fi
 
   __catalog_rows_result=(); __catalog_rows_kinds=()
   for __catalog_rows_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_rows_id]}; do
@@ -381,11 +404,15 @@ catalog_package_rows() {
     __catalog_rows_matched=yes
     if [[ -v "_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]" ]]; then
       __catalog_rows_result+=("${_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]}")
+      if [[ -n "${6:-}" ]]; then
+        __catalog_rows_labels+=("${_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]}")
+      fi
       __catalog_rows_kinds+=(g)
       __catalog_rows_other_open=no
     elif [[ "$__catalog_rows_has_category" == yes && "$__catalog_rows_other_open" == no ]]; then
       message_format __catalog_rows_other package_category_other || return
       __catalog_rows_result+=("$__catalog_rows_other")
+      if [[ -n "${6:-}" ]]; then __catalog_rows_labels+=("$__catalog_rows_other"); fi
       __catalog_rows_kinds+=(g)
       __catalog_rows_other_open=yes
     fi
@@ -393,6 +420,9 @@ catalog_package_rows() {
       _catalog_group_packages __catalog_rows_items "$__catalog_rows_group"
       for __catalog_rows_item in "${__catalog_rows_items[@]}"; do
         __catalog_rows_result+=("$__catalog_rows_item")
+        if [[ -n "${6:-}" ]]; then
+          __catalog_rows_labels+=("${_CATALOG_PACKAGE_ALIASES[${__catalog_rows_group%%:*}:$__catalog_rows_item]:-$__catalog_rows_item}")
+        fi
         __catalog_rows_kinds+=(i)
       done
     done

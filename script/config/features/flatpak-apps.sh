@@ -1,16 +1,45 @@
 #!/usr/bin/env bash
 
 package_group flatpak internet \
-  org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop
+  org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop \
+  org.mozilla.firefox com.discordapp.Discord com.google.Chrome
 package_group flatpak work_media \
   md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC \
   io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate \
-  app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe
+  app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe \
+  org.libreoffice.LibreOffice com.obsproject.Studio com.spotify.Client
 package_group flatpak development \
   ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
 package_group flatpak system \
   com.belmoussaoui.Authenticator it.mijorus.gearlever \
   com.mattjakeman.ExtensionManager com.github.tchx84.Flatseal
+
+package_alias flatpak org.telegram.desktop "Telegram"
+package_alias flatpak org.qbittorrent.qBittorrent "qBittorrent"
+package_alias flatpak com.mattermost.Desktop "Mattermost"
+package_alias flatpak org.mozilla.firefox "Firefox"
+package_alias flatpak com.discordapp.Discord "Discord"
+package_alias flatpak com.google.Chrome "Chrome"
+package_alias flatpak md.obsidian.Obsidian "Obsidian"
+package_alias flatpak com.bitwarden.desktop "Bitwarden"
+package_alias flatpak org.videolan.VLC "VLC"
+package_alias flatpak io.bassi.Amberol "Amberol"
+package_alias flatpak org.gnome.Snapshot "Snapshot"
+package_alias flatpak com.github.johnfactotum.Foliate "Foliate"
+package_alias flatpak app.drey.EarTag "Ear Tag"
+package_alias flatpak org.inkscape.Inkscape "Inkscape"
+package_alias flatpak org.gnome.Decibels "Decibels"
+package_alias flatpak org.gnome.Loupe "Loupe"
+package_alias flatpak org.libreoffice.LibreOffice "LibreOffice"
+package_alias flatpak com.obsproject.Studio "OBS Studio"
+package_alias flatpak com.spotify.Client "Spotify"
+package_alias flatpak ai.lmstudio.lm-studio "LM Studio"
+package_alias flatpak com.jgraph.drawio.desktop "draw.io"
+package_alias flatpak me.iepure.devtoolbox "Dev Toolbox"
+package_alias flatpak com.belmoussaoui.Authenticator "Authenticator"
+package_alias flatpak it.mijorus.gearlever "Gear Lever"
+package_alias flatpak com.mattjakeman.ExtensionManager "Extension Manager"
+package_alias flatpak com.github.tchx84.Flatseal "Flatseal"
 
 package_category flatpak internet_apps "Internet" internet
 package_category flatpak work_apps "Work & Media" work_media

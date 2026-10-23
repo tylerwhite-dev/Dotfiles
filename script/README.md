@@ -22,7 +22,7 @@ The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
 installation runs with direct terminal access so password prompts stay visible.
-On Linux, a separate grouped list offers the 20 applications from
+On Linux, a separate grouped list offers the 26 applications from
 `guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
 
 Homebrew and core CLI tools have separate yes/no questions and execution steps.
