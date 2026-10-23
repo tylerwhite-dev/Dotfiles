@@ -27,7 +27,10 @@ directory, `dotfiles-deploy.sh` loads `logic/load.sh`, parses CLI flags with
 
 The application flow is:
 
-1. `flags_parse` records CLI flags such as `--yolo` and `--add-optionals`.
+1. `flags_parse` accepts zero or one CLI flag and records the requested mode.
+   More than one argument returns status 2, including repeats and `--help`
+   combinations. `SETUP_MODE` stores `standard`, `yolo`, or `optionals` and is
+   reset to `standard` before parsing.
 2. `ui_is_interactive` rejects non-interactive input and output unless `--yolo`
    is given, which skips the interactive requirement.
 3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
@@ -368,6 +371,7 @@ Homebrew bash first (`brew install bash`) and run it with
 
 ```bash
 bash script/tests/config_validation.sh
+bash script/tests/flags.sh
 bash script/tests/features.sh
 bash script/tests/procedure_order.sh
 bash script/tests/workflow.sh

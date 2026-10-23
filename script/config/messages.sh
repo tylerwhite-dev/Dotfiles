@@ -23,8 +23,8 @@ message_define error.native_packages_unsupported \
   "Native package installation is not implemented for: %s"
 message_define error.brew_not_installed \
   "Homebrew is required for the selected packages but was not installed."
-message_define error.flags_conflict \
-  "Conflicting flags: --yolo and --add-optionals cannot be used together."
+message_define error.too_many_flags \
+  "Only one flag is allowed per run. Use --yolo, --add-optionals, or --help separately."
 message_define error.macos_clt_missing \
   "Apple developer tools are not ready. Complete the Command Line Tools installation or select a working Xcode, then run setup again."
 message_define status.distribution_detected \
@@ -81,4 +81,4 @@ message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space
 message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it now before selecting packages?"
-message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks,\nand it cannot be combined with --add-optionals.'
+message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks,\nand at most one flag is allowed per run, including --help.'

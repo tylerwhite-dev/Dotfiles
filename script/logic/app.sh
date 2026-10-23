@@ -98,7 +98,7 @@ _app_collect_yolo_selection() {
 _app_run_standard() {
   local platform="$1" distribution_name="$2" action text started_at
 
-  if [[ "${SETUP_YOLO:-0}" == 1 ]]; then
+  if [[ "${SETUP_MODE:-standard}" == yolo ]]; then
     _app_collect_yolo_selection "$platform" || return
   else
     while true; do
@@ -126,7 +126,7 @@ _app_run_standard() {
 setup_run() {
   local distribution_family distribution_name text
 
-  if [[ "${SETUP_YOLO:-0}" != 1 ]] && ! ui_is_interactive; then
+  if [[ "${SETUP_MODE:-standard}" != yolo ]] && ! ui_is_interactive; then
     error_report error.interactive_required
     return 1
   fi
@@ -141,7 +141,7 @@ setup_run() {
   message_format text status.distribution_detected "$distribution_name"
   ui_success "$text"
   ui_ansi_palette
-  if [[ "${SETUP_ADD_OPTIONALS:-0}" == 1 ]]; then
+  if [[ "${SETUP_MODE:-standard}" == optionals ]]; then
     _app_run_optionals "$distribution_family" "$distribution_name"
   else
     _app_run_standard "$distribution_family" "$distribution_name"

@@ -49,7 +49,7 @@ assert_events() {
   [[ "${events[*]}" == "$1" ]] || { printf 'App events: %s\n' "${events[*]}" >&2; exit 1; }
 }
 
-SETUP_YOLO=0 SETUP_ADD_OPTIONALS=0
+SETUP_MODE=standard
 events=() answers=(restart start) answer_index=0
 run_app 0
 assert_events 'status.distribution_detected collect collect status.settings_confirmed run elapsed'
@@ -90,7 +90,7 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
   assert_events error.distribution_unsupported
 )
 (
-  events=() SETUP_YOLO=1 interactive_status=1
+  events=() SETUP_MODE=yolo interactive_status=1
   run_app 0
   assert_events 'status.distribution_detected status.yolo_mode status.yolo_skipped_optionals status.settings_confirmed run elapsed'
   workflow_selected selected fedora
@@ -100,86 +100,86 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
 )
 
 if ((EUID == 0)); then
-  events=() SETUP_ADD_OPTIONALS=1
+  events=() SETUP_MODE=optionals
   run_app 1
   assert_events 'status.distribution_detected error.root_execution'
 else
   (
     # Existing Homebrew opens the lists without asking to install it.
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     # Empty choices happen after the explicitly approved preparation.
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=() brew_path=/missing/brew
+    events=() SETUP_MODE=optionals optional_ids=() brew_path=/missing/brew
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.optionals_none'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=()
+    events=() SETUP_MODE=optionals optional_ids=()
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.optionals_none'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1
     run_app 0
     assert_events 'status.distribution_detected status.exited'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130
     run_app 1
     assert_events 'status.distribution_detected error.input_interrupted'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_status=6 answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew brew_status=6 answers=(start) answer_index=0
     run_app 6
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=() optional_status=5
+    events=() SETUP_MODE=optionals optional_ids=() optional_status=5
     run_app 5
     assert_events 'status.distribution_detected optional-collect'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) install_status=8 answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) install_status=8 answers=(start) answer_index=0
     run_app 8
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run'
   )
   (
     # Homebrew is prepared before any package lists, including Flatpak.
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     # Exit after the review leaves the explicitly approved Homebrew installed.
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(exit) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(exit) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.exited'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(restart start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(restart start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew clt_status=9 answers=(start) answer_index=0
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew clt_status=9 answers=(start) answer_index=0
     run_app 9
     assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install'
   )

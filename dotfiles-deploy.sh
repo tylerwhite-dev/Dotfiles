@@ -15,4 +15,4 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "${script_dir}/script/logic/load.sh"
 
 flags_parse "$@"
-setup_run "$@"
+setup_run

@@ -88,7 +88,10 @@ bash dotfiles-deploy.sh -a
   in place. Homebrew preparation also applies when only Flatpak apps are wanted.
 - `-h`, `--help` prints usage.
 
-Any other flag exits with status 2 and an `Unknown flag` error.
+Run without flags for the standard questionnaire, or pass exactly one flag.
+Multiple arguments exit with status 2 before setup starts, including repeated
+flags and combinations with `--help`. Any unknown flag also exits with status 2.
+CLI arguments select one execution mode: standard, YOLO, or optionals.
 
 ## Layout
 
