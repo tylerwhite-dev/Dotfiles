@@ -212,11 +212,14 @@ Flathub in its main handler. The finish handler runs one
 for authentication. Installation confirmations are accepted automatically.
 Fedora's system `fedora` remote is deleted with `--force`, retaining installed
 refs. Existing Flathub URLs and filters are validated before remote changes.
-`--add-optionals` collects every available selectable procedure, shows a review,
-prepares missing Homebrew only for selected formulae/casks, and calls
-`runner_run_optionals`. This scenario satisfies manager prerequisites separately
-instead of selecting the core Homebrew procedure. Ordinary workflow dependency
-filtering remains unchanged. Empty optional selections make no system changes.
+`--add-optionals` first checks Homebrew. If absent, it asks permission to install
+it immediately, prepares macOS CLT when enabled, and installs and verifies
+Homebrew before collecting package choices. Declining exits successfully before
+the lists. Then it collects every available selectable procedure, shows a review,
+and calls `runner_run_optionals`. This applies even to Flatpak-only choices.
+Preparation happens once before the restart loop. Exiting at review or selecting
+no packages leaves the approved Homebrew installation in place. Core CLI tools
+and fonts are not installed. Ordinary workflow dependency filtering is unchanged.
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is
 needed, the operator completes Apple's dialog and presses Enter to verify.

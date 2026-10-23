@@ -28,7 +28,7 @@ questionnaire_confirm() {
 }
 executor_brew_bin() { printf '%s\n' "${brew_path:-/bin/bash}"; }
 ui_select() { printf -v "$1" '%s' "${brew_choice:-0}"; return "${input_status:-0}"; }
-action_install_homebrew_binary() { events+=(brew-install); return "${brew_status:-0}"; }
+action_install_homebrew() { events+=(brew-install); return "${brew_status:-0}"; }
 questionnaire_collect_optionals() {
   events+=(optional-collect)
   workflow_reset
@@ -105,6 +105,18 @@ if ((EUID == 0)); then
   assert_events 'status.distribution_detected error.root_execution'
 else
   (
+    # Existing Homebrew opens the lists without asking to install it.
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
+  )
+  (
+    # Empty choices happen after the explicitly approved preparation.
+    events=() SETUP_ADD_OPTIONALS=1 optional_ids=() brew_path=/missing/brew
+    run_app 0
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.optionals_none'
+  )
+  (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
@@ -117,22 +129,22 @@ else
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare brew-install status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1
-    run_app 1
-    assert_events 'status.distribution_detected optional-collect error.brew_not_installed'
+    run_app 0
+    assert_events 'status.distribution_detected status.exited'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130
     run_app 1
-    assert_events 'status.distribution_detected optional-collect error.input_interrupted'
+    assert_events 'status.distribution_detected error.input_interrupted'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew brew_status=6 answers=(start) answer_index=0
     run_app 6
-    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare brew-install'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=() optional_status=5
@@ -145,31 +157,31 @@ else
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run'
   )
   (
-    # Flatpak alone never prepares Homebrew, even if it is absent.
+    # Homebrew is prepared before any package lists, including Flatpak.
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    # Exit after the review must precede every system-changing operation.
+    # Exit after the review leaves the explicitly approved Homebrew installed.
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(exit) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare status.exited'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.exited'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(restart start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare clt-check clt-install brew-install status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install brew-install optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     events=() SETUP_ADD_OPTIONALS=1 optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew clt_status=9 answers=(start) answer_index=0
     run_app 9
-    assert_events 'status.distribution_detected optional-collect status.optionals_brew_prepare clt-check clt-install'
+    assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install'
   )
 fi
 printf 'Application scenario validation passed.\n'

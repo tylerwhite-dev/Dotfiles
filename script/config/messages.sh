@@ -42,7 +42,7 @@ message_define status.no_selection \
 message_define status.optionals_none \
   "No optional packages were selected. Nothing to do."
 message_define status.optionals_brew_prepare \
-  "Execution will prepare Homebrew for the selected packages; on macOS it will also check Apple Command Line Tools."
+  "Preparing Homebrew before package selection; on macOS this also checks Apple Command Line Tools."
 message_define status.selected_count \
   "%d selected"
 message_define status.all_packages_selected \
@@ -80,5 +80,5 @@ message_define ui.multiselect.status_format "cols %%d-%%d/%%d  ·  %%d selected"
 message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space toggle  Enter confirm"
 message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
-message_define prompt.brew_install "Homebrew is not installed. Install it?"
+message_define prompt.brew_install "Homebrew is not installed. Install it now before selecting packages?"
 message_define flags.help $'Usage: %s [flags]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks,\nand it cannot be combined with --add-optionals.'

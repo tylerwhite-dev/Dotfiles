@@ -16,6 +16,8 @@ The executable entry point lives at the repository root and loads this
 
 The setup has two phases. The questionnaire records choices without changing the
 system. Execution starts only after the user confirms the summary.
+In `--add-optionals` mode, a separate prompt can install missing Homebrew before
+the questionnaire; accepting that prompt starts Homebrew preparation immediately.
 The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
@@ -74,13 +76,16 @@ bash dotfiles-deploy.sh -a
   the confirmation summary. Every procedure that needs no package selection
   runs automatically; optional package sets and casks are skipped and listed as
   skipped, because they install only explicitly chosen packages.
-- `-a`, `--add-optionals` asks for extended Homebrew formulae, then Flatpak apps
-  on Linux or casks on macOS. It shows a review before executing the selection.
-  Homebrew is prepared only if selected formulae or casks need it; selecting
-  only Flatpak does not require Homebrew. Missing Homebrew is installed without
-  the core formula/font set, after confirmation. On macOS this also checks
-  Command Line Tools and opens Apple's installer if needed. Empty selections
-  perform no preparation or installation.
+- `-a`, `--add-optionals` checks Homebrew before showing package lists. If it is
+  missing, accepting the installation prompt installs and verifies Homebrew
+  immediately; declining exits successfully without opening the lists. On macOS
+  this also checks Command Line Tools and opens Apple's installer if needed.
+  Existing Homebrew skips the prompt. Then the script asks for extended formulae,
+  followed by Flatpak apps on Linux or casks on macOS, and shows a review before
+  installing the selected packages. Core CLI tools and fonts are not installed.
+  Restarting the questionnaire does not repeat Homebrew preparation. Exiting at
+  the review or selecting no packages leaves the approved Homebrew installation
+  in place. Homebrew preparation also applies when only Flatpak apps are wanted.
 - `-h`, `--help` prints usage.
 
 Any other flag exits with status 2 and an `Unknown flag` error.

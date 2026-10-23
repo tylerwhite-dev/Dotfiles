@@ -108,7 +108,7 @@ assert_invalid_order 'place queue_a before queue_a' queue_a
   ui_select() { printf -v "$1" 0; }
   action_prepare_macos_command_line_tools() { exit 77; }
   action_install_macos_command_line_tools() { exit 77; }
-  action_install_homebrew_binary() { events+=(brew); }
+  action_install_homebrew() { events+=(brew); }
   runner_run_optionals() { events+=(run); }
   events=()
   _app_run_optionals macos macOS > /dev/null
