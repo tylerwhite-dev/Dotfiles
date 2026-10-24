@@ -14,8 +14,9 @@ package_group brew util_tools \
   nvtop btop macmon
 
 package_group brew dev_tooling \
-  go nvm rustup uv sdkman-cli zig bun \
-  cmake ninja neovim fresh-editor
+  fresh-editor neovim \
+  nvm rustup uv sdkman-cli go qt zig bun \
+  cmake ninja
 
 package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full

@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 package_group brew_cask homebrew_fonts \
-  font-jetbrains-mono-nerd-font font-hack-nerd-font
+  font-jetbrains-mono-nerd-font font-hack-nerd-font \
+  font-zed-mono-nerd-font font-meslo-lg-nerd-font \
+  font-adwaita-mono-nerd-font font-commit-mono-nerd-font \
+  font-fira-code-nerd-font 
+  
 
 # Installs font casks after the core Homebrew procedure.
 action_install_homebrew_fonts() {

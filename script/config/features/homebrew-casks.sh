@@ -12,9 +12,9 @@ package_group brew_cask create \
   figma inkscape blender \
   audacity obs
 package_group brew_cask development \
-  visual-studio-code vscodium zed \
-  android-studio intellij-idea intellij-idea-ce qt-creator \
-  iterm2 ghostty cmux warp kitty wezterm alacritty \
+  zed visual-studio-code vscodium \
+  android-studio intellij-idea qt-creator \
+  iterm2 ghostty cmux warp wezterm \
   docker-desktop hermes-desktop lm-studio
 package_group brew_cask system \
   raycast maccy rectangle alt-tab jordanbaird-ice \
