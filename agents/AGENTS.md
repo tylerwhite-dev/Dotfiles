@@ -13,14 +13,14 @@
 
 ## Key Architecture Facts
 
-- The setup implementation lives under `script/` and is organized into
+- The setup implementation lives under `deploy/` and is organized into
   configuration, UI, business logic, actions, and execution adapters.
 - Package and procedure declarations are separate from the code that applies
   them.
 - GNU Stow creates symlinks for dotfiles and platform-specific Zsh settings.
 - The setup script supports Arch, Debian/Ubuntu, and Fedora Linux.
 - Homebrew provides most CLI tools and extensions on Linux.
-- Detailed script interfaces and entities are documented in `script/AGENTS.md`.
+- Detailed script interfaces and entities are documented in `deploy/AGENTS.md`.
 
 ## Important Commands
 
@@ -31,7 +31,7 @@
 ## Repo Conventions
 
 - Dotfiles organized by system type (Linux/macOS)
-- Setup code and tests live in `script/`
+- Setup code and tests live in `deploy/`
 - Configuration guides in `guide/` directory
 - Platform-specific ZSH configs in `zsh_linux/` and `zsh_mac/`
 

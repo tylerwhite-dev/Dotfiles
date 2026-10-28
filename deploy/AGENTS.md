@@ -21,7 +21,7 @@ Run the script from any directory:
 bash /path/to/Dotfiles/dotfiles-deploy.sh
 ```
 
-The executable entry point at the repository root resolves to this `script/`
+The executable entry point at the repository root resolves to this `deploy/`
 directory, `dotfiles-deploy.sh` loads `logic/load.sh`, parses CLI flags with
 `flags_parse`, and calls `setup_run`.
 
@@ -388,19 +388,19 @@ Homebrew bash first (`brew install bash`) and run it with
 `/opt/homebrew/bin/bash`:
 
 ```bash
-bash script/tests/config_validation.sh
-bash script/tests/flags.sh
-bash script/tests/features.sh
-bash script/tests/procedure_order.sh
-bash script/tests/workflow.sh
-bash script/tests/homebrew.sh
-bash script/tests/ui.sh
-bash script/tests/layer_dependencies.sh
-bash script/tests/app.sh
-bash script/tests/process.sh
-bash script/tests/macos.sh
-bash script/tests/flatpak.sh
-bash script/tests/optionals.sh
+bash deploy/tests/config_validation.sh
+bash deploy/tests/flags.sh
+bash deploy/tests/features.sh
+bash deploy/tests/procedure_order.sh
+bash deploy/tests/workflow.sh
+bash deploy/tests/homebrew.sh
+bash deploy/tests/ui.sh
+bash deploy/tests/layer_dependencies.sh
+bash deploy/tests/app.sh
+bash deploy/tests/process.sh
+bash deploy/tests/macos.sh
+bash deploy/tests/flatpak.sh
+bash deploy/tests/optionals.sh
 ```
 
 Use `bash -n` for syntax-only checks. Do not run `dotfiles-deploy.sh` without an explicit

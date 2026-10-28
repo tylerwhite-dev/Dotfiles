@@ -12,7 +12,7 @@ a Homebrew bash (`brew install bash`, then
 instruction otherwise.
 
 The executable entry point lives at the repository root and loads this
-`script/` directory for its logic, configuration, and UI.
+`deploy/` directory for its logic, configuration, and UI.
 
 The setup has two phases. The questionnaire records choices without changing the
 system. Execution starts only after the user confirms the summary.
@@ -143,14 +143,14 @@ all files finish loading before handlers execute.
 Validate declarations and dependency behavior with:
 
 ```bash
-bash script/tests/config_validation.sh
-bash script/tests/features.sh
-bash script/tests/procedure_order.sh
-bash script/tests/workflow.sh
-bash script/tests/ui.sh
-bash script/tests/layer_dependencies.sh
-bash script/tests/flatpak.sh
-bash script/tests/optionals.sh
+bash deploy/tests/config_validation.sh
+bash deploy/tests/features.sh
+bash deploy/tests/procedure_order.sh
+bash deploy/tests/workflow.sh
+bash deploy/tests/ui.sh
+bash deploy/tests/layer_dependencies.sh
+bash deploy/tests/flatpak.sh
+bash deploy/tests/optionals.sh
 ```
 
 ## Manual UI tests
@@ -159,13 +159,13 @@ The interactive UI checks run in a real terminal (TTY). Each case renders the
 component and lets you rate it: `[y] pass  [n] fail  [s] skip  [q] quit`.
 
 ```bash
-bash script/tests/manual/static_ui.sh     # static elements: rendered output, no interaction
-bash script/tests/manual/static_ui.sh ui_stage   # run one component
-bash script/tests/manual/static_ui.sh --list     # list available components
+bash deploy/tests/manual/static_ui.sh     # static elements: rendered output, no interaction
+bash deploy/tests/manual/static_ui.sh ui_stage   # run one component
+bash deploy/tests/manual/static_ui.sh --list     # list available components
 
-bash script/tests/manual/dynamic_ui.sh    # dynamic elements: interactive controls
-bash script/tests/manual/dynamic_ui.sh ui_select   # run one component
-bash script/tests/manual/dynamic_ui.sh --list     # list available components
+bash deploy/tests/manual/dynamic_ui.sh    # dynamic elements: interactive controls
+bash deploy/tests/manual/dynamic_ui.sh ui_select   # run one component
+bash deploy/tests/manual/dynamic_ui.sh --list     # list available components
 ```
 
 Static tests cover the stages, summary rows, and timeline rows. Dynamic tests

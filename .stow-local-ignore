@@ -6,6 +6,7 @@
 .vscode
 
 script
+deploy
 guide
 agents
 nix

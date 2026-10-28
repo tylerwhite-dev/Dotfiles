@@ -4,9 +4,9 @@ set -Eeuo pipefail
 script_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 fixture_dir="$(mktemp -d)"
 trap 'rm -rf -- "$fixture_dir"' EXIT
-cp -R "${script_root}" "${fixture_dir}/script"
-fixture_loader="${fixture_dir}/script/logic/load.sh"
-feature_dir="${fixture_dir}/script/config/features"
+cp -R "${script_root}" "${fixture_dir}/deploy"
+fixture_loader="${fixture_dir}/deploy/logic/load.sh"
+feature_dir="${fixture_dir}/deploy/config/features"
 
 # One feature file owns the procedure; a queue entry explicitly enables it.
 cat > "${feature_dir}/feature-fixture.sh" <<'FEATURE'
@@ -45,8 +45,8 @@ FEATURE
   [[ "${ids[*]}" != *feature_fixture* ]]
 )
 # Edit only the queue config to enable the automatically discovered feature.
-sed '/^)/i\  feature_fixture' "${fixture_dir}/script/config/procedure-order.sh" > "${fixture_dir}/queue"
-mv -- "${fixture_dir}/queue" "${fixture_dir}/script/config/procedure-order.sh"
+sed '/^)/i\  feature_fixture' "${fixture_dir}/deploy/config/procedure-order.sh" > "${fixture_dir}/queue"
+mv -- "${fixture_dir}/queue" "${fixture_dir}/deploy/config/procedure-order.sh"
 
 (
   trap ':' ERR

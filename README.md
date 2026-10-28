@@ -21,7 +21,7 @@ brew install bash
 ```
 
 There are also additional flags (e.g. `--yolo`, `--help`). See
-[`script/README.md`](script/README.md).
+[`deploy/README.md`](deploy/README.md).
 
 ## Apply configs only with Stow
 

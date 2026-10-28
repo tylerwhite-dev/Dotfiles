@@ -243,9 +243,9 @@ only through an interactive run or `--add-optionals`.
 The catalog validates itself on every run, and the same check runs standalone:
 
 ```bash
-/opt/homebrew/bin/bash script/tests/config_validation.sh
-/opt/homebrew/bin/bash script/tests/features.sh
-bash script/tests/procedure_order.sh
+/opt/homebrew/bin/bash deploy/tests/config_validation.sh
+/opt/homebrew/bin/bash deploy/tests/features.sh
+bash deploy/tests/procedure_order.sh
 ```
 
 Common errors and what they mean:

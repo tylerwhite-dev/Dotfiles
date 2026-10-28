@@ -9,18 +9,18 @@ Homebrew bash first (`brew install bash`) and run with
 `/opt/homebrew/bin/bash`:
 
 ```bash
-bash script/tests/config_validation.sh
-bash script/tests/features.sh
-bash script/tests/procedure_order.sh
-bash script/tests/workflow.sh
-bash script/tests/homebrew.sh
-bash script/tests/ui.sh
-bash script/tests/layer_dependencies.sh
-bash script/tests/app.sh
-bash script/tests/process.sh
-bash script/tests/macos.sh
-bash script/tests/flatpak.sh
-bash script/tests/optionals.sh
+bash deploy/tests/config_validation.sh
+bash deploy/tests/features.sh
+bash deploy/tests/procedure_order.sh
+bash deploy/tests/workflow.sh
+bash deploy/tests/homebrew.sh
+bash deploy/tests/ui.sh
+bash deploy/tests/layer_dependencies.sh
+bash deploy/tests/app.sh
+bash deploy/tests/process.sh
+bash deploy/tests/macos.sh
+bash deploy/tests/flatpak.sh
+bash deploy/tests/optionals.sh
 ```
 
 | Script | What it verifies |
@@ -52,9 +52,9 @@ dynamic elements (interactive controls the user can touch).
 Static elements only draw output and never interact with the user.
 
 ```bash
-bash script/tests/manual/static_ui.sh              # run all static tests
-bash script/tests/manual/static_ui.sh ui_stage     # run one component
-bash script/tests/manual/static_ui.sh --list       # list available components
+bash deploy/tests/manual/static_ui.sh              # run all static tests
+bash deploy/tests/manual/static_ui.sh ui_stage     # run one component
+bash deploy/tests/manual/static_ui.sh --list       # list available components
 ```
 
 | Component | What it checks |
@@ -72,9 +72,9 @@ Dynamic elements are interactive controls the user can touch: yes/no
 questions, single-choice lists, checkbox lists.
 
 ```bash
-bash script/tests/manual/dynamic_ui.sh             # run all dynamic tests
-bash script/tests/manual/dynamic_ui.sh ui_select   # run one component
-bash script/tests/manual/dynamic_ui.sh --list      # list available components
+bash deploy/tests/manual/dynamic_ui.sh             # run all dynamic tests
+bash deploy/tests/manual/dynamic_ui.sh ui_select   # run one component
+bash deploy/tests/manual/dynamic_ui.sh --list      # list available components
 ```
 
 | Component | What it checks |
@@ -109,7 +109,7 @@ in Bash 5 before and after a rendering change on the same machine:
 
 ```bash
 (
-  source script/logic/load.sh
+  source deploy/logic/load.sh
   rows=(); kinds=(); selected=()
   declare -A texts=()
   catalog_package_rows rows kinds homebrew_extended fedora
@@ -127,8 +127,8 @@ terminal painting or physical key-repeat latency, and is not a timing assertion
 for the automated suite. The original Git Bash measurement was 14.819 seconds.
 
 ```bash
-bash script/tests/manual/process.sh
-bash script/tests/manual/ui_contracts.sh
+bash deploy/tests/manual/process.sh
+bash deploy/tests/manual/ui_contracts.sh
 ```
 
 `process.sh` runs fixture handlers only. Checks success/failure propagation and that the finish

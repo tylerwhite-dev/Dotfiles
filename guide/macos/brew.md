@@ -7,7 +7,7 @@
 ```
 
 The setup script at the repository root can run the installation and the
-package groups below for you; see [`script/README.md`](../../script/README.md).
+package groups below for you; see [`deploy/README.md`](../../deploy/README.md).
 
 # packages
 
