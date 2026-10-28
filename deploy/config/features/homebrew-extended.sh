@@ -14,7 +14,7 @@ package_group brew util_tools \
   nvtop btop macmon
 
 package_group brew dev_tooling \
-  fresh-editor neovim \
+  fresh-editor neovim mise \
   nvm rustup uv sdkman-cli go qt zig bun \
   cmake ninja
 
@@ -22,7 +22,7 @@ package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
 
 package_group brew cli_harness \
-  opencode hermes-agent openclaw
+  opencode hermes-agent codex claude-code antigravity-cli openclaw
 
 package_category brew shell "Shell" shell_tools
 package_category brew utils "Utils" util_tools
