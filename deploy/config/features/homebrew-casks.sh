@@ -9,13 +9,14 @@ package_group brew_cask work_media \
   bitwarden veracrypt \
   iina vlc spotify
 package_group brew_cask create \
-  figma inkscape blender \
+  figma inkscape drawio figma blender \
   audacity obs
 package_group brew_cask development \
   zed visual-studio-code vscodium \
   android-studio intellij-idea qt-creator \
   iterm2 ghostty cmux warp wezterm \
-  docker-desktop hermes-desktop lm-studio
+  docker-desktop hermes-desktop lm-studio \
+  wireshark-app
 package_group brew_cask system \
   raycast maccy rectangle alt-tab jordanbaird-ice \
   betterdisplay mos linearmouse karabiner-elements hammerspoon \
