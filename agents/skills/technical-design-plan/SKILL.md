@@ -57,7 +57,7 @@ Use a Mermaid interaction diagram when explicitly requested, or when textual cal
 
 ### Relevant limits and verification
 
-Briefly mention compatibility behavior, intentional exceptions, and focused verification scenarios when they affect the proposal. Place these near the relevant edit or in a short closing paragraph. Avoid boilerplate sections or speculative edge-case inventories.
+Briefly mention compatibility behavior, intentional exceptions, and focused verification scenarios when they affect the proposal. For each substantial change, specify starting conditions, actions, and observable expected results, not just a test name. Give exact commands only when verified from the project. Place these near the relevant edit or in a short closing paragraph. Avoid boilerplate sections or speculative edge-case inventories.
 
 Distinguish proposed checks from checks actually performed. Source inspection does not establish compilation, device behavior, or durability. Do not infer persistence or migration guarantees merely from a mutex, write barrier, library name, or default property. Trace the mechanism and state uncertainty when unverified.
 
