@@ -16,7 +16,7 @@ Read the implemented changes, inspect related behavior, and prepare manual check
 
 ## Review behavior
 
-1. Read the full diff in scope and the current implementations of changed methods with their surrounding code. Derive expected behavior from the request, requirements, and existing contracts. Do not assume the new behavior is correct merely because the code now implements it.
+1. Read the full diff in scope and the current implementations of changed methods with their surrounding code. Track reviewed files and related paths internally. If output is truncated, read smaller portions until complete; explicitly account for inaccessible files and binary changes. Report material coverage gaps and their reasons without requiring an exhaustive file list. Derive expected behavior from the request, requirements, and existing contracts. Do not assume the new behavior is correct merely because the code now implements it.
 2. Trace the affected path from action or data source to result. Find callers, consumers, shared state, handlers, and other uses of changed components. For each affected function, identify neighboring scenarios that use the same code or state.
 3. Compare behavior before and after the change. Check the main scenario and relevant risks such as initial state, repeated actions, cancellation, mode changes, permissions, value boundaries, errors, connection loss and recovery, lifecycle, and persistence. Choose cases based on the actual code; do not apply the whole list mechanically.
 4. Read related tests. Run available checks that are allowed by the current task and project rules. Invoking this skill does not override restrictions on builds, app launches, devices, or external systems.
