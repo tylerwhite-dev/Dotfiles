@@ -1,1 +1,0 @@
-check settings before apply
