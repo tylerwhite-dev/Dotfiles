@@ -66,17 +66,17 @@ workflow_selected selected fedora
 if contains homebrew_casks "${selected[@]}"; then
   fail "macOS casks must not appear on Linux"
 fi
-# Selecting only the non-selectable procedures is what the YOLO path does, so
+# Selecting Homebrew alone must not implicitly select optional packages, so
 # neither optional package set may reach the runner in that state.
 workflow_reset
 workflow_select homebrew yes
 workflow_selected selected macos
 contains homebrew "${selected[@]}" || fail "core Homebrew should be selected"
 if contains homebrew_extended "${selected[@]}"; then
-  fail "optional brew packages must stay out of the YOLO selection"
+  fail "optional brew packages must stay out of an unselected package set"
 fi
 if contains homebrew_casks "${selected[@]}"; then
-  fail "cask applications must stay out of the YOLO selection"
+  fail "cask applications must stay out of an unselected package set"
 fi
 
 # Chosen packages survive the round trip through the workflow store.

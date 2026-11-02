@@ -51,7 +51,7 @@ assert_no_match \
   "shared configuration must not render UI or execute commands" \
   'ui_|executor_|workflow_' \
   "${script_root}/config/settings.sh" "${script_root}/config/messages.sh" \
-  "${script_root}/config/procedure-order.sh"
+  "${script_root}/config/procedure-order.sh" "${script_root}/config/scenarios.sh"
 
 assert_no_match \
   "application must not call private action helpers" \

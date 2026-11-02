@@ -27,7 +27,7 @@ bash deploy/tests/optionals.sh
 | --- | --- |
 | `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, installed-package probes, and declaration errors. |
 | `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, installed-package probes, caller trap preservation, and configuration load failures in a temporary copy. |
-| `procedure_order.sh` | Queue order, disabled procedures and dependants, YOLO/optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
+| `procedure_order.sh` | Queue order, disabled procedures and dependants, selection and optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
 | `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
 | `homebrew.sh` | Installed-package probes with a mock Homebrew executable, missing Homebrew, empty results, command failures and diagnostics, and install policy passed through the real executor. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
@@ -141,3 +141,5 @@ passed explicitly; `checkbox_texts` is prepared in the manual fixture file.
 `ui_contracts.sh` uses scripted keys with real terminal dimensions. It temporarily
 resizes the TTY, restoring its dimensions on exit, and checks single/checkbox
 selection, hidden columns, resize on the next key, EOF and INT/TERM cleanup.
+
+Scenario checks cover strict host matching, mandatory selections, platform filtering, optional lists, restarts, and planned core package presets.

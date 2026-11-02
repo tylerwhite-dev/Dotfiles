@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+# Recognizes WSL from its environment or kernel release.
+environment_is_wsl() {
+  local kernel=''
+  [[ ! -r /proc/sys/kernel/osrelease ]] || IFS= read -r kernel </proc/sys/kernel/osrelease
+  [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" || "${kernel,,}" == *microsoft* ]]
+}
+
+# Checks the scenario against the detected OS and WSL environment.
+environment_scenario_matches() {
+  local mode="$1" platform="$2"
+  case "$mode" in
+    standard|optionals) return 0 ;;
+    mac) [[ "$platform" == macos ]] ;;
+    wsl) [[ "$platform" != macos ]] && environment_is_wsl ;;
+    server|desktop) [[ "$platform" != macos ]] && ! environment_is_wsl ;;
+    *) return 1 ;;
+  esac
+}
+
 # Detects the Linux family and system name from /etc/os-release.
 _environment_detect_linux() {
   local family_result_name="$1"

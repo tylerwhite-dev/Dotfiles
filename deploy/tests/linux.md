@@ -21,7 +21,7 @@ distribution version and tested commit SHA. Keep passwords out of logs.
 - [ ] Ctrl+C restores the cursor and terminal settings.
 - [ ] Review shows the selected procedures and packages in configured order.
 - [ ] Restart returns to the questionnaire; exit runs no installation commands.
-- [ ] Installation starts only after confirmation. Run without `--yolo`.
+- [ ] Installation starts only after confirmation.
 - [ ] Manual process and UI contract fixtures pass in a real TTY.
 
 ## Real installation and repeat execution
@@ -41,7 +41,7 @@ selection, and only `org.gnome.Decibels` from Flatpak applications.
 ## Procedure queue in an isolated configuration copy
 
 - [ ] Reordering queue entries changes questionnaire and execution order.
-- [ ] Removing an entry excludes it from normal, YOLO and optional execution.
+- [ ] Removing an entry excludes it from normal, named-scenario and optional execution.
 - [ ] Removing a prerequisite also excludes its dependent procedures.
 - [ ] An empty queue is valid and executes no procedures.
 - [ ] Unknown IDs, duplicate IDs and dependencies ordered after their consumers

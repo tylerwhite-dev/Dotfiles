@@ -54,9 +54,7 @@ message_define status.flatpak_installed \
 
 # WSL sessions may lack authorization for the system helper.
 _flatpak_installation_scope() {
-  local kernel=''
-  [[ ! -r /proc/sys/kernel/osrelease ]] || IFS= read -r kernel </proc/sys/kernel/osrelease
-  if [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" || "${kernel,,}" == *microsoft* ]]; then
+  if environment_is_wsl; then
     printf '%s' --user
   else
     printf '%s' --system

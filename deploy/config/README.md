@@ -63,7 +63,7 @@ unset setup_procedure_order
 File names no longer need numeric prefixes. The array controls both the
 questionnaire and execution. Remove or comment out an ID to disable it without
 deleting its feature file. A file not listed in the queue is loaded and
-validated, but its procedure is unavailable in standard, `--yolo` and
+validated, but its procedure is unavailable in standard, named-scenario and
 `--add-optionals` workflows. An empty array enables no procedures.
 
 Put a prerequisite before its dependant in the queue. If a prerequisite is
@@ -234,9 +234,8 @@ with `HOMEBREW_NO_INSTALL_UPGRADE=1`, preventing automatic upgrades of packages
 that are already installed. Installing new packages can still affect dependencies.
 Clearing a checkbox excludes that package from installation; it does not uninstall it.
 
-`--yolo` mode never selects a selectable procedure. Optional package sets and
-casks are reported as skipped and install nothing, so their contents change
-only through an interactive run or `--add-optionals`.
+Optional packages are installed only when explicitly selected in an interactive
+run or through `--add-optionals`.
 
 ## Validation
 

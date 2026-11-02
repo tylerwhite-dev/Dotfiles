@@ -43,6 +43,20 @@ _questionnaire_read_selectable_packages() {
     error_report error.installed_packages_probe_failed
     return 1
   fi
+  # Keep shared core formulae visible and checked when already scheduled.
+  if [[ "$procedure_id" == homebrew_extended ]]; then
+    local core_selection package
+    local -a core_packages=()
+    workflow_selection core_selection core_cli_tools
+    if [[ "$core_selection" == yes ]]; then
+      catalog_packages core_packages core_cli_tools "$platform" brew || return
+      for package in "${core_packages[@]}"; do
+        if [[ " ${packages[*]} " == *" $package "* && " ${presets[*]} " != *" $package "* ]]; then
+          presets+=("$package")
+        fi
+      done
+    fi
+  fi
   questionnaire_multiselect_texts texts || return
 
   if ! ui_multiselect_grouped selected "$prompt" texts rows kinds presets labels; then
@@ -110,6 +124,7 @@ questionnaire_collect() {
   local metadata
   local procedure_id
   local current=0
+  local is_selectable
   local -a available=()
 
   workflow_reset
@@ -123,6 +138,14 @@ questionnaire_collect() {
     ((current += 1))
     if ! workflow_requirement_is_selected "$procedure_id"; then
       continue
+    fi
+
+    if [[ -v "SETUP_SCENARIO_PROCEDURES[${SETUP_MODE:-standard}]" ]]; then
+      catalog_is_selectable is_selectable "$procedure_id"
+      if [[ "$is_selectable" != yes ]]; then
+        workflow_select "$procedure_id" yes
+        continue
+      fi
     fi
 
     _questionnaire_read_procedure \

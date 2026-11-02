@@ -21,17 +21,17 @@ check_parse() {
 }
 
 # Existing environment values must not choose a mode or leak between parses.
-SETUP_MODE=yolo SETUP_YOLO=1 SETUP_ADD_OPTIONALS=1
+SETUP_MODE=server
 check_parse 0 parsed:standard
-for flag in -y --yolo; do check_parse 0 parsed:yolo "$flag"; done
+for mode in server desktop wsl mac; do check_parse 0 "parsed:$mode" "--$mode"; done
 for flag in -a --add-optionals; do check_parse 0 parsed:optionals "$flag"; done
 for flag in -h --help; do
   check_parse 0 "Usage: ${SETUP_REPOSITORY_ROOT}/dotfiles-deploy.sh [flag]" "$flag"
 done
-for flag in --unknown -ya -- ''; do check_parse 2 'Unknown flag:' "$flag"; done
+for flag in -y --yolo --unknown -ya -- ''; do check_parse 2 'Unknown flag:' "$flag"; done
 
 # Every pair is invalid, even aliases, repetitions and help in either position.
-flags=(-y --yolo -a --add-optionals -h --help --unknown)
+flags=(--server --desktop --wsl --mac -a --add-optionals -h --help --unknown)
 for first in "${flags[@]}"; do
   for second in "${flags[@]}"; do
     check_parse 2 'Only one flag is allowed per run.' "$first" "$second"
@@ -39,7 +39,7 @@ for first in "${flags[@]}"; do
 done
 check_parse 2 'Only one flag is allowed per run.' -y -a -h
 
-flags_parse --yolo
+flags_parse --server
 flags_parse --add-optionals
 [[ "$SETUP_MODE" == optionals ]]
 flags_parse

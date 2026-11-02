@@ -14,7 +14,10 @@ flags_parse() {
   (($# == 0)) && return 0
 
   case "$1" in
-    --yolo | -y) SETUP_MODE=yolo ;;
+    --server) SETUP_MODE=server ;;
+    --desktop) SETUP_MODE=desktop ;;
+    --wsl) SETUP_MODE=wsl ;;
+    --mac) SETUP_MODE=mac ;;
     --add-optionals | -a) SETUP_MODE=optionals ;;
     --help | -h)
       local help_text

@@ -63,8 +63,7 @@ first when sorting by name, searches the current folder, and opens new windows
 in Home. It does not change the status bar or hidden-file visibility. The Spaces
 profile only disables rearrangement by most recent use. Each profile restarts
 its respective Finder or Dock process for the current user. Keyboard preferences
-and shortcut mappings are not modified. These non-selectable procedures also
-run in `--yolo`; installing missing tools still needs the system dialog and Enter.
+and shortcut mappings are not modified. Installing missing tools still needs the system dialog and Enter.
 
 The entry point still requires Bash 5 before any procedure can run. On a clean
 Mac, prepare Command Line Tools, Homebrew and Bash first; the CLT procedure is
@@ -74,14 +73,16 @@ macOS commands; verify the preferences on your target macOS version as well.
 ## Flags
 
 ```bash
-bash dotfiles-deploy.sh -y
+bash dotfiles-deploy.sh --server
+bash dotfiles-deploy.sh --desktop
+bash dotfiles-deploy.sh --wsl
+bash dotfiles-deploy.sh --mac
 bash dotfiles-deploy.sh -a
 ```
 
-- `-y`, `--yolo` answers `yes` to every question and starts execution without
-  the confirmation summary. Every procedure that needs no package selection
-  runs automatically; optional package sets and casks are skipped and listed as
-  skipped, because they install only explicitly chosen packages.
+- `--server`, `--desktop`, `--wsl`, and `--mac` select named scenarios.
+  Mandatory steps are accepted automatically. Package lists remain interactive,
+  followed by review with Start, Restart, or Exit. Presets must match the host.
 - `-a`, `--add-optionals` checks Homebrew before showing package lists. If it is
   missing, accepting the installation prompt installs and verifies Homebrew
   immediately; declining exits successfully without opening the lists. On macOS
@@ -97,7 +98,32 @@ bash dotfiles-deploy.sh -a
 Run without flags for the standard questionnaire, or pass exactly one flag.
 Multiple arguments exit with status 2 before setup starts, including repeated
 flags and combinations with `--help`. Any unknown flag also exits with status 2.
-CLI arguments select one execution mode: standard, YOLO, or optionals.
+CLI arguments select standard setup, a named scenario, or optionals.
+
+## Scenario presets
+
+| Flag | Mandatory procedures | Package choices |
+| --- | --- | --- |
+| `--server` | Native packages, zsh, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
+| `--desktop` | Native packages, yay on Arch, zsh, Homebrew, core CLI tools, dotfiles | Fonts, extended Homebrew, Flatpak |
+| `--wsl` | Native packages, yay on Arch, zsh, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
+| `--mac` | Apple CLT, Finder, Spaces, Homebrew, core CLI tools, dotfiles | Fonts, extended Homebrew, casks |
+
+`--mac` requires macOS, `--wsl` requires WSL, and `--server`/`--desktop`
+require Linux outside WSL. OS and distribution detection still apply. A mismatch
+stops before questionnaire or installation. Queue order and platform restrictions
+still apply; yay is available only on Arch. Presets do not allow individual
+mandatory steps to be declined. Exiting the final review performs no setup.
+Restarting returns to package choices and restores mandatory selections.
+
+All presets use the existing complete native package and dotfiles sets. Package
+lists retain installed-package presets. Extended Homebrew also preselects core
+formulae scheduled for installation, in every mode where core tools are selected.
+These formulae remain visible; unchecking them in the extended list does not
+cancel their mandatory installation through core CLI tools.
+
+Scenario membership is configured in `config/scenarios.sh`. Running without
+flags keeps the standard questionnaire with individual procedure questions.
 
 ## Layout
 
@@ -122,7 +148,7 @@ See [config/README.md](config/README.md) for a complete example.
 The loader discovers all `config/features/*.sh` in C lexicographic order.
 Loading order does not control execution. The queue in `procedure-order.sh`
 sets questionnaire and execution order. Remove or comment out an ID to disable
-it in standard, YOLO and optional flows. Omitted prerequisites disable their
+it in standard, named-scenario and optional flows. Omitted prerequisites disable their
 dependants too. An empty queue runs nothing; unknown IDs, duplicates and a
 queued prerequisite after its dependant are errors. Package groups must precede
 categories that use them, and a procedure must precede its settings.

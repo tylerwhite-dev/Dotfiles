@@ -5,6 +5,8 @@ message_define error.config_invalid \
   "Could not load the setup configuration."
 message_define error.distribution_unsupported \
   $'The system could not be detected or is not supported.\nSupported systems: Arch Linux, Debian, Ubuntu, Fedora, and macOS.'
+message_define error.scenario_mismatch \
+  "Scenario --%s is incompatible with this environment: %s. Use --mac on macOS, --wsl in WSL, or --server/--desktop on Linux outside WSL."
 message_define error.unknown_flag \
   "Unknown flag: %s"
 message_define error.dry_run_removed \
@@ -24,17 +26,13 @@ message_define error.native_packages_unsupported \
 message_define error.brew_not_installed \
   "Homebrew is required for the selected packages but was not installed."
 message_define error.too_many_flags \
-  "Only one flag is allowed per run. Use --yolo, --add-optionals, or --help separately."
+  "Only one flag is allowed per run. Use --server, --desktop, --wsl, --mac, --add-optionals, or --help separately."
 message_define error.macos_clt_missing \
   "Apple developer tools are not ready. Complete the Command Line Tools installation or select a working Xcode, then run setup again."
 message_define status.distribution_detected \
   "Detected system: %s"
 message_define status.settings_confirmed \
   "Settings confirmed."
-message_define status.yolo_mode \
-  "YOLO mode enabled: every procedure without a package selection runs without confirmation."
-message_define status.yolo_skipped_optionals \
-  "Skipped optional procedures: %s. Choose their packages in an interactive run."
 message_define status.exited \
   "Exited without changes."
 message_define status.no_selection \
@@ -81,4 +79,4 @@ message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space
 message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Homebrew is not installed. Install it now before selecting packages?"
-message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  -y, --yolo             Run every procedure that needs no package selection.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nNote: --yolo skips optional package sets, Flatpak apps and casks,\nand at most one flag is allowed per run, including --help.'
+message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  --server              Select the server scenario.\n  --desktop             Select the desktop scenario.\n  --wsl                 Select the WSL scenario.\n  --mac                 Select the Mac scenario.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nScenario flags require a matching environment. Mandatory steps cannot be disabled.\nOptional package lists and final confirmation remain interactive.\nAt most one flag is allowed per run, including --help.'

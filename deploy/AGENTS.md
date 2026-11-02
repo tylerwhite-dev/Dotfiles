@@ -2,11 +2,13 @@
 
 This directory contains the interactive Linux and macOS setup program for the
 Dotfiles repository. The program asks for all choices first, shows a review
-screen, and only then runs the selected procedures. The `--yolo` flag (`-y`)
-answers `yes` to every question and skips the review screen, so every
-procedure that needs no package selection runs without confirmation. Optional
-package sets and casks are skipped, because they install only the packages a
-run explicitly chooses.
+screen, and only then runs the selected procedures. The `--server`, `--desktop`,
+`--wsl`, and `--mac` flags select presets declared in `config/scenarios.sh`.
+Mandatory non-selectable procedures are accepted automatically; selectable
+procedures show package lists. Review still allows Start, Restart, or Exit.
+Presets must match the detected host: macOS, WSL, or Linux outside WSL.
+Distribution filtering remains in effect. Optional packages install only
+explicitly selected packages.
 
 The script requires bash 5 or newer. macOS ships bash 3.2 in `/bin/bash`, so run
 it on macOS with a Homebrew bash, for example
@@ -29,29 +31,25 @@ The application flow is:
 
 1. `flags_parse` accepts zero or one CLI flag and records the requested mode.
    More than one argument returns status 2, including repeats and `--help`
-   combinations. `SETUP_MODE` stores `standard`, `yolo`, or `optionals` and is
+   combinations. `SETUP_MODE` stores `standard`, `server`, `desktop`, `wsl`, `mac`, or `optionals` and is
    reset to `standard` before parsing.
-2. `ui_is_interactive` rejects non-interactive input and output unless `--yolo`
-   is given, which skips the interactive requirement.
+2. `ui_is_interactive` rejects non-interactive input and output in every mode.
 3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
    platforms, and package references.
 4. `environment_detect` maps `/etc/os-release` or `sw_vers` to `arch`,
    `debian`, `fedora`, or `macos`.
 5. `questionnaire_collect` resets selections and asks one question per available
-   procedure. It may query installed packages, but does not change the system.
-   In `--yolo` mode every available
-   procedure that is not marked `procedure_selectable` is selected without
-   prompting, and the skipped ones are listed through
-   `status.yolo_skipped_optionals`. A procedure marked with
+   procedure in standard mode. Scenario modes automatically select mandatory
+   procedures and ask only for package choices. Collection may query installed
+   packages, but does not change the system.
+   A procedure marked with
    `procedure_selectable` shows a checkbox list instead of a plain yes/no
    question, and records the chosen packages with `workflow_select_packages`.
    The list is grouped under the categories its package references name. A
-   selectable procedure is the marker for an optional package set: `--yolo`
-   never selects one, so an optional set needs either an interactive run or
-   `--add-optionals`.
+   selectable procedure is the marker for an optional package set. Packages
+   must be chosen interactively or through `--add-optionals`.
 6. `questionnaire_confirm` renders the selected procedures and waits for
-   `Start execution`, `Restart questionnaire`, or `Exit without changes`. In
-   `--yolo` mode this step is skipped and execution starts immediately.
+   `Start execution`, `Restart questionnaire`, or `Exit without changes`.
 7. `runner_run` filters selected procedures and runs them in configured queue order.
 8. `process_run` adds privilege preparation, timeline rendering, output capture,
    and final status handling around each action.
@@ -70,7 +68,7 @@ The application flow is:
 | `logic/load.sh` | Loads interfaces, implementations, declarations, actions, and the application in dependency order. |
 | `logic/catalog.sh` | Stores and validates procedure and package declarations. |
 | `logic/messages.sh` | Message-template registry and formatter. |
-| `logic/flags.sh` | CLI flag parsing for `-y`/`--yolo`, `-a`/`--add-optionals`, and `-h`/`--help`. |
+| `logic/flags.sh` | CLI parsing for scenario flags, `-a`/`--add-optionals`, and `-h`/`--help`. |
 | `logic/environment.sh` | Linux and macOS system detection. |
 | `logic/workflow.sh` | In-memory yes/no selections and dependency filtering. |
 | `logic/questionnaire.sh` | Business flow for questions, summary, and final action choice. |
@@ -185,7 +183,9 @@ packages after it, and fills the array with the subset that is installed. The
 contract is `probe <result_array_name> <package>...`; an empty result means
 nothing is installed. `workflow_installed_packages` calls the probe of a
 procedure and returns the installed subset of the given packages.
-A successful empty result means nothing is installed. Missing Homebrew is also
+A successful empty result means nothing is installed. Extended Homebrew menus
+also preselect core formulae already scheduled through the core CLI procedure;
+these are planned installations, not results from the installed-package probe. Missing Homebrew is also
 a successful empty result. Other probe failures propagate through the workflow,
 discard partial results, and stop the questionnaire with an error before opening
 the checkbox list or running procedures. Homebrew diagnostics remain on stderr.

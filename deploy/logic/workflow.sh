@@ -53,6 +53,10 @@ workflow_available() {
   __workflow_available_result_ref=()
   catalog_procedure_ids __workflow_available_procedure_ids
   for __workflow_available_procedure_id in "${__workflow_available_procedure_ids[@]}"; do
+    if [[ -v "SETUP_SCENARIO_PROCEDURES[${SETUP_MODE:-standard}]" && \
+          " ${SETUP_SCENARIO_PROCEDURES[${SETUP_MODE:-standard}]} " != *" $__workflow_available_procedure_id "* ]]; then
+      continue
+    fi
     if catalog_is_available "$__workflow_available_procedure_id" "$__workflow_available_platform"; then
       __workflow_available_result_ref+=("$__workflow_available_procedure_id")
     fi

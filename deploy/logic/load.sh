@@ -36,6 +36,8 @@ source "${SETUP_SCRIPT_ROOT}/logic/runner.sh"
 # Shared configuration.
 # shellcheck source=../config/settings.sh
 source "${SETUP_SCRIPT_ROOT}/config/settings.sh"
+# shellcheck source=../config/scenarios.sh
+source "${SETUP_SCRIPT_ROOT}/config/scenarios.sh"
 # shellcheck source=../config/messages.sh
 source "${SETUP_SCRIPT_ROOT}/config/messages.sh"
 # Feature files own packages, messages, handlers and procedure declarations.

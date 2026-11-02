@@ -68,53 +68,23 @@ _app_run_optionals() {
   _app_print_elapsed_time "$((SECONDS - started_at))"
 }
 
-# Records every available non-selectable procedure for the YOLO scenario.
-_app_collect_yolo_selection() {
-  local platform="$1" procedure_id is_selectable label skipped_list text
-  local -a available=() skipped=()
-
-  message_format text status.yolo_mode
-  ui_notice "$text"
-  workflow_reset
-  workflow_available available "$platform"
-  for procedure_id in "${available[@]}"; do
-    catalog_is_selectable is_selectable "$procedure_id"
-    if [[ "$is_selectable" == yes ]]; then
-      message_format label "procedure.${procedure_id}.label"
-      skipped+=("$label")
-      continue
-    fi
-    workflow_select "$procedure_id" yes
-  done
-  if ((${#skipped[@]} > 0)); then
-    skipped_list="$(IFS=', '; printf '%s' "${skipped[*]}")"
-    message_format text status.yolo_skipped_optionals "$skipped_list"
-    ui_notice "$text"
-  fi
-  return 0
-}
-
-# Keeps restart/exit handling separate from execution and YOLO selection.
+# Collects choices and handles review before execution.
 _app_run_standard() {
   local platform="$1" distribution_name="$2" action text started_at
 
-  if [[ "${SETUP_MODE:-standard}" == yolo ]]; then
-    _app_collect_yolo_selection "$platform" || return
-  else
-    while true; do
-      questionnaire_collect "$platform" "$distribution_name" || return
-      questionnaire_confirm action "$platform" "$distribution_name" || return
-      case "$action" in
-        start) break ;;
-        restart) continue ;;
-        exit)
-          message_format text status.exited
-          ui_success "$text"
-          return 0
-          ;;
-      esac
-    done
-  fi
+  while true; do
+    questionnaire_collect "$platform" "$distribution_name" || return
+    questionnaire_confirm action "$platform" "$distribution_name" || return
+    case "$action" in
+      start) break ;;
+      restart) continue ;;
+      exit)
+        message_format text status.exited
+        ui_success "$text"
+        return 0
+        ;;
+    esac
+  done
   started_at="$SECONDS"
   message_format text status.settings_confirmed
   ui_success "$text"
@@ -126,7 +96,7 @@ _app_run_standard() {
 setup_run() {
   local distribution_family distribution_name text
 
-  if [[ "${SETUP_MODE:-standard}" != yolo ]] && ! ui_is_interactive; then
+  if ! ui_is_interactive; then
     error_report error.interactive_required
     return 1
   fi
@@ -136,6 +106,10 @@ setup_run() {
   fi
   if ! environment_detect distribution_family distribution_name; then
     error_report error.distribution_unsupported
+    return 1
+  fi
+  if ! environment_scenario_matches "${SETUP_MODE:-standard}" "$distribution_family"; then
+    error_report error.scenario_mismatch "$SETUP_MODE" "$distribution_name"
     return 1
   fi
   message_format text status.distribution_detected "$distribution_name"

@@ -6,6 +6,7 @@ source "${script_root}/logic/load.sh"
 
 # All system-changing and environment operations below are test doubles.
 ui_is_interactive() { return "${interactive_status:-0}"; }
+environment_is_wsl() { [[ "${test_wsl:-0}" == 1 ]]; }
 catalog_validate() { return "${validation_status:-0}"; }
 environment_detect() {
   printf -v "$1" '%s' "${test_platform:-fedora}"
@@ -89,14 +90,45 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
   run_app 1
   assert_events error.distribution_unsupported
 )
+# Scenario flags retain confirmation and require a matching environment.
+for mode in server desktop wsl mac; do
+  (
+    events=() SETUP_MODE="$mode" answers=(start) answer_index=0
+    test_platform=fedora test_wsl=0
+    if [[ "$mode" == mac ]]; then test_platform=macos; fi
+    if [[ "$mode" == wsl ]]; then test_wsl=1; fi
+    run_app 0
+    assert_events 'status.distribution_detected collect status.settings_confirmed run elapsed'
+  )
+  (
+    events=() SETUP_MODE="$mode" answers=(exit) answer_index=0
+    test_platform=fedora test_wsl=0
+    if [[ "$mode" == mac ]]; then test_platform=macos; fi
+    if [[ "$mode" == wsl ]]; then test_wsl=1; fi
+    run_app 0
+    assert_events 'status.distribution_detected collect status.exited'
+  )
+  (
+    events=() SETUP_MODE="$mode" interactive_status=1
+    run_app 1
+    assert_events error.interactive_required
+  )
+done
+
 (
-  events=() SETUP_MODE=yolo interactive_status=1
-  run_app 0
-  assert_events 'status.distribution_detected status.yolo_mode status.yolo_skipped_optionals status.settings_confirmed run elapsed'
-  workflow_selected selected fedora
-  [[ "${selected[*]}" == 'native_packages zsh_default homebrew core_cli_tools dotfiles' ]]
-  workflow_selection optional_selection homebrew_extended
-  [[ "$optional_selection" == no ]]
+  events=() SETUP_MODE=mac test_platform=fedora
+  run_app 1
+  assert_events error.scenario_mismatch
+)
+(
+  events=() SETUP_MODE=server test_platform=macos
+  run_app 1
+  assert_events error.scenario_mismatch
+)
+(
+  events=() SETUP_MODE=wsl test_platform=fedora test_wsl=0
+  run_app 1
+  assert_events error.scenario_mismatch
 )
 
 if ((EUID == 0)); then

@@ -6,12 +6,13 @@ source "${script_root}/logic/load.sh"
 error_output="$(mktemp)"
 trap 'rm -f -- "$error_output"' EXIT
 
-# Queue order controls discovery, YOLO selection and the actual runner.
+# Queue order controls discovery, selection and the actual runner.
 procedure_order dotfiles native_packages
 catalog_validate
 workflow_available available fedora
 [[ "${available[*]}" == 'dotfiles native_packages' ]]
-_app_collect_yolo_selection fedora > /dev/null
+workflow_reset
+for id in "${available[@]}"; do workflow_select "$id" yes; done
 workflow_selected selected fedora
 [[ "${selected[*]}" == 'dotfiles native_packages' ]]
 events=()
@@ -76,7 +77,7 @@ catalog_procedure_ids available
 # An empty queue is valid and executes no procedure.
 procedure_order
 catalog_validate
-_app_collect_yolo_selection fedora > /dev/null
+workflow_reset
 workflow_selected selected fedora
 [[ "${#selected[@]}" == 0 ]]
 events=()
