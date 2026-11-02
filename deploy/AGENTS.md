@@ -240,7 +240,8 @@ the lists. Then it collects every available selectable procedure, shows a review
 and calls `runner_run_optionals`. This applies even to Flatpak-only choices.
 Preparation happens once before the restart loop. Exiting at review or selecting
 no packages leaves the approved Homebrew installation in place. Core CLI tools
-and fonts are not installed. Ordinary workflow dependency filtering is unchanged.
+are not installed. Fonts are selectable alongside the other optional packages.
+Ordinary workflow dependency filtering is unchanged.
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is
 needed, the operator completes Apple's dialog and presses Enter to verify.

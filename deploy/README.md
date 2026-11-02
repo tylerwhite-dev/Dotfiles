@@ -31,6 +31,8 @@ Homebrew and core CLI tools have separate yes/no questions and execution steps.
 The core tools step requires Homebrew and installs the base formula set and shell
 extensions. Fonts, extended formulae and casks require Homebrew independently,
 so they remain available when core CLI tools are skipped.
+Choose individual fonts in a checkbox list. Installed fonts start checked;
+clearing a checkbox does not uninstall the font.
 
 The Flatpak procedure installs the CLI through pacman, APT or DNF if absent.
 Before installing native packages or a missing Flatpak CLI on Fedora, the setup
@@ -84,9 +86,9 @@ bash dotfiles-deploy.sh -a
   missing, accepting the installation prompt installs and verifies Homebrew
   immediately; declining exits successfully without opening the lists. On macOS
   this also checks Command Line Tools and opens Apple's installer if needed.
-  Existing Homebrew skips the prompt. Then the script asks for extended formulae,
+  Existing Homebrew skips the prompt. Then the script asks for fonts, extended formulae,
   followed by Flatpak apps on Linux or casks on macOS, and shows a review before
-  installing the selected packages. Core CLI tools and fonts are not installed.
+  installing the selected packages. Core CLI tools are not installed.
   Restarting the questionnaire does not repeat Homebrew preparation. Exiting at
   the review or selecting no packages leaves the approved Homebrew installation
   in place. Homebrew preparation also applies when only Flatpak apps are wanted.

@@ -38,9 +38,9 @@ for platform in arch debian fedora macos; do
   questionnaire_collect_optionals "$platform" "$platform"
   workflow_selected_optionals selected "$platform"
   if [[ "$platform" == macos ]]; then
-    [[ "${selected[*]}" == 'homebrew_extended homebrew_casks' ]]
+    [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended homebrew_casks' ]]
   else
-    [[ "${selected[*]}" == 'homebrew_extended flatpak_apps' ]]
+    [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended flatpak_apps' ]]
   fi
   # Packages that are installed already reach the list as presets.
   [[ " ${all_presets[*]} " == *" tmux "* ]]
@@ -58,7 +58,7 @@ summary_labels=()
 ui_summary_item_packages() { summary_labels+=("$1"); }
 ui_summary_item() { exit 1; }
 _questionnaire_show_summary macos macOS optionals
-[[ "${#summary_labels[@]}" == 2 ]]
+[[ "${#summary_labels[@]}" == 3 ]]
 
 # Both runners use the same process seam, including direct-input finish handlers.
 events=()
@@ -66,15 +66,15 @@ ui_notice() { :; }
 ui_success() { :; }
 process_run() { events+=("$1:$8"); }
 runner_run_optionals macos macOS ''
-[[ "${events[*]}" == 'action_install_homebrew_extended: action_prepare_homebrew_casks:action_install_homebrew_casks' ]]
+[[ "${events[*]}" == 'action_install_homebrew_fonts: action_install_homebrew_extended: action_prepare_homebrew_casks:action_install_homebrew_casks' ]]
 questionnaire_collect_optionals fedora Fedora
 events=()
 runner_run_optionals fedora Fedora ''
-[[ "${events[*]}" == 'action_install_homebrew_extended: action_prepare_flatpak:action_install_flatpak_apps' ]]
+[[ "${events[*]}" == 'action_install_homebrew_fonts: action_install_homebrew_extended: action_prepare_flatpak:action_install_flatpak_apps' ]]
 process_run() { events+=("$1"); return 8; }
 events=() actual=0
 runner_run_optionals fedora Fedora '' || actual=$?
-[[ "$actual" == 8 && "${events[*]}" == action_install_homebrew_extended ]]
+[[ "$actual" == 8 && "${events[*]}" == action_install_homebrew_fonts ]]
 
 # A failed probe stops collection before any list or installation is opened.
 (

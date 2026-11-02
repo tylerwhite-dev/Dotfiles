@@ -4,6 +4,23 @@ set -Eeuo pipefail
 script_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source "${script_root}/logic/load.sh"
 
+# The group heading selects all fonts and is not itself a package.
+catalog_package_rows font_rows font_kinds homebrew_fonts fedora brew_cask
+catalog_packages font_packages homebrew_fonts fedora brew_cask
+[[ "${font_rows[0]}" == All && "${font_kinds[0]}" == g ]]
+[[ "${font_rows[*]:1}" == "${font_packages[*]}" ]]
+declare -A font_texts=()
+questionnaire_multiselect_texts font_texts
+font_presets=(font-hack-nerd-font)
+font_labels=("${font_rows[@]}")
+ui_multiselect_grouped font_selection Prompt font_texts font_rows font_kinds font_presets font_labels \
+  <<< $' \n' >/dev/null
+[[ "${font_selection[*]}" == "${font_packages[*]}" ]]
+font_presets=("${font_packages[@]}")
+ui_multiselect_grouped font_selection Prompt font_texts font_rows font_kinds font_presets font_labels \
+  <<< $' \n' >/dev/null
+[[ "${#font_selection[@]}" == 0 ]]
+
 fixture_dir="$(mktemp -d)"
 trap 'rm -rf -- "$fixture_dir"' EXIT
 export BREW_FIXTURE_OUTPUT="${fixture_dir}/output"
@@ -78,8 +95,13 @@ workflow_select_packages homebrew_extended tmux
 action_install_homebrew_extended macos '' >/dev/null
 workflow_select_packages homebrew_casks firefox
 action_install_homebrew_casks macos '' >/dev/null
+workflow_select_packages homebrew_fonts font-hack-nerd-font
+action_install_homebrew_fonts macos '' >/dev/null
 [[ "$HOMEBREW_NO_INSTALL_UPGRADE" == 0 ]]
-[[ "$(tail -n 2 "$BREW_FIXTURE_CALLS")" == $'install tmux\ninstall --cask firefox' ]]
+[[ "$(tail -n 3 "$BREW_FIXTURE_CALLS")" == $'install tmux\ninstall --cask firefox\ninstall --cask font-hack-nerd-font' ]]
+workflow_select_packages homebrew_fonts
+action_install_homebrew_fonts macos '' >/dev/null
+[[ "$(tail -n 1 "$BREW_FIXTURE_CALLS")" == 'install --cask font-hack-nerd-font' ]]
 
 # Homebrew preparation never installs formulae; the core step owns the base set.
 : > "$BREW_FIXTURE_CALLS"
