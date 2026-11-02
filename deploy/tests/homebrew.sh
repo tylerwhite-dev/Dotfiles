@@ -103,24 +103,23 @@ workflow_select_packages homebrew_fonts
 action_install_homebrew_fonts macos '' >/dev/null
 [[ "$(tail -n 1 "$BREW_FIXTURE_CALLS")" == 'install --cask font-hack-nerd-font' ]]
 
-# Homebrew preparation never installs formulae; the core step owns the base set.
+# Homebrew preparation never installs formulae; the menu owns all formula choices.
 : > "$BREW_FIXTURE_CALLS"
 action_install_homebrew macos '' >/dev/null
 [[ "$(cat "$BREW_FIXTURE_CALLS")" == --version ]]
-BREW_FIXTURE_UPGRADE_POLICY=0 action_install_core_cli_tools macos '' >/dev/null
-[[ "$(tail -n 1 "$BREW_FIXTURE_CALLS")" == 'install starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs herdr superfile zip zoxide fzf eza stow' ]]
 
-# Core tools require Homebrew, while other Brew procedures remain independent.
+# Clearing all formula choices never invokes brew install.
+workflow_select_packages homebrew_extended
+action_install_homebrew_extended macos '' >/dev/null
+[[ "$(cat "$BREW_FIXTURE_CALLS")" == --version ]]
+
+# Other Brew procedures require Homebrew independently.
 workflow_reset
-workflow_select core_cli_tools yes
+workflow_select homebrew_extended yes
 workflow_selected selected fedora
 [[ "${#selected[@]}" == 0 ]]
 workflow_select homebrew yes
-workflow_selected selected fedora
-[[ "${selected[*]}" == 'homebrew core_cli_tools' ]]
-workflow_select core_cli_tools no
 workflow_select homebrew_fonts yes
-workflow_select homebrew_extended yes
 workflow_selected selected fedora
 [[ "${selected[*]}" == 'homebrew homebrew_fonts homebrew_extended' ]]
 

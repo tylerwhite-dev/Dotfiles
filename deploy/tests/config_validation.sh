@@ -91,15 +91,6 @@ done
 [[ "${cask_categories[*]}" == 'Internet Work & Media create Dev tools System Games' ]]
 [[ "${cask_rows[*]}" == 'Internet firefox google-chrome librewolf zen ungoogled-chromium tor-browser telegram whatsapp discord slack zoom qbittorrent amneziavpn Work & Media obsidian libreoffice bitwarden veracrypt iina vlc spotify create figma inkscape blender audacity obs Dev tools visual-studio-code vscodium zed android-studio intellij-idea intellij-idea-ce qt-creator iterm2 ghostty cmux warp kitty wezterm alacritty docker-desktop hermes-desktop lm-studio System raycast maccy rectangle alt-tab jordanbaird-ice betterdisplay mos linearmouse karabiner-elements hammerspoon stats coconutbattery appcleaner macfuse balenaetcher raspberry-pi-imager utm Games steam playcover-community' ]]
 
-# A procedure without category references renders a plain item list.
-plain_rows=()
-plain_kinds=()
-catalog_package_rows plain_rows plain_kinds core_cli_tools macos brew
-((${#plain_kinds[@]} == ${#plain_rows[@]}))
-for kind in "${plain_kinds[@]}"; do
-  [[ "$kind" == "i" ]]
-done
-
 # The installed-package probe is registered per procedure.
 installed_probe=""
 catalog_installed_probe installed_probe homebrew_extended

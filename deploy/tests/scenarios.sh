@@ -29,9 +29,13 @@ ui_multiselect_grouped() {
   local -n result="$1" initial="$6"
   asked+=("$2")
   if [[ "$2" == *extended* ]]; then
-    for package in starship zoxide fzf eza stow; do
-      [[ " ${initial[*]} " == *" $package "* ]]
-    done
+    if [[ "$SETUP_MODE" == mac ]]; then
+      [[ "${#initial[@]}" == 0 ]]
+    else
+      for package in starship eza stow; do
+        [[ " ${initial[*]} " == *" $package "* ]]
+      done
+    fi
   fi
   result=()
 }
@@ -43,10 +47,10 @@ for SETUP_MODE in server desktop wsl mac; do
     questionnaire_collect "$platform" "$platform"
     workflow_selected selected "$platform"
     case "$SETUP_MODE" in
-      server) expected='native_packages zsh_default homebrew core_cli_tools dotfiles'; count=1 ;;
-      desktop) expected='native_packages zsh_default homebrew core_cli_tools dotfiles'; count=3 ;;
-      wsl) expected='native_packages zsh_default homebrew core_cli_tools dotfiles'; count=1 ;;
-      mac) expected='macos_command_line_tools macos_finder macos_spaces homebrew core_cli_tools dotfiles'; count=3 ;;
+      server) expected='native_packages zsh_default homebrew dotfiles'; count=1 ;;
+      desktop) expected='native_packages zsh_default homebrew dotfiles'; count=3 ;;
+      wsl) expected='native_packages zsh_default homebrew dotfiles'; count=1 ;;
+      mac) expected='macos_command_line_tools macos_finder macos_spaces homebrew dotfiles'; count=3 ;;
     esac
     if [[ "$platform" == arch && "$SETUP_MODE" != server ]]; then
       expected="${expected/native_packages /native_packages yay }"
@@ -79,34 +83,50 @@ ui_multiselect_grouped() {
 }
 questionnaire_collect fedora Fedora
 workflow_selected selected fedora
-[[ "${selected[*]}" == 'native_packages zsh_default homebrew core_cli_tools homebrew_fonts homebrew_extended flatpak_apps dotfiles' ]]
+[[ "${selected[*]}" == 'native_packages zsh_default homebrew homebrew_fonts homebrew_extended flatpak_apps dotfiles' ]]
 for procedure in homebrew_fonts homebrew_extended flatpak_apps; do
   workflow_selected_packages packages "$procedure"
   [[ "${#packages[@]}" == 1 ]]
 done
 
-# Core formula presets also apply to the ordinary questionnaire.
-SETUP_MODE=standard
-workflow_reset
-workflow_select core_cli_tools yes
-asked=()
-ui_multiselect_grouped() {
-  local -n result="$1" initial="$6"
-  for package in starship zoxide fzf eza stow; do
-    [[ " ${initial[*]} " == *" $package "* ]]
-  done
-  result=()
-}
-_questionnaire_read_selectable_packages homebrew_extended fedora 1 1
+# Base defaults depend on zsh selection; missing/no answers keep installed presets only.
+for zsh_answer in yes no unset; do
+  workflow_reset
+  if [[ "$zsh_answer" != unset ]]; then
+    workflow_select zsh_default "$zsh_answer"
+  fi
+  workflow_installed_packages() { local -n result="$1"; result=(tmux starship); }
+  ui_multiselect_grouped() {
+    local -n result="$1" initial="$6"
+    local -a defaults=()
+    homebrew_extended_default_packages defaults
+    if [[ "$zsh_answer" == yes ]]; then
+      [[ "${#initial[@]}" == $((${#defaults[@]} + 1)) ]]
+      for package in "${defaults[@]}"; do
+        [[ " ${initial[*]} " == *" $package "* ]]
+      done
+    else
+      [[ "${initial[*]}" == 'tmux starship' ]]
+    fi
+    # Users can change the list regardless of its defaults.
+    result=(stow tmux)
+  }
+  _questionnaire_read_selectable_packages homebrew_extended fedora 1 1
+  workflow_selected_packages packages homebrew_extended
+  [[ "${packages[*]}" == 'stow tmux' ]]
+done
 
-# Clearing a checkbox cannot cancel the core installation. Installed presets
-# remain checked even when core tools are not selected.
-workflow_reset
-workflow_installed_packages() { local -n result="$1"; result=(tmux); }
+# --add-optionals resets zsh selection and must not preselect the base set.
+workflow_installed_packages() { local -n result="$1"; result=(); }
 ui_multiselect_grouped() {
   local -n result="$1" initial="$6"
-  [[ "${initial[*]}" == tmux ]]
+  [[ "${#initial[@]}" == 0 ]]
   result=()
 }
-_questionnaire_read_selectable_packages homebrew_extended fedora 1 1
+workflow_select zsh_default yes
+questionnaire_collect_optionals fedora Fedora
+workflow_selected_packages packages homebrew_extended
+[[ "${#packages[@]}" == 0 ]]
+workflow_selection selection zsh_default
+[[ "$selection" == no ]]
 printf 'Scenario validation passed.\n'

@@ -184,8 +184,9 @@ contract is `probe <result_array_name> <package>...`; an empty result means
 nothing is installed. `workflow_installed_packages` calls the probe of a
 procedure and returns the installed subset of the given packages.
 A successful empty result means nothing is installed. Extended Homebrew menus
-also preselect core formulae already scheduled through the core CLI procedure;
-these are planned installations, not results from the installed-package probe. Missing Homebrew is also
+also preselect the base CLI formulae as editable defaults when `zsh_default`
+is selected;
+only checked packages are installed. Missing Homebrew is also
 a successful empty result. Other probe failures propagate through the workflow,
 discard partial results, and stop the questionnaire with an error before opening
 the checkbox list or running procedures. Homebrew diagnostics remain on stderr.
@@ -239,8 +240,9 @@ Homebrew before collecting package choices. Declining exits successfully before
 the lists. Then it collects every available selectable procedure, shows a review,
 and calls `runner_run_optionals`. This applies even to Flatpak-only choices.
 Preparation happens once before the restart loop. Exiting at review or selecting
-no packages leaves the approved Homebrew installation in place. Core CLI tools
-are not installed. Fonts are selectable alongside the other optional packages.
+no packages leaves the approved Homebrew installation in place. Base CLI defaults
+require a selected `zsh_default`, so they are absent in `--add-optionals`. Fonts are selectable alongside the
+other optional packages.
 Ordinary workflow dependency filtering is unchanged.
 The macOS Command Line Tools check uses the same finish-handler mechanism before
 Homebrew. It preserves a working selected Xcode or CLT; when installation is

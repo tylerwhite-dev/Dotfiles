@@ -27,10 +27,11 @@ On Linux, a separate grouped list offers the 26 applications from
 Applications already installed through Flatpak start checked in the list.
 Clearing a checkbox does not uninstall an application.
 
-Homebrew and core CLI tools have separate yes/no questions and execution steps.
-The core tools step requires Homebrew and installs the base formula set and shell
-extensions. Fonts, extended formulae and casks require Homebrew independently,
-so they remain available when core CLI tools are skipped.
+Homebrew has its own yes/no question. Base CLI tools and additional formulae
+share the extended Homebrew checkbox list. Installed formulae start checked.
+Base packages also start checked when `zsh_default` is selected.
+Clearing a checkbox excludes that package from installation.
+Fonts, formulae and casks require Homebrew independently.
 Choose individual fonts in a checkbox list. Installed fonts start checked;
 clearing a checkbox does not uninstall the font.
 
@@ -89,7 +90,7 @@ bash dotfiles-deploy.sh -a
   this also checks Command Line Tools and opens Apple's installer if needed.
   Existing Homebrew skips the prompt. Then the script asks for fonts, extended formulae,
   followed by Flatpak apps on Linux or casks on macOS, and shows a review before
-  installing the selected packages. Core CLI tools are not installed.
+  installing the selected packages. Only installed packages start checked; base CLI defaults require `zsh_default`.
   Restarting the questionnaire does not repeat Homebrew preparation. Exiting at
   the review or selecting no packages leaves the approved Homebrew installation
   in place. Homebrew preparation also applies when only Flatpak apps are wanted.
@@ -104,10 +105,10 @@ CLI arguments select standard setup, a named scenario, or optionals.
 
 | Flag | Mandatory procedures | Package choices |
 | --- | --- | --- |
-| `--server` | Native packages, zsh, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
-| `--desktop` | Native packages, yay on Arch, zsh, Homebrew, core CLI tools, dotfiles | Fonts, extended Homebrew, Flatpak |
-| `--wsl` | Native packages, yay on Arch, zsh, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
-| `--mac` | Apple CLT, Finder, Spaces, Homebrew, core CLI tools, dotfiles | Fonts, extended Homebrew, casks |
+| `--server` | Native packages, zsh, Homebrew, dotfiles | Extended Homebrew |
+| `--desktop` | Native packages, yay on Arch, zsh, Homebrew, dotfiles | Fonts, extended Homebrew, Flatpak |
+| `--wsl` | Native packages, yay on Arch, zsh, Homebrew, dotfiles | Extended Homebrew |
+| `--mac` | Apple CLT, Finder, Spaces, Homebrew, dotfiles | Fonts, extended Homebrew, casks |
 
 `--mac` requires macOS, `--wsl` requires WSL, and `--server`/`--desktop`
 require Linux outside WSL. OS and distribution detection still apply. A mismatch
@@ -117,10 +118,10 @@ mandatory steps to be declined. Exiting the final review performs no setup.
 Restarting returns to package choices and restores mandatory selections.
 
 All presets use the existing complete native package and dotfiles sets. Package
-lists retain installed-package presets. Extended Homebrew also preselects core
-formulae scheduled for installation, in every mode where core tools are selected.
-These formulae remain visible; unchecking them in the extended list does not
-cancel their mandatory installation through core CLI tools.
+lists retain installed-package presets. Extended Homebrew also preselects the base
+CLI tools when `zsh_default` is selected. macOS and `--add-optionals` do not
+select that procedure, so they use installed-package presets only. These defaults
+can be cleared, and only the checked packages are installed.
 
 Scenario membership is configured in `config/scenarios.sh`. Running without
 flags keeps the standard questionnaire with individual procedure questions.

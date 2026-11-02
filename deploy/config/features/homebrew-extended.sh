@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Base packages to preselect when zsh is chosen; menu choices remain editable.
+homebrew_extended_default_packages() {
+  local -n defaults_result="$1"
+  defaults_result=(
+    starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs zoxide
+    herdr stow
+  )
+}
+
 package_group brew shell_tools \
   starship zoxide fzf eza \
   zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch \

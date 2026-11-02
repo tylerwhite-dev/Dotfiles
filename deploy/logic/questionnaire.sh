@@ -43,19 +43,19 @@ _questionnaire_read_selectable_packages() {
     error_report error.installed_packages_probe_failed
     return 1
   fi
-  # Keep shared core formulae visible and checked when already scheduled.
+  # Base formulae default to checked only when the zsh procedure is selected.
   if [[ "$procedure_id" == homebrew_extended ]]; then
-    local core_selection package
+    local package zsh_selection
     local -a core_packages=()
-    workflow_selection core_selection core_cli_tools
-    if [[ "$core_selection" == yes ]]; then
-      catalog_packages core_packages core_cli_tools "$platform" brew || return
-      for package in "${core_packages[@]}"; do
-        if [[ " ${packages[*]} " == *" $package "* && " ${presets[*]} " != *" $package "* ]]; then
-          presets+=("$package")
-        fi
-      done
+    workflow_selection zsh_selection zsh_default
+    if [[ "$zsh_selection" == yes ]]; then
+      homebrew_extended_default_packages core_packages
     fi
+    for package in "${core_packages[@]}"; do
+      if [[ " ${packages[*]} " == *" $package "* && " ${presets[*]} " != *" $package "* ]]; then
+        presets+=("$package")
+      fi
+    done
   fi
   questionnaire_multiselect_texts texts || return
 
