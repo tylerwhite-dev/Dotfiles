@@ -47,13 +47,43 @@ package_category flatpak developer_apps "Dev tools" development
 package_category flatpak system_apps "System" system
 
 message_define error.flathub_configuration \
-  "The system flathub remote has an unexpected URL or a filter. Review its configuration before running setup again."
+  "The selected flathub remote has an unexpected URL or a filter. Review its configuration before running setup again."
 
 message_define status.flatpak_installed \
   "Flatpak is installed. Log out and back in after setup if applications do not appear in the desktop menu."
 
-message_define status.flatpak_fedora_remove \
-  "Removing the system fedora Flatpak remote. Installed applications and runtimes remain, but can no longer receive updates from this remote."
+# WSL sessions may lack authorization for the system helper.
+_flatpak_installation_scope() {
+  local kernel=''
+  [[ ! -r /proc/sys/kernel/osrelease ]] || IFS= read -r kernel </proc/sys/kernel/osrelease
+  if [[ -n "${WSL_DISTRO_NAME:-}${WSL_INTEROP:-}" || "${kernel,,}" == *microsoft* ]]; then
+    printf '%s' --user
+  else
+    printf '%s' --system
+  fi
+}
+
+# Finds installed application IDs among the available choices.
+flatpak_installed_packages() {
+  local -n __flatpak_installed_result="$1"
+  shift
+  local __flatpak_installed_output __flatpak_installed_id __flatpak_candidate
+  local -A __flatpak_installed_set=()
+  __flatpak_installed_result=()
+  command -v flatpak >/dev/null 2>&1 || return 0
+  local scope
+  scope="$(_flatpak_installation_scope)" || return
+  __flatpak_installed_output="$(LC_ALL=C flatpak list "$scope" --app --columns=application)" || return
+  while IFS= read -r __flatpak_installed_id; do
+    [[ -n "$__flatpak_installed_id" ]] || continue
+    __flatpak_installed_set["$__flatpak_installed_id"]=1
+  done <<< "$__flatpak_installed_output"
+  for __flatpak_candidate in "$@"; do
+    if [[ -v "__flatpak_installed_set[$__flatpak_candidate]" ]]; then
+      __flatpak_installed_result+=("$__flatpak_candidate")
+    fi
+  done
+}
 
 # Installs the CLI only when absent, independently of the base package choice.
 action_install_flatpak_binary() {
@@ -90,13 +120,16 @@ action_install_flatpak_binary() {
 # Validates existing configuration before modifying remotes. Tab-separated
 # fields are parsed without IFS splitting, which would discard an empty filter.
 action_prepare_flatpak() {
-  local platform="$1" remotes line name url filter options fields
+  local platform="$1" remotes line name url filter options fields scope
   local flathub_found=0 fedora_found=0
+  local -a remote_executor=(executor_run_as_root)
   local -a selected=()
   workflow_selected_packages selected flatpak_apps || return
   ((${#selected[@]} > 0)) || return 0
   action_install_flatpak_binary "$platform" || return
-  remotes="$(LC_ALL=C flatpak remotes --system --show-disabled \
+  scope="$(_flatpak_installation_scope)" || return
+  [[ "$scope" != --user ]] || remote_executor=(executor_run)
+  remotes="$(LC_ALL=C flatpak remotes "$scope" --show-disabled \
     --columns=name,url,filter,options)" || return
   while IFS= read -r line; do
     [[ -n "$line" ]] || continue
@@ -118,27 +151,27 @@ action_prepare_flatpak() {
       return 1
     fi
     if [[ ",${options//;/,}," == *,disabled,* ]]; then
-      executor_run_as_root flatpak remote-modify --system --enable flathub || return
+      "${remote_executor[@]}" flatpak remote-modify "$scope" --enable flathub || return
     fi
   done <<< "$remotes"
   if ((flathub_found == 0)); then
-    executor_run_as_root flatpak remote-add --system --if-not-exists \
+    "${remote_executor[@]}" flatpak remote-add "$scope" --if-not-exists \
       flathub https://dl.flathub.org/repo/flathub.flatpakrepo || return
   fi
-  if [[ "$platform" == fedora ]] && ((fedora_found)); then
-    status_report status.flatpak_fedora_remove
+  if [[ "$scope" == --system && "$platform" == fedora ]] && ((fedora_found)); then
     executor_run_as_root flatpak remote-delete --system --force fedora || return
   fi
 }
 
-# Accepts installation confirmations while retaining terminal authentication.
+# Keeps installation confirmations on the terminal.
 action_install_flatpak_apps() {
-  local package
+  local package scope
   local -a selected=()
   workflow_selected_packages selected flatpak_apps || return
   ((${#selected[@]} > 0)) || return 0
+  scope="$(_flatpak_installation_scope)" || return
   for package in "${selected[@]}"; do
-    executor_run flatpak install -y "$package" || return
+    executor_run flatpak install "$scope" flathub "$package" || return
   done
 }
 
@@ -148,6 +181,7 @@ procedure_finish_handler flatpak_apps action_install_flatpak_apps
 procedure_platforms flatpak_apps arch debian fedora
 procedure_requires_root flatpak_apps arch debian fedora
 procedure_selectable flatpak_apps
+procedure_installed_probe flatpak_apps flatpak_installed_packages
 procedure_packages flatpak_apps \
   flatpak internet_apps \
   flatpak work_apps \
@@ -157,4 +191,4 @@ message_define procedure.flatpak_apps.question \
   "Select Linux applications to install with Flatpak?"
 message_define procedure.flatpak_apps.label "Install selected Flatpak applications"
 message_define procedure.flatpak_apps.description \
-  "Install Flatpak if missing, configure system Flathub, and install selected applications. On Fedora, remove the system fedora remote while retaining installed applications."
+  "Install Flatpak if missing, configure Flathub, and install selected applications. Linux uses system installation; WSL uses per-user installation. On Fedora, remove the system fedora remote while retaining installed applications."

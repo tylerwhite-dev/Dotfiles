@@ -24,6 +24,8 @@ On macOS, the questionnaire also offers categorized Homebrew casks. Their
 installation runs with direct terminal access so password prompts stay visible.
 On Linux, a separate grouped list offers the 26 applications from
 `guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
+Applications already installed through Flatpak start checked in the list.
+Clearing a checkbox does not uninstall an application.
 
 Homebrew and core CLI tools have separate yes/no questions and execution steps.
 The core tools step requires Homebrew and installs the base formula set and shell
@@ -35,14 +37,16 @@ Before installing native packages or a missing Flatpak CLI on Fedora, the setup
 disables `fedora-cisco-openh264` with
 `dnf config-manager setopt fedora-cisco-openh264.enabled=0` as root.
 If disabling the repository fails, the installation stops.
-It adds the official system Flathub remote or enables an existing official
-remote. An unexpected URL or a client-side filter stops the procedure for
-manual review. On Fedora, it removes the system `fedora` remote with `--force`:
-installed applications and runtimes remain, but stop receiving updates from
-that remote. User remotes are unchanged.
-Each selected application runs as `flatpak install -y <ID>` without sudo.
-Installation confirmations are accepted automatically; terminal access remains
-available for authentication if requested.
+On ordinary Linux hosts, it configures system Flathub and runs each application
+installation as `flatpak install --system flathub <ID>` without sudo, using
+polkit when authorization is required. On Fedora, preparation removes the
+system `fedora` remote with `--force`, retaining installed applications and runtimes.
+WSL uses user Flathub and `flatpak install --user flathub <ID>` to avoid
+system-helper authorization. System remotes are unchanged on WSL.
+The installed-package probe checks the same installation scope as the installer.
+Existing installations are not migrated between scopes. Flathub URLs and filters
+are validated before remote changes. A missing Flatpak CLI is installed through
+the distribution package manager with administrator access.
 
 Three additional macOS-only questions check Apple Command Line Tools, configure
 Finder, and disable automatic rearrangement of Spaces. The tools check comes

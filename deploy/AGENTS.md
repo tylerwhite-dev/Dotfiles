@@ -223,12 +223,16 @@ does not upgrade them automatically. New packages may still affect dependencies.
 Clearing a package checkbox excludes it from installation and never uninstalls it.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.
-On Linux, `flatpak_apps` installs a missing Flatpak CLI and configures system
-Flathub in its main handler. The finish handler runs one
-`flatpak install -y <ID>` per chosen application with direct terminal input
-for authentication. Installation confirmations are accepted automatically.
-Fedora's system `fedora` remote is deleted with `--force`, retaining installed
-refs. Existing Flathub URLs and filters are validated before remote changes.
+On Linux, `flatpak_apps` installs a missing CLI and configures Flathub in its
+main handler. The finish handler installs selected applications with direct
+terminal input for confirmations and authentication. Ordinary Linux hosts use
+`flatpak install --system flathub <ID>` without sudo, with polkit authorization.
+WSL uses `--user` for remote preparation, installed-app queries and installation.
+The installed-package probe always checks the chosen installation scope.
+System Fedora remote removal applies only to ordinary Linux; installed refs
+remain. WSL leaves system remotes unchanged. Existing installations are not
+migrated. Existing Flathub URLs and filters are validated before changes.
+A missing CLI requires administrator access through the native package manager.
 `--add-optionals` first checks Homebrew. If absent, it asks permission to install
 it immediately, prepares macOS CLT when enabled, and installs and verifies
 Homebrew before collecting package choices. Declining exits successfully before
