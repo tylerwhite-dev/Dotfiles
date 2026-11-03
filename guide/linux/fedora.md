@@ -20,7 +20,7 @@ sudo dnf upgrade -y
 sudo dnf install git -y
 git clone https://github.com/tylerwhite-dev/Dotfiles
 chmod +x ~/Dotfiles/dotfiles-deploy.sh
-bash ~/Dotfiles/dotfiles-deploy.sh
+bash ~/Dotfiles/dotfiles-deploy.sh --wsl
 ```
 
 ## disable dnf repo

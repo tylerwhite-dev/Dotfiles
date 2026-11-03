@@ -43,7 +43,7 @@ Run the deployment as the new user:
 ```bash
 git clone https://github.com/tylerwhite-dev/Dotfiles
 chmod +x ~/Dotfiles/dotfiles-deploy.sh
-bash ~/Dotfiles/dotfiles-deploy.sh
+bash ~/Dotfiles/dotfiles-deploy.sh --wsl
 ```
 
 ## apps
