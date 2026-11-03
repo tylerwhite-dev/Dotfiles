@@ -1,7 +1,7 @@
 ---
 name: commit-this
 description: Suggest commit subjects or prepare user-approved commits in a Git repository. Use when explicitly requested for commit work.
-
+disable-model-invocation: true
 ---
 
 # Git commit preparation
@@ -9,6 +9,8 @@ description: Suggest commit subjects or prepare user-approved commits in a Git r
 Use only when the user explicitly requests this skill for commit work. A request to inspect or maintain this skill does not start the commit workflow or require a task number.
 
 ## Select the mode
+
+A bare `$commit-this` invocation means **Commit existing changes** for the repository and scope established by the conversation. Prepare the plan and request native approval; do not stop after suggesting a message. Use **Subjects only** only when the user explicitly asks for message suggestions without creating commits. A request to maintain this skill remains outside the commit workflow.
 
 - **Subjects only:** inspect the selected changes and suggest messages. Do not stage, commit, or request commit approval.
 - **Commit existing changes:** inspect their contents and prepare the commit plan. Read neighboring code only to resolve a concrete uncertainty. Do not turn commit preparation into a style audit or edit code without authorization.
@@ -36,10 +38,19 @@ Reuse the inspected diff and context throughout planning. Reread source or histo
 - Write a short, specific summary using established project terminology. Follow the requested language, then documented repository conventions, then the consistent language of relevant Git history; use the language of the task only when none establishes a preference. Follow repository length rules and established subject style; otherwise keep the subject concise without a trailing period.
 - If the established format uses a type, derive it from the change and show it in the approval plan. Do not require a type for formats that omit it. Ask only when the ambiguity materially changes the intended commit or conflicts with repository rules.
 
+## Keep commit messages in the main response
+
+Commit messages are a user-facing deliverable. Include them in the final assistant response, not only in analysis, tool output, an approval prompt, or a commentary/progress message that the app may collapse.
+
+- In subjects-only mode, put all suggested messages in the final response.
+- When waiting for approval, include the complete ordered plan in the final response, even if it was already shown before calling `request_user_input_async`. Keep the repository, exact messages, assigned paths, and any shared-file hunk descriptions together. Present the plan directly, without a sentence announcing that approval is pending or that the native dialog is open. The native dialog handles the confirmation request; a status such as "plan published" does not replace the plan.
+- After creating commits, include each created commit's hash and full message in the final report. If execution stops partway through, distinguish created commits from remaining planned commits and retain the exact messages for both.
+- Put each full message in its own fenced `text` block, preserving its subject, body, footers, and real line breaks. Keep numbering, repository names, paths, hashes, and status explanations outside the message block so the message can be copied directly.
+
 ## Create commits
 
 1. Assign exact files or hunks to each commit and specify their order. Record base HEAD and retain a per-commit snapshot before requesting approval: assigned paths/hunks, resulting contents including binary data, additions/deletions, and Git file modes. Preserve unrelated changes and pre-existing staging; when changes share a file, include only the assigned hunks. If separation cannot preserve the user's staging, stop and explain the conflict before committing.
-2. Before staging or committing, publish the ordered plan in a visible assistant message. For each commit, show the repository, exact message (including any body and footers), and assigned paths; describe selected hunks when a file is shared. A status such as "plan ready" is not a plan.
-3. Only after publishing the plan, request confirmation through the harness's native user-input interface, or in conversation if unavailable. Offer explicit approve/cancel choices. The question must refer to the displayed plan and introduce no new contents. Wait for an explicit affirmative answer; cancellation, dismissal, or no answer grants no approval. Approval covers only that plan; changes require renewed approval.
+2. Before staging or committing, publish the ordered plan in a visible assistant message and retain it in the final response as required above. For each commit, show the repository, exact message (including any body and footers), and assigned paths; describe selected hunks when a file is shared. A status such as "plan ready" is not a plan.
+3. Only after publishing the plan, request confirmation through the harness's native user-input interface, or in conversation if unavailable. In Codex, call `request_user_input_async` in this turn after displaying the plan and before the final response. Do not replace this call with a prose question or end with only a suggested message. Offer explicit approve/cancel choices. Keep the native dialog short: ask only whether to approve the displayed plan, for example, "Подтвердить показанный план коммитов?", with approve/cancel choices. Do not repeat commit subjects, bodies, footers, or assigned paths in the dialog title, question, or options; those belong in the chat plan. The question must refer to the displayed plan and introduce no new contents. Wait for an explicit affirmative answer; cancellation, dismissal, or no answer grants no approval. Approval covers only that plan; changes require renewed approval.
 4. After approval, create commits one at a time. Before each commit, verify the expected HEAD and compare the actual staged changes with the approved snapshot. Matching paths or passing `git diff --check` alone does not verify contents. Avoid rereading unrelated source or history. Pass the full message with real line breaks through `git commit -F` or separate `-m` arguments. Let configured hooks run; do not bypass them with `--no-verify` without explicit authorization or use `--amend` to recover from a failed commit. If contents differ, a hook changes files, or a commit fails, stop and report completed commits, any new diff, and remaining work. Do not auto-fix hook failures in commit-existing-changes mode; obtain approval for any revised plan before retrying.
 5. Check the resulting commit sequence against approved snapshots and full messages, and check final Git status once. Verify paragraphs and footers contain real line breaks, not accidental literal `\n`. Confirm unrelated and omitted changes remain uncommitted and unrelated staging is preserved. Report created commits and the checks actually performed, without claiming compilation or device verification from static checks.
