@@ -24,8 +24,8 @@ if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   ui_color_group=$'\033[1;2m'
 fi
 
-ui_timeline_frames=('●' '●' '●' '◉' '◎' '○' '◌' '◌' '◌' '○' '◎' '◉' '●' '●' '●')
-ui_timeline_frame_microseconds=115000
+ui_timeline_frames=('●' '●' '●' '●' '◉' '◎' '○' '◌' '◌' '◌' '○' '◎' '◉' '●' '●' '●' '●' '●')
+ui_timeline_frame_microseconds=100000
 
 # Uncomment both lines of one variant below to override the defaults above.
 
