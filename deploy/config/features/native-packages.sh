@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 package_group native arch \
-  git git-lfs curl openssh zsh file wl-clipboard base-devel
+  git git-lfs curl openssh zsh file wl-clipboard
 
 package_group native debian \
-  git git-lfs curl ssh zsh nala file wl-clipboard build-essential
+  git git-lfs curl ssh zsh nala file wl-clipboard
 
 package_group native fedora \
-  git git-lfs curl openssh-clients zsh file wl-clipboard gcc
+  git git-lfs curl openssh-clients zsh file wl-clipboard
 
 # Installs the platform-specific native package group with its package manager.
 action_install_native_packages() {
@@ -16,35 +16,7 @@ action_install_native_packages() {
 
   catalog_packages packages native_packages "$platform" native || return
 
-  case "$platform" in
-    arch)
-      executor_require pacman || return
-      executor_retry_as_root \
-        "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        pacman -Syu --needed --noconfirm "${packages[@]}"
-      ;;
-    debian)
-      executor_require apt || return
-      executor_retry_as_root \
-        "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt update || return
-      executor_retry_as_root \
-        "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt install -y "${packages[@]}"
-      ;;
-    fedora)
-      executor_require dnf || return
-      executor_run_as_root \
-        dnf config-manager setopt fedora-cisco-openh264.enabled=0 || return
-      executor_retry_as_root \
-        "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        dnf install -y --refresh "${packages[@]}"
-      ;;
-    *)
-      error_report error.native_packages_unsupported "$platform"
-      return 1
-      ;;
-  esac
+  executor_install_native_items "$platform" package "${packages[@]}"
 }
 
 procedure_define native_packages

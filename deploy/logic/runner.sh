@@ -14,6 +14,21 @@ runner_run_optionals() {
   _runner_run_selected "$1" "$2" "$3" "${selected[@]}"
 }
 
+# Installs only requirements approved for the current selection.
+runner_install_native_requirements() {
+  local platform="$1" name resolved
+  shift
+  if ((EUID == 0)); then
+    error_report error.root_execution
+    return 1
+  fi
+  for name in "$@"; do
+    catalog_native_requirement resolved "$name" "$platform"
+    [[ -n "$resolved" ]] || return 2
+    executor_install_native_items "$platform" "${resolved%%:*}" "${resolved#*:}" || return
+  done
+}
+
 # Both scenarios share privilege preparation, finish handlers and failure policy.
 _runner_run_selected() {
   local platform="$1"

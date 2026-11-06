@@ -254,3 +254,30 @@ questionnaire_confirm() {
     2) printf -v "$result_name" '%s' exit ;;
   esac
 }
+
+# Asks about each distinct native requirement after the main review.
+# A refusal restarts selection before any installation begins.
+questionnaire_confirm_requirements() {
+  local -n approved_result="$1"
+  local platform="$2" mode="$3" name consumer resolved target prompt choice yes_option no_option
+  local -a names=() consumers=()
+  local index
+  approved_result=()
+  workflow_native_requirements names consumers "$platform" "$mode" || return
+  message_format yes_option option.yes
+  message_format no_option option.no
+  for index in "${!names[@]}"; do
+    name="${names[$index]}"; consumer="${consumers[$index]}"
+    catalog_native_requirement resolved "$name" "$platform"
+    target="${resolved#*:}"
+    message_format prompt prompt.native_requirement "$consumer" "$target"
+    if ! ui_select choice "$prompt" "" 0 minimal "$yes_option" "$no_option"; then
+      error_report error.input_interrupted
+      return 1
+    fi
+    if ((choice != 0)); then
+      return 2
+    fi
+    approved_result+=("$name")
+  done
+}

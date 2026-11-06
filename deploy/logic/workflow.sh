@@ -144,3 +144,42 @@ workflow_installed_packages() {
   "$__workflow_installed_probe" __workflow_installed_found "$@" || return
   __workflow_installed_result=("${__workflow_installed_found[@]}")
 }
+
+# Resolves native requirements of the current selection, once per named need.
+# Parallel output arrays contain requirement names and the first consumer.
+workflow_native_requirements() {
+  local -n names_result="$1" consumers_result="$2"
+  local platform="$3" mode="$4" id key source package name resolved
+  local -a selected=() packages=() candidates=()
+  local -A seen=()
+  names_result=(); consumers_result=()
+  if [[ "$mode" == optionals ]]; then
+    workflow_selected_optionals selected "$platform"
+  else
+    workflow_selected selected "$platform"
+  fi
+  for id in "${selected[@]}"; do
+    for name in ${_CATALOG_PROCEDURE_NEEDS[$id]:-}; do
+      [[ ! -v "seen[$name]" ]] || continue
+      catalog_native_requirement resolved "$name" "$platform"
+      if [[ -n "$resolved" ]]; then
+        names_result+=("$name"); consumers_result+=("$id"); seen["$name"]=1
+      fi
+    done
+    workflow_selected_packages packages "$id"
+    for key in "${!_CATALOG_PACKAGE_NEEDS[@]}"; do
+      source="${key%%:*}"; package="${key#*:}"
+      [[ " ${packages[*]} " == *" $package "* ]] || continue
+      [[ " ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]} " == *" $source:"* ]] || continue
+      catalog_packages candidates "$id" "$platform" "$source" || return
+      [[ " ${candidates[*]} " == *" $package "* ]] || continue
+      for name in ${_CATALOG_PACKAGE_NEEDS[$key]}; do
+        [[ ! -v "seen[$name]" ]] || continue
+        catalog_native_requirement resolved "$name" "$platform"
+        if [[ -n "$resolved" ]]; then
+          names_result+=("$name"); consumers_result+=("$package"); seen["$name"]=1
+        fi
+      done
+    done
+  done
+}

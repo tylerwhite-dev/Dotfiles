@@ -5,7 +5,7 @@ checkbox categories, messages, handler functions and declarations. Add or
 extend a function by editing its feature file. To enable a new procedure,
 add its ID to `procedure-order.sh`. No changes to `logic/` or `ui/` are needed.
 
-`settings.sh` contains shared settings; `messages.sh` contains shared messages.
+`settings.sh` contains shared settings; `messages.sh` contains shared messages. `requirements.sh` maps named requirements to native packages or groups per distribution.
 Feature-specific errors and statuses belong in the owning feature file.
 
 ## Adding a feature

@@ -14,10 +14,11 @@ instruction otherwise.
 The executable entry point lives at the repository root and loads this
 `deploy/` directory for its logic, configuration, and UI.
 
-The setup has two phases. The questionnaire records choices without changing the
-system. Execution starts only after the user confirms the summary.
-In `--add-optionals` mode, a separate prompt can install missing Homebrew before
-the questionnaire; accepting that prompt starts Homebrew preparation immediately.
+The questionnaire records choices without changing the system. After the review,
+the setup asks to install native build tools if selected packages need them.
+Declining returns to the questionnaire. Execution starts after these confirmations.
+In `--add-optionals` mode, missing Homebrew is prepared only after the review
+when Homebrew packages were selected.
 The final menu opens on `Start execution`; use the arrow keys to choose another
 action.
 On macOS, the questionnaire also offers categorized Homebrew casks. Their
@@ -84,16 +85,12 @@ bash dotfiles-deploy.sh -a
 - `--server`, `--desktop`, `--wsl`, and `--mac` select named scenarios.
   Mandatory steps are accepted automatically. Package lists remain interactive,
   followed by review with Start, Restart, or Exit. Presets must match the host.
-- `-a`, `--add-optionals` checks Homebrew before showing package lists. If it is
-  missing, accepting the installation prompt installs and verifies Homebrew
-  immediately; declining exits successfully without opening the lists. On macOS
-  this also checks Command Line Tools and opens Apple's installer if needed.
-  Existing Homebrew skips the prompt. Then the script asks for fonts, extended formulae,
-  followed by Flatpak apps on Linux or casks on macOS, and shows a review before
-  installing the selected packages. Only installed packages start checked; base CLI defaults require `zsh_default`.
-  Restarting the questionnaire does not repeat Homebrew preparation. Exiting at
-  the review or selecting no packages leaves the approved Homebrew installation
-  in place. Homebrew preparation also applies when only Flatpak apps are wanted.
+- `-a`, `--add-optionals` asks for fonts, extended formulae, and Flatpak apps
+  on Linux or casks on macOS. After the review, it asks to install missing
+  Homebrew if Homebrew packages were selected. On macOS this may also prepare
+  Command Line Tools. Flatpak-only selections do not prepare Homebrew.
+  Only installed packages start checked; base CLI defaults require `zsh_default`.
+  Restarting or exiting at review makes no changes.
 - `-h`, `--help` prints usage.
 
 Run without flags for the standard questionnaire, or pass exactly one flag.

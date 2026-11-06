@@ -28,6 +28,8 @@ package_group brew dev_tooling \
   nvm rustup uv sdkman-cli go qt zig bun \
   cmake ninja
 
+package_requires brew sdkman-cli NATIVE_BUILD_TOOLS
+
 package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
 

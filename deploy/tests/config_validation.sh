@@ -11,6 +11,14 @@ trap 'rm -f -- "$validation_error"' EXIT
 
 catalog_validate
 
+[[ "${_CATALOG_PACKAGE_NEEDS[brew:sdkman-cli]}" == NATIVE_BUILD_TOOLS ]]
+[[ "${_CATALOG_PROCEDURE_NEEDS[yay]}" == NATIVE_BUILD_TOOLS ]]
+(
+  package_requires brew missing-package NATIVE_BUILD_TOOLS
+  if catalog_validate 2>"$validation_error"; then exit 1; fi
+  grep -Fq 'Invalid package requirement' "$validation_error"
+)
+
 # Keep all guide IDs in the selectable Flatpak catalog, exactly once.
 flatpak_packages=()
 catalog_packages flatpak_packages flatpak_apps fedora flatpak

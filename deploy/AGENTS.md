@@ -62,6 +62,7 @@ The application flow is:
 | --- | --- |
 | `dotfiles-deploy.sh` | Thin executable entry point at the repository root. |
 | `config/settings.sh` | Retry counts, retry delay, and the Homebrew path. |
+| `config/requirements.sh` | Native targets for named package and procedure requirements. |
 | `config/messages.sh` | Shared message templates, labels, and stage text. |
 | `config/procedure-order.sh` | Enabled procedure IDs in questionnaire and execution order. |
 | `config/features/*.sh` | One file per procedure: packages, categories, texts, handlers, and declarations. |
@@ -156,6 +157,19 @@ that run. A later loose group starts a new fallback heading.
 Neither function de-duplicates: referencing the same group twice lists its
 packages twice. Keep a procedure's references disjoint.
 
+### Native requirements
+
+`requirement_define <name> <platform> <package|group> <target>` maps a named
+requirement to a native package or package-manager group. Shared mappings live in `config/requirements.sh`. `package_requires
+<source> <package_id> <name>...` attaches requirements to a selectable package;
+`procedure_needs <procedure_id> <name>...` attaches them to a procedure. An absent
+platform mapping means no native installation on that platform. The workflow
+collects requirements only from selected consumers and de-duplicates by name.
+After the final review, the questionnaire asks for each dependency. Declining
+returns to selection. The runner installs approved dependencies before selected
+procedures; a failure stops execution. `NATIVE_BUILD_TOOLS` applies to `yay`
+and the Homebrew `sdkman-cli` formula, not the Homebrew procedure.
+
 ### Package alias
 
 `package_alias <source> <package_id> <label>` declares an optional display name
@@ -234,13 +248,13 @@ System Fedora remote removal applies only to ordinary Linux; installed refs
 remain. WSL leaves system remotes unchanged. Existing installations are not
 migrated. Existing Flathub URLs and filters are validated before changes.
 A missing CLI requires administrator access through the native package manager.
-`--add-optionals` first checks Homebrew. If absent, it asks permission to install
-it immediately, prepares macOS CLT when enabled, and installs and verifies
-Homebrew before collecting package choices. Declining exits successfully before
-the lists. Then it collects every available selectable procedure, shows a review,
-and calls `runner_run_optionals`. This applies even to Flatpak-only choices.
-Preparation happens once before the restart loop. Exiting at review or selecting
-no packages leaves the approved Homebrew installation in place. Base CLI defaults
+`--add-optionals` collects selectable packages before making changes. After review,
+native build-tool requirements of selected packages are confirmed. If Homebrew
+packages were chosen and Homebrew is missing, the script asks to install it,
+prepares macOS CLT when enabled, and verifies Homebrew before running optionals.
+Declining a requirement or Homebrew returns to the questionnaire. Flatpak-only
+choices do not prepare Homebrew. Exiting at review or selecting no packages
+makes no changes. Base CLI defaults
 require a selected `zsh_default`, so they are absent in `--add-optionals`. Fonts are selectable alongside the
 other optional packages.
 Ordinary workflow dependency filtering is unchanged.
@@ -279,7 +293,7 @@ successful process ends with `●`; a failure ends with `×`.
   duplicates and prerequisites queued after dependants are rejected.
   An empty queue is valid. All loaded feature definitions remain validated.
 - Shared `config/settings.sh` and `config/messages.sh` declare only common
-  settings and messages. A category label belongs next to its package category
+  settings and messages. `config/requirements.sh` declares shared native requirements. A category label belongs next to its package category
   in the owning feature file.
 - `ui/` renders values passed by callers. It must not know procedure IDs,
   package groups, workflow state, executors, or message keys.
@@ -348,7 +362,9 @@ Extend a procedure by editing its handler steps in that same file.
 The source comments give the local contract for every function. The main
 interfaces are grouped below for quick navigation.
 
-- Catalog: `package_group`, `package_category`, `package_alias`, `procedure_define`, `procedure_handler`,
+- Catalog: `package_group`, `package_category`, `package_alias`, `requirement_define`,
+  `package_requires`, `procedure_needs`, `catalog_native_requirement`,
+  `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
   `procedure_selectable`, `procedure_installed_probe`, `procedure_packages`, `procedure_order`,
@@ -363,11 +379,12 @@ interfaces are grouped below for quick navigation.
   `workflow_requirement_is_selected`, `workflow_available`, `workflow_selected`,
   `workflow_available_optionals`, `workflow_selected_optionals`,
   `workflow_select_packages`, `workflow_selected_packages`, and
-  `workflow_installed_packages`.
+  `workflow_installed_packages`, `workflow_native_requirements`.
 - Questionnaire and application: `questionnaire_collect`,
-  `questionnaire_confirm`, `questionnaire_multiselect_texts`, `runner_run`,
-  `runner_run_optionals`, `process_run`, and `setup_run`.
-- Execution: `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
+  `questionnaire_confirm`, `questionnaire_confirm_requirements`,
+  `questionnaire_multiselect_texts`, `runner_run`, `runner_run_optionals`,
+  `runner_install_native_requirements`, `process_run`, and `setup_run`.
+- Execution: `executor_install_native_items`, `executor_run`, `executor_require`, `executor_resolve_command`, `executor_run_as_root`, `executor_retry`,
   `executor_retry_as_root`, `executor_prepare_privilege`, `executor_download`,
   `executor_temp_file`, `executor_brew`, `executor_brew_bin`,
   `executor_brew_installed`,

@@ -31,7 +31,7 @@ awk '
     next
   }
   continuation { continuation = ($0 ~ /\\$/); next }
-  /^(package_group|package_alias|package_category|message_define|procedure_define|procedure_handler|procedure_finish_handler|procedure_platforms|procedure_requires|procedure_requires_root|procedure_selectable|procedure_installed_probe|procedure_packages)[[:space:]]/ {
+  /^(package_group|package_alias|package_category|package_requires|procedure_needs|message_define|procedure_define|procedure_handler|procedure_finish_handler|procedure_platforms|procedure_requires|procedure_requires_root|procedure_selectable|procedure_installed_probe|procedure_packages)[[:space:]]/ {
     continuation = ($0 ~ /\\$/)
     next
   }
@@ -50,7 +50,7 @@ assert_no_match \
 assert_no_match \
   "shared configuration must not render UI or execute commands" \
   'ui_|executor_|workflow_' \
-  "${script_root}/config/settings.sh" "${script_root}/config/messages.sh" \
+  "${script_root}/config/settings.sh" "${script_root}/config/messages.sh" "${script_root}/config/requirements.sh" \
   "${script_root}/config/procedure-order.sh" "${script_root}/config/scenarios.sh"
 
 assert_no_match \

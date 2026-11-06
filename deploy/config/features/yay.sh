@@ -108,6 +108,7 @@ procedure_finish_handler yay action_install_yay_package
 procedure_platforms yay arch
 procedure_requires_root yay arch
 procedure_packages yay native yay_prerequisites
+procedure_needs yay NATIVE_BUILD_TOOLS
 message_define procedure.yay.question "Install yay?"
 message_define procedure.yay.label "Install yay"
 message_define procedure.yay.description \

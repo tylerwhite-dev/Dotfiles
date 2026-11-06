@@ -40,7 +40,7 @@ message_define status.no_selection \
 message_define status.optionals_none \
   "No optional packages were selected. Nothing to do."
 message_define status.optionals_brew_prepare \
-  "Preparing Homebrew before package selection; on macOS this also checks Apple Command Line Tools."
+  "Preparing Homebrew for selected packages; on macOS this also checks Apple Command Line Tools."
 message_define status.selected_count \
   "%d selected"
 message_define status.all_packages_selected \
@@ -78,5 +78,6 @@ message_define ui.multiselect.status_format "cols %%d-%%d/%%d  ·  %%d selected"
 message_define ui.multiselect.navigation_hint "↑↓ move  ←→ column  Space toggle  Enter confirm"
 message_define ui.multiselect.resize_notice "Increase terminal size, then press a key."
 message_define prompt.action "Choose an action:"
-message_define prompt.brew_install "Homebrew is not installed. Install it now before selecting packages?"
+message_define prompt.brew_install "Selected packages require Homebrew. Install it now?"
+message_define prompt.native_requirement "%s requires %s. Install it?"
 message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  --server              Select the server scenario.\n  --desktop             Select the desktop scenario.\n  --wsl                 Select the WSL scenario.\n  --mac                 Select the Mac scenario.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nScenario flags require a matching environment. Mandatory steps cannot be disabled.\nOptional package lists and final confirmation remain interactive.\nAt most one flag is allowed per run, including --help.'

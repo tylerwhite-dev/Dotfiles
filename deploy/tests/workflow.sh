@@ -127,4 +127,27 @@ formula_command="$(
     fail "failed probes must propagate status and discard partial results"
 )
 
+# Native requirements follow selected consumers and are deduplicated.
+SETUP_MODE=standard
+workflow_reset
+workflow_select homebrew yes
+workflow_select homebrew_extended yes
+workflow_select_packages homebrew_extended sdkman-cli
+workflow_native_requirements needs consumers debian all
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${consumers[*]}" == sdkman-cli ]] ||
+  fail "SDKMAN should request Debian build tools"
+workflow_native_requirements needs consumers macos all
+[[ "${#needs[@]}" == 0 ]] || fail "macOS should not request native build tools"
+workflow_select_packages homebrew_extended tmux
+workflow_native_requirements needs consumers debian all
+[[ "${#needs[@]}" == 0 ]] || fail "other Brew formulae should not request build tools"
+workflow_reset
+workflow_select yay yes
+workflow_select homebrew yes
+workflow_select homebrew_extended yes
+workflow_select_packages homebrew_extended sdkman-cli
+workflow_native_requirements needs consumers arch all
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${#needs[@]}" == 1 ]] ||
+  fail "yay and SDKMAN should share one Arch build-tool requirement"
+
 printf 'Workflow validation passed.\n'

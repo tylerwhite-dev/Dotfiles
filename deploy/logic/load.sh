@@ -40,6 +40,9 @@ source "${SETUP_SCRIPT_ROOT}/config/settings.sh"
 source "${SETUP_SCRIPT_ROOT}/config/scenarios.sh"
 # shellcheck source=../config/messages.sh
 source "${SETUP_SCRIPT_ROOT}/config/messages.sh"
+# shellcheck source=../config/requirements.sh
+source "${SETUP_SCRIPT_ROOT}/config/requirements.sh"
+
 # Feature files own packages, messages, handlers and procedure declarations.
 _setup_load_features() {
   # Loading order is deterministic; procedure-order.sh controls execution.

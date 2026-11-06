@@ -60,8 +60,8 @@ does not uninstall a package or cancel its installation through a mandatory step
 ### Other flags
 
 - `-a`, `--add-optionals` selects optional packages without installing core CLI
-  tools. If Homebrew is missing, the script asks to install it before opening
-  the package lists; this preparation remains even if you exit the final review.
+  tools. If selected packages need missing Homebrew, the script asks to install
+  it after the final review.
 - `-h`, `--help` prints usage.
 
 Pass at most one flag per run. The former `-y` / `--yolo` flag is no longer

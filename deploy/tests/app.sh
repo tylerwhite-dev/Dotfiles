@@ -20,6 +20,7 @@ ui_ansi_palette() { :; }
 error_report() { events+=("$1"); }
 status_report() { events+=("$1"); }
 runner_run() { events+=(run); return "${runner_status:-0}"; }
+runner_install_native_requirements() { return "${requirements_status:-0}"; }
 _app_print_elapsed_time() { events+=(elapsed); }
 questionnaire_collect() { events+=(collect); return "${collect_status:-0}"; }
 questionnaire_confirm() {
@@ -74,6 +75,20 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
   events=() answers=(start) answer_index=0 runner_status=9
   run_app 9
   assert_events 'status.distribution_detected collect status.settings_confirmed run'
+)
+(
+  events=() answers=(start start) answer_index=0 requirement_asks=0
+  questionnaire_confirm_requirements() {
+    ((requirement_asks+=1))
+    if ((requirement_asks == 1)); then return 2; fi
+  }
+  run_app 0
+  assert_events 'status.distribution_detected collect collect status.settings_confirmed run elapsed'
+)
+(
+  events=() answers=(start) answer_index=0 requirements_status=8
+  run_app 8
+  assert_events 'status.distribution_detected collect status.settings_confirmed'
 )
 (
   events=() interactive_status=1
@@ -143,10 +158,10 @@ else
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    # Empty choices happen after the explicitly approved preparation.
+    # Empty choices do not prepare Homebrew.
     events=() SETUP_MODE=optionals optional_ids=() brew_path=/missing/brew
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.optionals_none'
+    assert_events 'status.distribution_detected optional-collect status.optionals_none'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) answers=(start) answer_index=0
@@ -161,22 +176,22 @@ else
   (
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed status.optionals_brew_prepare brew-install optional-run elapsed'
   )
   (
-    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew brew_choice=1 answers=(start exit) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.exited'
+    assert_events 'status.distribution_detected optional-collect optional-collect status.exited'
   )
   (
-    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130
+    events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew input_status=130 answers=(start) answer_index=0
     run_app 1
-    assert_events 'status.distribution_detected error.input_interrupted'
+    assert_events 'status.distribution_detected optional-collect error.input_interrupted'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew brew_status=6 answers=(start) answer_index=0
     run_app 6
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed status.optionals_brew_prepare brew-install'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=() optional_status=5
@@ -189,31 +204,31 @@ else
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run'
   )
   (
-    # Homebrew is prepared before any package lists, including Flatpak.
+    # Flatpak-only selection does not prepare Homebrew.
     events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
-    # Exit after the review leaves the explicitly approved Homebrew installed.
+    # Exit after review makes no changes.
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) brew_path=/missing/brew answers=(exit) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect status.exited'
+    assert_events 'status.distribution_detected optional-collect status.exited'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(restart start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare brew-install optional-collect optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected optional-collect optional-collect status.settings_confirmed optional-run elapsed'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
-    assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install brew-install optional-collect status.settings_confirmed optional-run elapsed'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed status.optionals_brew_prepare clt-check clt-install brew-install optional-run elapsed'
   )
   (
     events=() SETUP_MODE=optionals optional_ids=(homebrew_casks) test_platform=macos brew_path=/missing/brew clt_status=9 answers=(start) answer_index=0
     run_app 9
-    assert_events 'status.distribution_detected status.optionals_brew_prepare clt-check clt-install'
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed status.optionals_brew_prepare clt-check clt-install'
   )
 fi
 printf 'Application scenario validation passed.\n'

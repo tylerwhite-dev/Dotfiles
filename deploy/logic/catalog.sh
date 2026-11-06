@@ -14,6 +14,30 @@ declare -Ag _CATALOG_PACKAGE_GROUPS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_LABELS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_REFS=()
 declare -Ag _CATALOG_PACKAGE_ALIASES=()
+declare -Ag _CATALOG_NATIVE_REQUIREMENTS=()
+declare -Ag _CATALOG_PACKAGE_NEEDS=()
+declare -Ag _CATALOG_PROCEDURE_NEEDS=()
+
+# Names are resolved by platform; an absent platform needs no native package.
+requirement_define() {
+  _CATALOG_NATIVE_REQUIREMENTS["$1:$2"]="$3:$4"
+}
+
+package_requires() {
+  local key="$1:$2"
+  shift 2
+  _CATALOG_PACKAGE_NEEDS["$key"]="$*"
+}
+
+procedure_needs() {
+  local id="$1"
+  shift
+  _CATALOG_PROCEDURE_NEEDS["$id"]="$*"
+}
+
+catalog_native_requirement() {
+  printf -v "$1" '%s' "${_CATALOG_NATIVE_REQUIREMENTS[$2:$3]:-}"
+}
 
 # Registers an optional display name; package identity remains source and ID.
 package_alias() {
@@ -480,6 +504,7 @@ catalog_validate() {
   local requirement
   local platform
   local installed_probe
+  local key source package name kind target group packages needs
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then
     printf 'No setup procedures were declared.\n' >&2
@@ -544,6 +569,54 @@ catalog_validate() {
 
     _catalog_validate_messages "$id" || return
     _catalog_validate_package_references "$id" || return
+  done
+
+  for key in "${!_CATALOG_NATIVE_REQUIREMENTS[@]}"; do
+    platform="${key#*:}"
+    kind="${_CATALOG_NATIVE_REQUIREMENTS[$key]%%:*}"
+    target="${_CATALOG_NATIVE_REQUIREMENTS[$key]#*:}"
+    if [[ ! "$key" =~ ^[A-Z][A-Z0-9_]*:(arch|debian|fedora)$ ||
+      ! "$kind" =~ ^(package|group)$ || ! "$target" =~ ^[a-zA-Z0-9][a-zA-Z0-9._+-]*$ ]]; then
+      printf 'Invalid native requirement: %s\n' "$key" >&2
+      return 1
+    fi
+  done
+  for key in "${!_CATALOG_PACKAGE_NEEDS[@]}"; do
+    source="${key%%:*}"; package="${key#*:}"
+    needs="${_CATALOG_PACKAGE_NEEDS[$key]}"
+    group=no
+    for id in "${!_CATALOG_PACKAGE_GROUPS[@]}"; do
+      [[ "${id%%:*}" == "$source" ]] || continue
+      packages=" ${_CATALOG_PACKAGE_GROUPS[$id]} "
+      [[ "$packages" == *" $package "* ]] && group=yes
+    done
+    if [[ "$group" != yes || -z "$needs" ]]; then
+      printf 'Invalid package requirement: %s -> %s\n' "$key" "$needs" >&2
+      return 1
+    fi
+    for name in $needs; do
+      if [[ ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:arch]" &&
+        ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:debian]" &&
+        ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:fedora]" ]]; then
+        printf 'Invalid package requirement: %s -> %s\n' "$key" "$name" >&2
+        return 1
+      fi
+    done
+  done
+  for id in "${!_CATALOG_PROCEDURE_NEEDS[@]}"; do
+    needs="${_CATALOG_PROCEDURE_NEEDS[$id]}"
+    if [[ ! -v "_CATALOG_PROCEDURE_HANDLER[$id]" || -z "$needs" ]]; then
+      printf 'Invalid procedure requirement: %s -> %s\n' "$id" "$needs" >&2
+      return 1
+    fi
+    for name in $needs; do
+      if [[ ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:arch]" &&
+        ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:debian]" &&
+        ! -v "_CATALOG_NATIVE_REQUIREMENTS[$name:fedora]" ]]; then
+        printf 'Invalid procedure requirement: %s -> %s\n' "$id" "$name" >&2
+        return 1
+      fi
+    done
   done
 
   _catalog_validate_order
