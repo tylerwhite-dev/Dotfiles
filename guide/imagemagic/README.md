@@ -15,6 +15,7 @@ magick "$input" \
   -blur "0x${blur}" \
   -gravity center \
   -extent "$size" \
+  -depth 8 \
   "$output"
 ```
 
@@ -39,13 +40,15 @@ magick mogrify \
   -blur "0x${blur}" \
   -gravity center \
   -extent "$size" \
+  -depth 8 \
   "$input_dir"/*
 ```
 
-The reusable scripts in the repository's `script/` directory accept the same size and blur settings:
+The batch script replaces the input filename extension with `.png`. Inputs with the same base name can overwrite the same output file. The reusable scripts accept the same size and blur settings:
 
 ```bash
 bash script/imagemagick/image-to-png.sh input.avif output.png [WIDTH [HEIGHT [BLUR]]]
 bash script/imagemagick/images-to-png.sh inputs outputs_png [WIDTH [HEIGHT [BLUR]]]
 ```
 
+PNG output uses 8 bits per channel. Converting a higher-bit-depth input reduces color precision and can produce banding in gradients.

@@ -37,4 +37,5 @@ magick "$input" \
   -blur "0x${blur}" \
   -gravity center \
   -extent "$size" \
+  -depth 8 \
   "$output"

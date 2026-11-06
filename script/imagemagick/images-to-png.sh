@@ -35,6 +35,7 @@ for input in "$input_dir"/*; do
   [[ -f $input ]] || continue
 
   filename=${input##*/}
+  [[ $filename == *.* ]] && filename=${filename%.*}
   magick "${input}[0]" \
     -auto-orient \
     -filter Lanczos \
@@ -42,6 +43,7 @@ for input in "$input_dir"/*; do
     -blur "0x${blur}" \
     -gravity center \
     -extent "$size" \
+    -depth 8 \
     "$output_dir/${filename}.png"
   ((processed += 1))
 done
