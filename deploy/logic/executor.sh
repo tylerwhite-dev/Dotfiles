@@ -235,12 +235,14 @@ executor_install_native_items() {
     fedora:package|fedora:group)
       executor_require dnf || return
       executor_run_as_root dnf config-manager setopt fedora-cisco-openh264.enabled=0 || return
+      executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
+        dnf --setopt=timeout=10 makecache --refresh || return
       if [[ "$kind" == group ]]; then
         executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
           dnf group install -y "$@"
       else
         executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-          dnf install -y --refresh "$@"
+          dnf install -y "$@"
       fi ;;
     *) error_report error.native_packages_unsupported "$platform:$kind"; return 1 ;;
   esac
