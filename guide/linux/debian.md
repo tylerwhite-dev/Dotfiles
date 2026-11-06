@@ -5,6 +5,22 @@
 sudo nala upgrade -y && brew upgrade -y && flatpak update -y
 ```
 
+## upgrade to a new Debian release
+
+```bash
+sudo apt update
+sudo apt full-upgrade
+```
+
+Check the [release notes](https://www.debian.org/releases/stable/release-notes/) for the target release. Update the Debian repository entries in `/etc/apt/sources.list` and any files under `/etc/apt/sources.list.d/` to use the target release's codename. Review third-party repositories separately and disable those that do not support the target release. Then run:
+
+```bash
+sudo apt update
+sudo apt upgrade --without-new-pkgs
+sudo apt full-upgrade
+sudo reboot
+```
+
 ## cleanup system
 ```bash
 sudo nala autoremove -y && sudo nala clean && brew autoremove && brew cleanup --prune=all && flatpak uninstall --unused -y

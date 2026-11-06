@@ -6,6 +6,17 @@
 sudo dnf upgrade -y && brew upgrade -y && flatpak update -y
 ```
 
+## upgrade to a new Fedora release
+
+```bash
+sudo dnf --refresh upgrade
+sudo reboot
+sudo dnf system-upgrade download --releasever=NN # Replace `NN` with Fedora release
+sudo dnf system-upgrade reboot
+```
+
+Run the last command only after the download succeeds. Check that enabled third-party repositories support the target release.
+
 ## cleanup system
 
 ```bash
