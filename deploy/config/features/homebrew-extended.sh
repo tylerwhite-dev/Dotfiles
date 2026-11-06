@@ -20,7 +20,8 @@ package_alias brew zsh-syntax-highlighting "zsh syntax"
 package_group brew util_tools \
   lazygit lazyjournal lazydocker mailsy tio \
   yazi superfile zip stow \
-  nvtop btop macmon
+  nvtop btop macmon \
+  typtea typioca
 
 package_group brew dev_tooling \
   fresh-editor neovim mise \
