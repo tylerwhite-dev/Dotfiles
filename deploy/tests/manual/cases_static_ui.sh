@@ -72,7 +72,7 @@ _tsa_col40() {
 _tsa_animation() {
   local i marker
   for ((i = 0; i < 20; i++)); do
-    ui_timeline_frame marker $((i * ui_timeline_frame_microseconds))
+    ui_timeline_frame marker $((i * ui_timeline_frame_milliseconds))
     ui_timeline_active 1 8 "Install packages" $((i / 4)) "$marker" yes
     sleep 0.125
   done

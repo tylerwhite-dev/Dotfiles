@@ -60,6 +60,7 @@ _process_render_output() {
   local started_at_microseconds="$6"
   local now_microseconds
   local elapsed_microseconds
+  local elapsed_milliseconds
   local frame
   local line
   local read_status
@@ -67,7 +68,8 @@ _process_render_output() {
   while true; do
     now_microseconds="${EPOCHREALTIME/./}"
     elapsed_microseconds=$((now_microseconds - started_at_microseconds))
-    ui_timeline_frame frame "$elapsed_microseconds"
+    elapsed_milliseconds=$((elapsed_microseconds / 1000))
+    ui_timeline_frame frame "$elapsed_milliseconds"
     ui_timeline_active \
       "$current" "$total" "$label" "$((SECONDS - started_at))" "$frame" yes
 

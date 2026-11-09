@@ -39,13 +39,13 @@ _ui_timeline_format_duration() {
   fi
 }
 
-# Selects an animation frame from elapsed microseconds.
+# Selects an animation frame from elapsed milliseconds.
 ui_timeline_frame() {
   _ui_output_name "$1" || return
   local __ui_frame_result_name="$1"
-  local __ui_frame_elapsed_microseconds="$2"
+  local __ui_frame_elapsed_milliseconds="$2"
   local __ui_frame_frame_count="${#ui_timeline_frames[@]}"
-  local __ui_frame_frame_index=$((__ui_frame_elapsed_microseconds / ui_timeline_frame_microseconds))
+  local __ui_frame_frame_index=$((__ui_frame_elapsed_milliseconds / ui_timeline_frame_milliseconds))
 
   printf -v "$__ui_frame_result_name" '%s' \
     "${ui_timeline_frames[__ui_frame_frame_index % __ui_frame_frame_count]}"
