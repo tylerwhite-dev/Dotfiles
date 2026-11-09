@@ -27,25 +27,29 @@ _questionnaire_read_selectable_packages() {
   local total="$4"
   local question
   local prompt
+  local package
   local -a rows=()
   local -a labels=()
   local -a kinds=()
   local -a packages=()
   local -a presets=()
+  local -a detected=()
   local -a selected=()
+  local -a to_install=()
   local -A texts=()
 
   _questionnaire_procedure_text question "$procedure_id" question
   message_format prompt question.progress "$current" "$total" "$question"
   catalog_package_rows rows kinds "$procedure_id" "$platform" "" labels || return
   catalog_packages packages "$procedure_id" "$platform" || return
-  if ! workflow_installed_packages presets "$procedure_id" "${packages[@]}"; then
+  if ! workflow_installed_packages detected "$procedure_id" "${packages[@]}"; then
     error_report error.installed_packages_probe_failed
     return 1
   fi
+  presets=("${detected[@]}")
   # Base formulae default to checked only when the zsh procedure is selected.
   if [[ "$procedure_id" == homebrew_extended ]]; then
-    local package zsh_selection
+    local zsh_selection
     local -a core_packages=()
     workflow_selection zsh_selection zsh_default
     if [[ "$zsh_selection" == yes ]]; then
@@ -64,8 +68,13 @@ _questionnaire_read_selectable_packages() {
     return 1
   fi
 
-  workflow_select_packages "$procedure_id" "${selected[@]}"
-  if ((${#selected[@]} > 0)); then
+  for package in "${selected[@]}"; do
+    if [[ " ${detected[*]} " != *" $package "* ]]; then
+      to_install+=("$package")
+    fi
+  done
+  workflow_select_packages "$procedure_id" "${to_install[@]}"
+  if ((${#to_install[@]} > 0)); then
     workflow_select "$procedure_id" yes
   else
     workflow_select "$procedure_id" no

@@ -118,7 +118,8 @@ All presets use the existing complete native package and dotfiles sets. Package
 lists retain installed-package presets. Extended Homebrew also preselects the base
 CLI tools when `zsh_default` is selected. macOS and `--add-optionals` do not
 select that procedure, so they use installed-package presets only. These defaults
-can be cleared, and only the checked packages are installed.
+can be cleared. Checked packages that were not detected as installed are
+included in the review and installation.
 
 Scenario membership is configured in `config/scenarios.sh`. Running without
 flags keeps the standard questionnaire with individual procedure questions.

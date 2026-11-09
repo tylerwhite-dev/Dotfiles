@@ -200,7 +200,7 @@ procedure and returns the installed subset of the given packages.
 A successful empty result means nothing is installed. Extended Homebrew menus
 also preselect the base CLI formulae as editable defaults when `zsh_default`
 is selected;
-only checked packages are installed. Missing Homebrew is also
+only checked packages that were not detected as installed are installed. Missing Homebrew is also
 a successful empty result. Other probe failures propagate through the workflow,
 discard partial results, and stop the questionnaire with an error before opening
 the checkbox list or running procedures. Homebrew diagnostics remain on stderr.
@@ -229,12 +229,12 @@ item rows only; group rows are never part of the result. The grouped menu has
 no global `All` row. The checkbox menu uses a temporary screen and restores the
 previous terminal view after confirmation.
 The questionnaire passes the packages that are installed already as a preset
-list, so they start checked and the operator only confirms the rest. A preset
+list, so they start checked. It excludes detected packages from the installation
+selection and review count. A preset
 package that is not part of the list is ignored. A procedure without an
 installed-package probe starts with an empty selection.
 The optional Homebrew formula and cask handlers use
-`HOMEBREW_NO_INSTALL_UPGRADE=1` for installation, so confirming installed packages
-does not upgrade them automatically. New packages may still affect dependencies.
+`HOMEBREW_NO_INSTALL_UPGRADE=1` for installation. New packages may still affect dependencies.
 Clearing a package checkbox excludes it from installation and never uninstalls it.
 On macOS, `homebrew_casks` uses the same selection UI and installs its selected
 `brew_cask` packages through a direct-input finish handler.

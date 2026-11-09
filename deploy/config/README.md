@@ -195,7 +195,8 @@ procedure_installed_probe homebrew_extended homebrew_extended_installed_packages
 ```
 
 The probe receives the result array name first and the candidate packages after
-it, and fills the array with the installed ones. `homebrew_extended` checks
+it, and fills the array with the installed ones. Detected packages start checked
+but are excluded from the installation selection. `homebrew_extended` checks
 formulae, `homebrew_casks` checks casks. A procedure without a probe starts with
 an empty selection. The probe name must be a plain identifier, and the function
 must exist — the catalog rejects the configuration otherwise.
