@@ -35,15 +35,6 @@ chmod +x ~/Dotfiles/dotfiles-deploy.sh
 bash ~/Dotfiles/dotfiles-deploy.sh --wsl
 ```
 
-## apps
-`
-loupe - images;
-decibels - music;
-eartag - song tags;
-vlc - video;
-snapshot - camera.
-`
-
 ### apt
 
 basic

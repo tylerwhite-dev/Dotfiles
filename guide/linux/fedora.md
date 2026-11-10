@@ -58,14 +58,6 @@ flatpak remotes
 flatpak remote-delete fedora
 ```
 
-## apps
-
-`loupe - images;
-decibels - music;
-eartag - song tags;
-vlc - video;
-snapshot - camera.`
-
 ## dnf
 
 basic
@@ -78,12 +70,6 @@ common
 
 ```
 flatpak gparted timeshift
-```
-
-gnome
-
-```
-nautilus gnome-keyring gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
 ```
 
 ### docker
