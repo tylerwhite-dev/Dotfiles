@@ -14,25 +14,47 @@ package groups below for you; see [`deploy/README.md`](../../deploy/README.md).
 ## casks
 
 ```bash
-brew install --cask firefox google-chrome telegram qbittorrent amneziavpn brave-browser microsoft-edge chromium librewolf arc zen ungoogled-chromium tor-browser discord slack zoom whatsapp microsoft-teams signal bluebubbles wechat thunderbird obsidian libreoffice iina bitwarden veracrypt vlc spotify blender inkscape obs gimp figma audacity handbrake-app zed visual-studio-code vscodium ghostty hermes-desktop docker-desktop lm-studio android-studio intellij-idea qt-creator iterm2 warp cmux kitty wezterm alacritty termius wave tabby cursor sublime-text emacs-app intellij-idea-ce coteditor utm appcleaner betterdisplay coconutbattery macfuse mos raycast balenaetcher raspberry-pi-imager stats rectangle maccy alt-tab karabiner-elements jordanbaird-ice hammerspoon linearmouse playcover-community steam
+brew install --cask firefox google-chrome librewolf zen ungoogled-chromium tor-browser telegram whatsapp discord slack zoom qbittorrent amneziavpn obsidian libreoffice bitwarden veracrypt iina vlc spotify figma inkscape drawio blender audacity obs zed visual-studio-code vscodium android-studio intellij-idea qt-creator iterm2 ghostty cmux warp wezterm docker-desktop hermes-desktop lm-studio wireshark-app raycast maccy rectangle alt-tab jordanbaird-ice betterdisplay mos linearmouse karabiner-elements hammerspoon stats coconutbattery appcleaner macfuse balenaetcher raspberry-pi-imager utm steam playcover-community
+```
+
+## shell
+
+```bash
+brew install starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
 ```
 
 ## utilities
 
 ```bash
-brew install bash-completion btop cbonsai eza fastfetch ffmpeg-full git-lfs htop imagemagick-full jq lazygit macmon mailsy neovim nvtop pfetch-rs starship stow superfile tio tmux tree yazi yt-dlp zip zoxide fzf zsh-autosuggestions zsh-syntax-highlighting
+brew install lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
 ```
 
 ## developer
 
 ```bash
-brew install cmake go nvm qt opencode rustup uv zig
+brew install fresh-editor neovim mise nvm rustup uv sdkman-cli go qt zig bun cmake ninja
+```
+
+The deploy script adds and trusts `sdkman/tap` when `sdkman-cli` is selected.
+For manual installation, run `brew tap sdkman/tap` and
+`brew trust --tap sdkman/tap` before installing it.
+
+## media
+
+```bash
+brew install yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
+```
+
+## CLI harness
+
+```bash
+brew install opencode hermes-agent codex claude-code antigravity-cli openclaw
 ```
 
 ## fonts
 
 ```bash
-brew install font-hack-nerd-font font-jetbrains-mono-nerd-font
+brew install --cask font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 ```
 
 # configurations

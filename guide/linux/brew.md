@@ -18,24 +18,44 @@ export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 
 # formulae
 
-## main
+The deploy script offers these formulae for selection. When zsh is selected,
+it preselects `starship`, `zsh-autosuggestions`, `zsh-syntax-highlighting`,
+`pfetch-rs`, `zoxide`, `herdr`, and `stow`.
+
+## shell
 ```
-zsh-autosuggestions zsh-syntax-highlighting yazi starship tmux neovim fastfetch pfetch-rs btop yt-dlp nvtop zoxide fzf eza lazygit zip
+starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
+```
+
+## utils
+```
+lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
+```
+
+## dev tools
+```
+fresh-editor neovim mise nvm rustup uv sdkman-cli go qt zig bun cmake ninja
+```
+
+## media
+```
+yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
+```
+
+## CLI harness
+```
+opencode hermes-agent codex claude-code antigravity-cli openclaw
 ```
 
 ## tap
 ```
-oven-sh/bun sdkman/tap
+sdkman/tap
 ```
+
+The deploy script adds and trusts this tap when `sdkman-cli` is selected.
 
 ## fonts
+These are installed as casks:
 ```
-font-jetbrains-mono-nerd-font font-hack-nerd-font
-```
-
-## optional
-```
-opencode charmbracelet/tap/crush qwen-code
-llvm cmake go nvm rustup uv zig bun sdkman-cli
-tio ffmpeg-full superfile htop tree mailsy imagemagick-full taproom file-formula 
+font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 ```
