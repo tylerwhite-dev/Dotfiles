@@ -25,6 +25,20 @@ cargo -V
 rustup show
 ```
 
+## uv
+
+Run a standalone Python script without loading the current project's dependencies:
+
+```bash
+uv run --no-project script.py
+```
+
+If the script needs a package, supply it for this run:
+
+```bash
+uv run --no-project --with requests script.py
+```
+
 ## SDKMAN
 
 look at available java
