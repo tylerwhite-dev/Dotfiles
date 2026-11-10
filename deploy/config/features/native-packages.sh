@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 package_group native arch \
-  git git-lfs curl openssh zsh file wl-clipboard
+  git git-lfs curl zsh file openssh cronie
 
 package_group native debian \
-  git git-lfs curl ssh zsh nala file wl-clipboard
+  git git-lfs curl zsh file ssh nala
 
 package_group native fedora \
-  git git-lfs curl openssh-clients zsh file wl-clipboard
+  git git-lfs curl zsh file openssh-clients
 
 # Installs the platform-specific native package group with its package manager.
 action_install_native_packages() {
