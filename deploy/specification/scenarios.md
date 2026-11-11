@@ -2,6 +2,12 @@
 
 This map reflects the current code. Independent package choices are not expanded into every possible combination. Package definitions are in `config/features/`.
 
+The extended Homebrew menu checks both installed formulae and casks on every
+supported platform. This includes CLI packages such as codex, claude-code,
+antigravity-cli, and openclaw installed as casks. Matching packages start checked
+and are excluded from the installation selection. A failure to read either list
+stops the questionnaire without using partial results.
+
 ## Errors before the questionnaire
 
 - Bash versions below 5, a non-interactive terminal, an invalid catalog, or an unsupported system cause startup to fail.

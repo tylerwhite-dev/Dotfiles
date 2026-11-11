@@ -194,21 +194,28 @@ _executor_brew_list() {
     "$brew_bin" list "--$kind"
 }
 
-# Collects the requested packages that Homebrew already has installed.
+# Collects installed candidates from formulae, casks, or both (all).
 executor_brew_installed() {
   local -n __executor_installed_result="$1"
   local __executor_installed_kind="$2"
   shift 2
 
   local __executor_installed_name __executor_installed_package __executor_installed_output
+  local __executor_installed_list_kind
+  local -a __executor_installed_kinds=("$__executor_installed_kind")
   local -A __executor_installed_set=()
 
   __executor_installed_result=()
-  __executor_installed_output="$(_executor_brew_list "$__executor_installed_kind")" || return
-  while IFS= read -r __executor_installed_name; do
-    [[ -n "$__executor_installed_name" ]] || continue
-    __executor_installed_set["$__executor_installed_name"]=1
-  done <<< "$__executor_installed_output"
+  if [[ "$__executor_installed_kind" == all ]]; then
+    __executor_installed_kinds=(formula cask)
+  fi
+  for __executor_installed_list_kind in "${__executor_installed_kinds[@]}"; do
+    __executor_installed_output="$(_executor_brew_list "$__executor_installed_list_kind")" || return
+    while IFS= read -r __executor_installed_name; do
+      [[ -n "$__executor_installed_name" ]] || continue
+      __executor_installed_set["$__executor_installed_name"]=1
+    done <<< "$__executor_installed_output"
+  done
   for __executor_installed_package in "$@"; do
     if [[ -v "__executor_installed_set[$__executor_installed_package]" ]]; then
       __executor_installed_result+=("$__executor_installed_package")

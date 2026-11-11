@@ -63,6 +63,32 @@ printf '%s\n' firefox obsidian > "$BREW_FIXTURE_OUTPUT"
 executor_brew_installed installed cask steam firefox
 [[ "${installed[*]}" == firefox ]]
 [[ "$(tail -n 1 "$BREW_FIXTURE_CALLS")" == 'list --cask' ]]
+executor_brew_installed installed all firefox missing
+[[ "${installed[*]}" == firefox ]]
+[[ "$(tail -n 2 "$BREW_FIXTURE_CALLS")" == $'list --formula\nlist --cask' ]]
+
+# Extended CLI packages may be installed as casks on Linux or macOS.
+# Keep candidate order, deduplicate matches, and discard partial probe results.
+(
+  _executor_brew_list() {
+    case "$1" in
+      formula) printf '%s\n' tmux opencode codex ;;
+      cask) printf '%s\n' antigravity-cli claude-code codex openclaw ;;
+      *) return 2 ;;
+    esac
+  }
+  workflow_installed_packages installed homebrew_extended \
+    opencode codex claude-code antigravity-cli openclaw missing tmux
+  [[ "${installed[*]}" == 'opencode codex claude-code antigravity-cli openclaw tmux' ]]
+
+  _executor_brew_list() {
+    if [[ "$1" == formula ]]; then printf '%s\n' tmux; else return 7; fi
+  }
+  installed=(stale)
+  actual=0
+  workflow_installed_packages installed homebrew_extended tmux codex || actual=$?
+  [[ "$actual" == 7 && "${#installed[@]}" == 0 ]]
+)
 
 # Empty output and missing Homebrew are valid empty results.
 : > "$BREW_FIXTURE_OUTPUT"

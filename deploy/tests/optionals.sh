@@ -26,7 +26,7 @@ executor_brew_installed() {
   local package
   result=()
   for package in "$@"; do
-    if [[ "$kind" == formula && "$package" == tmux ]]; then
+    if [[ "$kind" == all && "$package" == tmux ]]; then
       result+=("$package")
     elif [[ "$kind" == cask && "$package" == firefox ]]; then
       result+=("$package")

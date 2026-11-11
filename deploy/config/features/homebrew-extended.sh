@@ -44,7 +44,7 @@ package_category brew harness "CLI Harness" cli_harness
 
 # Reports which of the given packages Homebrew already has installed.
 homebrew_extended_installed_packages() {
-  executor_brew_installed "$1" formula "${@:2}"
+  executor_brew_installed "$1" all "${@:2}"
 }
 
 # Installs the user-selected extended Homebrew packages.
