@@ -1,14 +1,10 @@
 # Script setup guide
 
 This directory contains the interactive Linux and macOS setup program for the
-Dotfiles repository. The program asks for all choices first, shows a review
-screen, and only then runs the selected procedures. The `--server`, `--desktop`,
-`--wsl`, and `--mac` flags select presets declared in `config/scenarios.sh`.
-Mandatory non-selectable procedures are accepted automatically; selectable
-procedures show package lists. Review still allows Start, Restart, or Exit.
-Presets must match the detected host: macOS, WSL, or Linux outside WSL.
-Distribution filtering remains in effect. Optional packages install only
-explicitly selected packages.
+Dotfiles repository. See the [scenario map](specification/scenarios.md) for
+platform-specific flows, preset contents, package choices, confirmation and
+cancellation behavior, and installation effects. Keep those descriptions in the
+scenario map when behavior changes; this file documents implementation contracts.
 
 The script requires bash 5 or newer. macOS ships bash 3.2 in `/bin/bash`, so run
 it on macOS with a Homebrew bash, for example
@@ -29,31 +25,19 @@ directory, `dotfiles-deploy.sh` loads `logic/load.sh`, parses CLI flags with
 
 The application flow is:
 
-1. `flags_parse` accepts zero or one CLI flag and records the requested mode.
-   More than one argument returns status 2, including repeats and `--help`
-   combinations. `SETUP_MODE` stores `standard`, `server`, `desktop`, `wsl`, `mac`, or `optionals` and is
-   reset to `standard` before parsing.
-2. `ui_is_interactive` rejects non-interactive input and output in every mode.
-3. `catalog_validate` checks the declarations, handlers, dependencies, messages,
-   platforms, and package references.
-4. `environment_detect` maps `/etc/os-release` or `sw_vers` to `arch`,
-   `debian`, `fedora`, or `macos`.
-5. `questionnaire_collect` resets selections and asks one question per available
-   procedure in standard mode. Scenario modes automatically select mandatory
-   procedures and ask only for package choices. Collection may query installed
-   packages, but does not change the system.
-   A procedure marked with
-   `procedure_selectable` shows a checkbox list instead of a plain yes/no
-   question, and records the chosen packages with `workflow_select_packages`.
-   The list is grouped under the categories its package references name. A
-   selectable procedure is the marker for an optional package set. Packages
-   must be chosen interactively or through `--add-optionals`.
-6. `questionnaire_confirm` renders the selected procedures and waits for
-   `Start execution`, `Restart questionnaire`, or `Exit without changes`.
-7. `runner_run` filters selected procedures and runs them in configured queue order.
-8. `process_run` adds privilege preparation, timeline rendering, output capture,
+1. `flags_parse` records the requested mode in `SETUP_MODE`.
+   Preset membership is declared in `config/scenarios.sh`.
+2. `setup_run` checks terminal interactivity, validates the catalog, detects the
+   platform, checks mode compatibility, and dispatches to the application flow.
+3. `questionnaire_collect` and `questionnaire_collect_optionals` populate workflow
+   state. Installed-package probes may read system state; collection must not
+   change the system. `questionnaire_confirm` and
+   `questionnaire_confirm_requirements` handle review and dependency approval.
+4. `runner_install_native_requirements` installs approved dependencies;
+   `runner_run` or `runner_run_optionals` dispatches selected procedures in queue order.
+5. `process_run` adds privilege preparation, timeline rendering, output capture,
    and final status handling around each action.
-9. `_app_print_elapsed_time` reports the duration measured from the execution
+6. `_app_print_elapsed_time` reports the duration measured from the execution
    confirmation, not from script startup.
 
 ## Directory layout
@@ -62,6 +46,7 @@ The application flow is:
 | --- | --- |
 | `dotfiles-deploy.sh` | Thin executable entry point at the repository root. |
 | `config/settings.sh` | Retry counts, retry delay, and the Homebrew path. |
+| `config/scenarios.sh` | Procedure membership for named presets. |
 | `config/requirements.sh` | Native targets for named package and procedure requirements. |
 | `config/messages.sh` | Shared message templates, labels, and stage text. |
 | `config/procedure-order.sh` | Enabled procedure IDs in questionnaire and execution order. |
@@ -86,6 +71,7 @@ The application flow is:
 | `ui/timeline.sh` | Active, finished, and captured-output timeline rows. |
 | `ui/ui.sh` | UI entry point that sources the UI modules. |
 | `tests/*.sh` | Shell checks for declarations, workflow rules, UI output, and layer rules. |
+| `specification/scenarios.md` | Platform-specific scenario map and package lists. |
 
 ## Domain entities
 
@@ -165,17 +151,10 @@ requirement to a native package or package-manager group. Shared mappings live i
 `procedure_needs <procedure_id> <name>...` attaches them to a procedure. An absent
 platform mapping means no native installation on that platform. The workflow
 collects requirements only from selected consumers and de-duplicates by name.
-After the final review, the questionnaire asks for each dependency. Declining
-offers an explanation and explicit actions to review the current selection,
-restart the questionnaire, or exit without changes. Returning to review preserves
-all choices; only an explicit restart resets them. Preset mandatory procedures
-remain selected. The runner installs approved dependencies before selected
-procedures; a failure stops execution. `NATIVE_BUILD_TOOLS` applies to `yay`
-and the Homebrew `sdkman-cli` formula, not the Homebrew procedure.
-The Linux base native package groups include `gawk`, `openssl`, and
-`ca-certificates`. Only a new Linux Homebrew installation installs its
-`ca-certificates` formula, which creates the CA bundle during installation. Existing Homebrew is
-only verified, including in the optional-only workflow.
+`questionnaire_confirm_requirements` collects approvals;
+`runner_install_native_requirements` consumes them before procedure execution.
+See the [scenario map](specification/scenarios.md) for consumers, platform
+targets, and refusal behavior.
 
 ### Package alias
 
@@ -204,13 +183,11 @@ packages after it, and fills the array with the subset that is installed. The
 contract is `probe <result_array_name> <package>...`; an empty result means
 nothing is installed. `workflow_installed_packages` calls the probe of a
 procedure and returns the installed subset of the given packages.
-A successful empty result means nothing is installed. Extended Homebrew menus
-also preselect the base CLI formulae as editable defaults when `zsh_default`
-is selected;
-only checked packages that were not detected as installed are installed. Missing Homebrew is also
-a successful empty result. Other probe failures propagate through the workflow,
-discard partial results, and stop the questionnaire with an error before opening
-the checkbox list or running procedures. Homebrew diagnostics remain on stderr.
+Only checked packages that were not detected as installed enter the installation
+selection. Missing Homebrew is a successful empty probe result. Other probe
+failures propagate through the workflow, discard partial results, and stop the
+questionnaire with an error before opening the checkbox list or running
+procedures. Homebrew diagnostics remain on stderr.
 
 ### Message template
 
@@ -240,37 +217,8 @@ list, so they start checked. It excludes detected packages from the installation
 selection and review count. A preset
 package that is not part of the list is ignored. A procedure without an
 installed-package probe starts with an empty selection.
-The optional Homebrew formula and cask handlers use
-`HOMEBREW_NO_INSTALL_UPGRADE=1` for installation. New packages may still affect dependencies.
-Clearing a package checkbox excludes it from installation and never uninstalls it.
-On macOS, `homebrew_casks` uses the same selection UI and installs its selected
-`brew_cask` packages through a direct-input finish handler.
-On Linux, `flatpak_apps` installs a missing CLI and configures Flathub in its
-main handler. The finish handler installs selected applications with direct
-terminal input for confirmations and authentication. Ordinary Linux hosts use
-`flatpak install --system flathub <ID>` without sudo, with polkit authorization.
-WSL uses `--user` for remote preparation, installed-app queries and installation.
-The installed-package probe always checks the chosen installation scope.
-System Fedora remote removal applies only to ordinary Linux; installed refs
-remain. WSL leaves system remotes unchanged. Existing installations are not
-migrated. Existing Flathub URLs and filters are validated before changes.
-A missing CLI requires administrator access through the native package manager.
-`--add-optionals` collects selectable packages before making changes. After review,
-native build-tool requirements of selected packages are confirmed. If Homebrew
-packages were chosen and Homebrew is missing, the script asks to install it,
-prepares macOS CLT when enabled, and verifies Homebrew before running optionals.
-Declining a requirement or Homebrew returns to the questionnaire. Flatpak-only
-choices do not prepare Homebrew. Exiting at review or selecting no packages
-makes no changes. Base CLI defaults
-require a selected `zsh_default`, so they are absent in `--add-optionals`. Fonts are selectable alongside the
-other optional packages.
-Ordinary workflow dependency filtering is unchanged.
-The macOS Command Line Tools check uses the same finish-handler mechanism before
-Homebrew. It preserves a working selected Xcode or CLT; when installation is
-needed, the operator completes Apple's dialog and presses Enter to verify.
-Finder and Spaces are separate macOS-only procedures. Finder leaves the status
-bar and hidden-file visibility unchanged; Spaces changes only `mru-spaces`.
-Keyboard preferences and shortcut mappings are not modified.
+Feature-specific defaults, package-manager preparation, installation scopes,
+and system changes are described in the [scenario map](specification/scenarios.md).
 
 ### Command execution
 

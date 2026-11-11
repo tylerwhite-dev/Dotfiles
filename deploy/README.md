@@ -14,120 +14,30 @@ instruction otherwise.
 The executable entry point lives at the repository root and loads this
 `deploy/` directory for its logic, configuration, and UI.
 
-The questionnaire records choices without changing the system. After the review,
-the setup asks to install native build tools if selected packages need them.
-Declining returns to the questionnaire. Execution starts after these confirmations.
-In `--add-optionals` mode, missing Homebrew is prepared only after the review
-when Homebrew packages were selected.
-The final menu opens on `Start execution`; use the arrow keys to choose another
-action.
-On macOS, the questionnaire also offers categorized Homebrew casks. Their
-installation runs with direct terminal access so password prompts stay visible.
-On Linux, a separate grouped list offers the 26 applications from
-`guide/linux/flatpak.md`. Selecting none skips all Flatpak preparation.
-Applications already installed through Flatpak start checked in the list.
-Clearing a checkbox does not uninstall an application.
-
-Homebrew has its own yes/no question. Base CLI tools and additional formulae
-share the extended Homebrew checkbox list. Installed formulae start checked.
-Base packages also start checked when `zsh_default` is selected.
-Clearing a checkbox excludes that package from installation.
-Fonts, formulae and casks require Homebrew independently.
-The Linux native package set includes `gawk`, `openssl` and `ca-certificates`.
-When Homebrew is first installed on Linux, setup installs its `ca-certificates`
-formula, whose installation creates the CA bundle automatically.
-Existing Homebrew installations are only verified; their certificates are not
-regenerated on subsequent runs.
-Choose individual fonts in a checkbox list. Installed fonts start checked;
-clearing a checkbox does not uninstall the font.
-
-The Flatpak procedure installs the CLI through pacman, APT or DNF if absent.
-Before installing native packages or a missing Flatpak CLI on Fedora, the setup
-disables `fedora-cisco-openh264` with
-`dnf config-manager setopt fedora-cisco-openh264.enabled=0` as root.
-If disabling the repository fails, the installation stops.
-On ordinary Linux hosts, it configures system Flathub and runs each application
-installation as `flatpak install --system flathub <ID>` without sudo, using
-polkit when authorization is required. On Fedora, preparation removes the
-system `fedora` remote with `--force`, retaining installed applications and runtimes.
-WSL uses user Flathub and `flatpak install --user flathub <ID>` to avoid
-system-helper authorization. System remotes are unchanged on WSL.
-The installed-package probe checks the same installation scope as the installer.
-Existing installations are not migrated between scopes. Flathub URLs and filters
-are validated before remote changes. A missing Flatpak CLI is installed through
-the distribution package manager with administrator access.
-
-Three additional macOS-only questions check Apple Command Line Tools, configure
-Finder, and disable automatic rearrangement of Spaces. The tools check comes
-before Homebrew and preserves a working CLT or full Xcode selection. When tools
-are missing, it opens Apple's installer: finish installation in the system
-dialog, then press Enter to verify. An incomplete installation stops execution.
-Homebrew installation also checks tools readiness if that question was skipped,
-and requests administrator access before running its non-interactive installer.
-
-The Finder profile shows all filename extensions and the path bar, keeps folders
-first when sorting by name, searches the current folder, and opens new windows
-in Home. It does not change the status bar or hidden-file visibility. The Spaces
-profile only disables rearrangement by most recent use. Each profile restarts
-its respective Finder or Dock process for the current user. Keyboard preferences
-and shortcut mappings are not modified. Installing missing tools still needs the system dialog and Enter.
-
-The entry point still requires Bash 5 before any procedure can run. On a clean
-Mac, prepare Command Line Tools, Homebrew and Bash first; the CLT procedure is
-not a bootstrap replacement for the system Bash 3.2. The automated tests replace
-macOS commands; verify the preferences on your target macOS version as well.
+See the [scenario map](specification/scenarios.md) for supported platforms,
+mode compatibility, preset contents, package lists, selection defaults,
+confirmation and cancellation behavior, and installation effects.
 
 ## Flags
+
+Run without flags for the standard questionnaire, or use one of:
 
 ```bash
 bash dotfiles-deploy.sh --server
 bash dotfiles-deploy.sh --desktop
 bash dotfiles-deploy.sh --wsl
 bash dotfiles-deploy.sh --mac
-bash dotfiles-deploy.sh -a
+bash dotfiles-deploy.sh --add-optionals  # short form: -a
+bash dotfiles-deploy.sh --help          # short form: -h
 ```
 
-- `--server`, `--desktop`, `--wsl`, and `--mac` select named scenarios.
-  Mandatory steps are accepted automatically. Package lists remain interactive,
-  followed by review with Start, Restart, or Exit. Presets must match the host.
-- `-a`, `--add-optionals` asks for fonts, extended formulae, and Flatpak apps
-  on Linux or casks on macOS. After the review, it asks to install missing
-  Homebrew if Homebrew packages were selected. On macOS this may also prepare
-  Command Line Tools. Flatpak-only selections do not prepare Homebrew.
-  Only installed packages start checked; base CLI defaults require `zsh_default`.
-  Restarting or exiting at review makes no changes.
-- `-h`, `--help` prints usage.
+Preset membership is configured in `config/scenarios.sh`; procedure availability
+and order come from `config/procedure-order.sh` and the feature declarations.
+See the [scenario map](specification/scenarios.md) for each mode's behavior.
 
-Run without flags for the standard questionnaire, or pass exactly one flag.
-Multiple arguments exit with status 2 before setup starts, including repeated
-flags and combinations with `--help`. Any unknown flag also exits with status 2.
-CLI arguments select standard setup, a named scenario, or optionals.
-
-## Scenario presets
-
-| Flag | Mandatory procedures | Package choices |
-| --- | --- | --- |
-| `--server` | Native packages, zsh, Homebrew, dotfiles | Extended Homebrew |
-| `--desktop` | Native packages, yay on Arch, zsh, Homebrew, dotfiles | Fonts, extended Homebrew, Flatpak |
-| `--wsl` | Native packages, yay on Arch, zsh, Homebrew, dotfiles | Extended Homebrew |
-| `--mac` | Apple CLT, Finder, Spaces, Homebrew, dotfiles | Fonts, extended Homebrew, casks |
-
-`--mac` requires macOS, `--wsl` requires WSL, and `--server`/`--desktop`
-require Linux outside WSL. OS and distribution detection still apply. A mismatch
-stops before questionnaire or installation. Queue order and platform restrictions
-still apply; yay is available only on Arch. Presets do not allow individual
-mandatory steps to be declined. Exiting the final review performs no setup.
-Restarting returns to package choices and restores mandatory selections.
-
-All presets use the existing complete native package and dotfiles sets. Package
-lists retain installed-package presets. Extended Homebrew also preselects the base
-CLI tools when `zsh_default` is selected. macOS and `--add-optionals` do not
-select that procedure, so they use installed-package presets only. These defaults
-can be cleared. Checked packages that were not detected as installed are
-included in the review and installation.
-
-Scenario membership is configured in `config/scenarios.sh`. Running without
-flags keeps the standard questionnaire with individual procedure questions.
+On a clean Mac, prepare Command Line Tools, Homebrew, and Bash first. The setup
+requires Bash 5 before any procedure can run, so its CLT procedure cannot
+bootstrap the script from the system Bash 3.2.
 
 ## Layout
 
