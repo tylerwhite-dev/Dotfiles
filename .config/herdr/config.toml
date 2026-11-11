@@ -23,6 +23,7 @@ tab_bar_position = "bottom"
 delivery = "herdr"
 
 [keys]
+prefix = "ctrl+k"
 
 # Pane navigation
 focus_pane_left = "alt+h"
