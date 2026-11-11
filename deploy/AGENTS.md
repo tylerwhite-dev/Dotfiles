@@ -377,6 +377,7 @@ bash deploy/tests/ui.sh
 bash deploy/tests/layer_dependencies.sh
 bash deploy/tests/app.sh
 bash deploy/tests/process.sh
+bash deploy/tests/zsh.sh
 bash deploy/tests/macos.sh
 bash deploy/tests/flatpak.sh
 bash deploy/tests/optionals.sh

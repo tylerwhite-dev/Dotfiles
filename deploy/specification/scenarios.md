@@ -53,7 +53,8 @@ Start
 └─ Selected action order:
    ├─ native_packages → dnf: git git-lfs curl zsh file openssh-clients gawk openssl ca-certificates.
    │  DNF disables fedora-cisco-openh264 and refreshes the cache before installation.
-   ├─ zsh_default → identify the user, check /bin/zsh, and run chsh.
+   ├─ zsh_default → validate the user account, chsh, and executable /bin/zsh before changing the shell.
+   │  A failed check or chsh command marks the procedure failed and stops the script.
    ├─ homebrew → if missing, download and run the installer; check
    │  the executable and its version. A fresh Homebrew installation on Linux also installs the ca-certificates formula.
    ├─ homebrew_fonts → install the selected fonts.
@@ -113,7 +114,8 @@ Start
 └─ Selected action order:
    ├─ native_packages → apt: git git-lfs curl zsh file ssh nala gawk openssl ca-certificates.
    │  APT updates package lists before installation.
-   ├─ zsh_default → identify the user, check /bin/zsh, and run chsh.
+   ├─ zsh_default → validate the user account, chsh, and executable /bin/zsh before changing the shell.
+   │  A failed check or chsh command marks the procedure failed and stops the script.
    ├─ homebrew → if missing, download and run the installer; check
    │  the executable and its version. A fresh Homebrew installation on Linux also installs the ca-certificates formula.
    ├─ homebrew_fonts → install the selected fonts.
@@ -174,7 +176,8 @@ Start
    ├─ native_packages → pacman: git git-lfs curl zsh file openssh cronie gawk openssl ca-certificates.
    ├─ yay → base-devel; if yay is missing, install go, update or clone the
    │  AUR checkout, build with makepkg, install the package with pacman, and verify yay.
-   ├─ zsh_default → identify the user, check /bin/zsh, and run chsh.
+   ├─ zsh_default → validate the user account, chsh, and executable /bin/zsh before changing the shell.
+   │  A failed check or chsh command marks the procedure failed and stops the script.
    ├─ homebrew → if missing, download and run the installer; check
    │  the executable and its version. A fresh Homebrew installation on Linux also installs the ca-certificates formula.
    ├─ homebrew_fonts → install the selected fonts.
