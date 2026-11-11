@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 package_group native arch \
-  git git-lfs curl zsh file openssh cronie
+  git git-lfs curl zsh file openssh cronie gawk openssl ca-certificates
 
 package_group native debian \
-  git git-lfs curl zsh file ssh nala
+  git git-lfs curl zsh file ssh nala gawk openssl ca-certificates
 
 package_group native fedora \
-  git git-lfs curl zsh file openssh-clients
+  git git-lfs curl zsh file openssh-clients gawk openssl ca-certificates
 
 # Installs the platform-specific native package group with its package manager.
 action_install_native_packages() {

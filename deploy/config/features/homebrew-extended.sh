@@ -24,9 +24,9 @@ package_group brew util_tools \
   typtea typioca
 
 package_group brew dev_tooling \
-  fresh-editor neovim mise \
-  nvm rustup uv sdkman-cli go qt zig bun \
-  cmake ninja
+  fresh-editor neovim mise podman \
+  nvm rustup uv sdkman-cli go qt bun \
+  cmake ninja 
 
 package_requires brew sdkman-cli NATIVE_BUILD_TOOLS
 

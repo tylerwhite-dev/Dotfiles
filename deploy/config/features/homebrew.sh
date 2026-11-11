@@ -3,7 +3,7 @@
 message_define status.homebrew_admin_prompt \
   "Installing Homebrew requires administrator access. Enter your sudo password if prompted."
 
-# Downloads and runs the Homebrew installer when Homebrew is absent.
+# Downloads and runs the Homebrew installer, then installs Linux certificates.
 # On macOS developer tools and administrator access must be ready first.
 action_install_homebrew_binary() {
   local installer
@@ -41,7 +41,11 @@ action_install_homebrew_binary() {
     return 1
   fi
 
-  executor_run rm -f -- "$installer"
+  executor_run rm -f -- "$installer" || return
+
+  if ((setup_dir)); then
+    executor_brew install ca-certificates || return
+  fi
 }
 
 # Installs Homebrew when absent and verifies the executable.

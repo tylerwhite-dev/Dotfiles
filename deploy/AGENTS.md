@@ -169,6 +169,10 @@ After the final review, the questionnaire asks for each dependency. Declining
 returns to selection. The runner installs approved dependencies before selected
 procedures; a failure stops execution. `NATIVE_BUILD_TOOLS` applies to `yay`
 and the Homebrew `sdkman-cli` formula, not the Homebrew procedure.
+The Linux base native package groups include `gawk`, `openssl`, and
+`ca-certificates`. Only a new Linux Homebrew installation installs its
+`ca-certificates` formula, which creates the CA bundle during installation. Existing Homebrew is
+only verified, including in the optional-only workflow.
 
 ### Package alias
 

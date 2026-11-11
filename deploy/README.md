@@ -33,6 +33,11 @@ share the extended Homebrew checkbox list. Installed formulae start checked.
 Base packages also start checked when `zsh_default` is selected.
 Clearing a checkbox excludes that package from installation.
 Fonts, formulae and casks require Homebrew independently.
+The Linux native package set includes `gawk`, `openssl` and `ca-certificates`.
+When Homebrew is first installed on Linux, setup installs its `ca-certificates`
+formula, whose installation creates the CA bundle automatically.
+Existing Homebrew installations are only verified; their certificates are not
+regenerated on subsequent runs.
 Choose individual fonts in a checkbox list. Installed fonts start checked;
 clearing a checkbox does not uninstall the font.
 
