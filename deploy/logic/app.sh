@@ -22,6 +22,7 @@ _app_print_elapsed_time() {
 _app_run_optionals() {
   local platform="$1" distribution_name="$2" started_at
   local brew_bin prompt yes_option no_option choice action confirmation_status need_brew
+  local collect_answers=yes
   local -a selected=() approved_requirements=()
 
   if ((EUID == 0)); then
@@ -29,7 +30,10 @@ _app_run_optionals() {
     return 1
   fi
   while true; do
-    questionnaire_collect_optionals "$platform" "$distribution_name" || return
+    if [[ "$collect_answers" == yes ]]; then
+      questionnaire_collect_optionals "$platform" "$distribution_name" || return
+      collect_answers=no
+    fi
     workflow_selected_optionals selected "$platform"
     if ((${#selected[@]} == 0)); then
       status_report status.optionals_none
@@ -42,7 +46,11 @@ _app_run_optionals() {
           :
         else
           confirmation_status=$?
-          ((confirmation_status == 2)) && continue
+          case "$confirmation_status" in
+            2) continue ;;
+            3) collect_answers=yes; continue ;;
+            4) status_report status.exited; return 0 ;;
+          esac
           return "$confirmation_status"
         fi
         need_brew=no
@@ -58,10 +66,13 @@ _app_run_optionals() {
             error_report error.input_interrupted
             return 1
           fi
-          ((choice == 0)) || continue
+          if ((choice != 0)); then
+            collect_answers=yes
+            continue
+          fi
         fi
         break ;;
-      restart) continue ;;
+      restart) collect_answers=yes; continue ;;
       exit) status_report status.exited; return 0 ;;
     esac
   done
@@ -83,10 +94,14 @@ _app_run_optionals() {
 # Collects choices and handles review before execution.
 _app_run_standard() {
   local platform="$1" distribution_name="$2" action text started_at confirmation_status
+  local collect_answers=yes
   local -a approved_requirements=()
 
   while true; do
-    questionnaire_collect "$platform" "$distribution_name" || return
+    if [[ "$collect_answers" == yes ]]; then
+      questionnaire_collect "$platform" "$distribution_name" || return
+      collect_answers=no
+    fi
     questionnaire_confirm action "$platform" "$distribution_name" || return
     case "$action" in
       start)
@@ -94,10 +109,14 @@ _app_run_standard() {
           break
         else
           confirmation_status=$?
-          ((confirmation_status == 2)) && continue
+          case "$confirmation_status" in
+            2) continue ;;
+            3) collect_answers=yes; continue ;;
+            4) status_report status.exited; return 0 ;;
+          esac
           return "$confirmation_status"
         fi ;;
-      restart) continue ;;
+      restart) collect_answers=yes; continue ;;
       exit)
         message_format text status.exited
         ui_success "$text"

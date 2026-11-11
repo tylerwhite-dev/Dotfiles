@@ -68,6 +68,7 @@ message_define option.yes "Yes"
 message_define option.no "No"
 message_define option.start "Start execution"
 message_define option.restart "Restart questionnaire"
+message_define option.review "Review current selection"
 message_define option.exit "Exit without changes"
 message_define label.yes "yes"
 message_define label.no "no"
@@ -80,4 +81,6 @@ message_define ui.multiselect.resize_notice "Increase terminal size, then press 
 message_define prompt.action "Choose an action:"
 message_define prompt.brew_install "Selected packages require Homebrew. Install it now?"
 message_define prompt.native_requirement "%s requires %s. Install it?"
+message_define prompt.native_requirement_declined \
+  "%s cannot be installed without %s. No changes have been applied. Choose an action:"
 message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  --server              Select the server scenario.\n  --desktop             Select the desktop scenario.\n  --wsl                 Select the WSL scenario.\n  --mac                 Select the Mac scenario.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nScenario flags require a matching environment. Mandatory steps cannot be disabled.\nOptional package lists and final confirmation remain interactive.\nAt most one flag is allowed per run, including --help.'

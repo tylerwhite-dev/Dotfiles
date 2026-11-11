@@ -83,8 +83,53 @@ assert_events 'status.distribution_detected collect collect status.settings_conf
     if ((requirement_asks == 1)); then return 2; fi
   }
   run_app 0
-  assert_events 'status.distribution_detected collect collect status.settings_confirmed run elapsed'
+  assert_events 'status.distribution_detected collect status.settings_confirmed run elapsed'
 )
+# Exercise the real dependency prompt and refusal menu, including interruption.
+for refusal_choice in 0 1 2 interrupted; do
+  (
+    workflow_reset
+    workflow_select yay yes
+    approved_requirements=(previous_approval)
+    prompt_index=0
+    ui_select() {
+      ((prompt_index+=1))
+      if ((prompt_index == 1)); then
+        printf -v "$1" '%s' 1
+      elif [[ "$refusal_choice" == interrupted ]]; then
+        return 130
+      else
+        printf -v "$1" '%s' "$refusal_choice"
+      fi
+    }
+    actual=0
+    questionnaire_confirm_requirements approved_requirements arch all || actual=$?
+    if [[ "$refusal_choice" == interrupted ]]; then
+      [[ "$actual" == 1 ]]
+    else
+      [[ "$actual" == "$((refusal_choice + 2))" ]]
+    fi
+    [[ "${#approved_requirements[@]}" == 0 && "$prompt_index" == 2 ]]
+    workflow_selection yay_selection yay
+    [[ "$yay_selection" == yes ]]
+  )
+done
+# Restart and exit are explicit outcomes rather than automatic recollection.
+for refusal_status in 3 4; do
+  (
+    events=() answers=(start start) answer_index=0 requirement_asks=0
+    questionnaire_confirm_requirements() {
+      ((requirement_asks+=1))
+      if ((requirement_asks == 1)); then return "$refusal_status"; fi
+    }
+    run_app 0
+    if ((refusal_status == 3)); then
+      assert_events 'status.distribution_detected collect collect status.settings_confirmed run elapsed'
+    else
+      assert_events 'status.distribution_detected collect status.exited'
+    fi
+  )
+done
 (
   events=() answers=(start) answer_index=0 requirements_status=8
   run_app 8
@@ -151,6 +196,22 @@ if ((EUID == 0)); then
   run_app 1
   assert_events 'status.distribution_detected error.root_execution'
 else
+  for refusal_status in 2 3 4; do
+    (
+      events=() SETUP_MODE=optionals optional_ids=(homebrew_extended)
+      answers=(start start) answer_index=0 requirement_asks=0
+      questionnaire_confirm_requirements() {
+        ((requirement_asks+=1))
+        if ((requirement_asks == 1)); then return "$refusal_status"; fi
+      }
+      run_app 0
+      case "$refusal_status" in
+        2) assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed' ;;
+        3) assert_events 'status.distribution_detected optional-collect optional-collect status.settings_confirmed optional-run elapsed' ;;
+        4) assert_events 'status.distribution_detected optional-collect status.exited' ;;
+      esac
+    )
+  done
   (
     # Existing Homebrew opens the lists without asking to install it.
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0

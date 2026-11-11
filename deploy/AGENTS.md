@@ -166,7 +166,10 @@ requirement to a native package or package-manager group. Shared mappings live i
 platform mapping means no native installation on that platform. The workflow
 collects requirements only from selected consumers and de-duplicates by name.
 After the final review, the questionnaire asks for each dependency. Declining
-returns to selection. The runner installs approved dependencies before selected
+offers an explanation and explicit actions to review the current selection,
+restart the questionnaire, or exit without changes. Returning to review preserves
+all choices; only an explicit restart resets them. Preset mandatory procedures
+remain selected. The runner installs approved dependencies before selected
 procedures; a failure stops execution. `NATIVE_BUILD_TOOLS` applies to `yay`
 and the Homebrew `sdkman-cli` formula, not the Homebrew procedure.
 The Linux base native package groups include `gawk`, `openssl`, and

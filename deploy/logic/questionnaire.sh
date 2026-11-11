@@ -265,12 +265,12 @@ questionnaire_confirm() {
 }
 
 # Asks about each distinct native requirement after the main review.
-# A refusal restarts selection before any installation begins.
+# A refusal offers review (2), restart (3), or exit (4) before installation.
 questionnaire_confirm_requirements() {
   local -n approved_result="$1"
   local platform="$2" mode="$3" name consumer resolved target prompt choice yes_option no_option
   local -a names=() consumers=()
-  local index
+  local index review_option restart_option exit_option
   approved_result=()
   workflow_native_requirements names consumers "$platform" "$mode" || return
   message_format yes_option option.yes
@@ -285,7 +285,21 @@ questionnaire_confirm_requirements() {
       return 1
     fi
     if ((choice != 0)); then
-      return 2
+      approved_result=()
+      message_format prompt prompt.native_requirement_declined "$consumer" "$target"
+      message_format review_option option.review
+      message_format restart_option option.restart
+      message_format exit_option option.exit
+      if ! ui_select choice "$prompt" "" 0 minimal \
+        "$review_option" "$restart_option" "$exit_option"; then
+        error_report error.input_interrupted
+        return 1
+      fi
+      case "$choice" in
+        0) return 2 ;;
+        1) return 3 ;;
+        2) return 4 ;;
+      esac
     fi
     approved_result+=("$name")
   done
