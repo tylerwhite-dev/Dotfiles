@@ -28,10 +28,10 @@ Use [Gobidev/pfetch-rs](https://github.com/Gobidev/pfetch-rs).
 
 ## 3. Copy the PowerShell profile
 
-Copy [profile](C:\Users\User\Developer\personal\Dotfiles\guide\windows\powershell\Microsoft.PowerShell_profile.ps1) from this folder to your PowerShell 7 profile location. The default path is:
+Copy [profile](Microsoft.PowerShell_profile.ps1) from this folder to your PowerShell 7 profile location. The default path is:
 
 ```text
 C:\Users\<username>\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
 ```
 
-Or run `$PROFILE` in PowerShell 7 to see the actual file on device and paste content of [profile](C:\Users\User\Developer\personal\Dotfiles\guide\windows\powershell\Microsoft.PowerShell_profile.ps1)
+Or run `$PROFILE` in PowerShell 7 to see the actual file on device and paste content of [profile](Microsoft.PowerShell_profile.ps1)
