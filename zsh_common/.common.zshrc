@@ -4,7 +4,7 @@ eval "$($__HOMEBREW/bin/brew shellenv)"
 HOMEBREW_NO_ENV_HINTS=1
 
 # <-- herdr on startup -->
-if [[ "$SHLVL" -eq 1 && "$PWD" == "$HOME" && -z "$HERDR_CLIENT" ]] && command -v herdr &> /dev/null; then
+if [[ "$PWD" == "$HOME" && -z "$HERDR_ENV" ]] && command -v herdr &> /dev/null; then
   herdr
 fi
 
