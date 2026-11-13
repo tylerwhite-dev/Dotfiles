@@ -259,9 +259,9 @@ layout {
 // See the binds section below for more spawn examples.
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
-spawn-at-startup "/usr/bin/waybar" "-c" "/home/arseny/.config/waybar/config-simple" "-s" "/home/arseny/.config/waybar/style-simple.css"
+spawn-sh-at-startup "waybar -c ~/.config/waybar/config-simple -s ~/.config/waybar/style-simple.css"
 
-spawn-at-startup "swaybg" "-i" "/home/arseny/Pictures/Wallpapers/11.png" "-m" "fill"
+spawn-sh-at-startup "swaybg -i ~/Pictures/Wallpapers/11.png -m fill"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
