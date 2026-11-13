@@ -1,0 +1,17 @@
+[theme]
+mode = "dark"
+sync_color_scheme = true
+
+[bar.default]
+margin_ends = 0
+start = ["launcher", "wallpaper", "workspaces"]
+center = ["clock"]
+end = ["tray", "network", "volume", "control-center"]
+
+[shell.panel]
+control_center_placement = "floating"
+control_center_position = "top_right"
+floating_offset = 8
+
+[wallpaper]
+enabled = true
