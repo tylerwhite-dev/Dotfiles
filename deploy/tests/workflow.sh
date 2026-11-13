@@ -143,11 +143,24 @@ workflow_native_requirements needs consumers debian all
 [[ "${#needs[@]}" == 0 ]] || fail "other Brew formulae should not request build tools"
 workflow_reset
 workflow_select yay yes
+yay_is_installed() { return 1; }
 workflow_select homebrew yes
 workflow_select homebrew_extended yes
 workflow_select_packages homebrew_extended sdkman-cli
 workflow_native_requirements needs consumers arch all
 [[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${#needs[@]}" == 1 ]] ||
   fail "yay and SDKMAN should share one Arch build-tool requirement"
+
+workflow_select homebrew_extended no
+workflow_native_requirements needs consumers arch all
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${consumers[*]}" == yay ]] ||
+  fail "missing yay should request build tools"
+yay_is_installed() { return 0; }
+workflow_native_requirements needs consumers arch all
+[[ "${#needs[@]}" == 0 ]] || fail "installed yay should not request build tools"
+workflow_select homebrew_extended yes
+workflow_native_requirements needs consumers arch all
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${consumers[*]}" == sdkman-cli ]] ||
+  fail "installed yay must not suppress SDKMAN build tools"
 
 printf 'Workflow validation passed.\n'

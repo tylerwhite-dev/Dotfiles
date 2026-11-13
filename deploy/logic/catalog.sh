@@ -17,6 +17,7 @@ declare -Ag _CATALOG_PACKAGE_ALIASES=()
 declare -Ag _CATALOG_NATIVE_REQUIREMENTS=()
 declare -Ag _CATALOG_PACKAGE_NEEDS=()
 declare -Ag _CATALOG_PROCEDURE_NEEDS=()
+declare -Ag _CATALOG_PROCEDURE_READY_PROBE=()
 
 # Names are resolved by platform; an absent platform needs no native package.
 requirement_define() {
@@ -33,6 +34,16 @@ procedure_needs() {
   local id="$1"
   shift
   _CATALOG_PROCEDURE_NEEDS["$id"]="$*"
+}
+
+# Assigns a read-only check returning success when installation is unnecessary.
+procedure_ready_probe() {
+  _catalog_require_procedure "$1" || return
+  _CATALOG_PROCEDURE_READY_PROBE["$1"]="$2"
+}
+
+catalog_ready_probe() {
+  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_READY_PROBE[$2]:-}"
 }
 
 catalog_native_requirement() {
@@ -503,7 +514,7 @@ catalog_validate() {
   local finish_handler
   local requirement
   local platform
-  local installed_probe
+  local installed_probe ready_probe
   local key source package name kind target group packages needs
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then
@@ -558,6 +569,15 @@ catalog_validate() {
       return 1
     fi
     installed_probe="${_CATALOG_PROCEDURE_INSTALLED_PROBE[$id]}"
+    ready_probe="${_CATALOG_PROCEDURE_READY_PROBE[$id]:-}"
+    if [[ -n "$ready_probe" ]]; then
+      if [[ ! "$ready_probe" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
+        ! declare -F "$ready_probe" >/dev/null; then
+        printf 'Procedure %s references an unknown ready probe: %s\n' \
+          "$id" "$ready_probe" >&2
+        return 1
+      fi
+    fi
     if [[ -n "$installed_probe" ]]; then
       if [[ ! "$installed_probe" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
         ! declare -F "$installed_probe" >/dev/null; then

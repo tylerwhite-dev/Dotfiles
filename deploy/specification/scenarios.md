@@ -193,12 +193,12 @@ Start
 
 NATIVE_BUILD_TOOLS = base-devel; required by sdkman-cli and yay.
 
-When `yay` is selected, the script asks to install `base-devel` even if `yay`
-or `base-devel` is already installed. Native requirements are collected from the
-selection without checking whether they are installed. After approval, the
-native installer runs before the yay handler checks for an existing `yay`.
-The shared build-tool requirement is requested only once when both `yay` and
-`sdkman-cli` require it.
+When `yay` is selected and available in PATH, its native requirements are skipped:
+there is no `base-devel` question or installation on behalf of `yay`.
+If `yay` is missing, the script asks to install `base-devel` even if `base-devel`
+is already installed. The shared build-tool requirement is requested only once
+when both `yay` and `sdkman-cli` require it. An installed `yay` does not suppress
+the requirement of a selected `sdkman-cli`.
 
 Installing native packages and approved native dependencies, installing go for a missing yay, and installing a missing Flatpak CLI all use `pacman -Syu --needed --noconfirm`. These commands also perform a full system upgrade. `--needed` skips reinstalling target packages that are already up to date but does not prevent the system upgrade.
 

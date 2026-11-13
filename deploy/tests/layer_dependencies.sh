@@ -31,7 +31,7 @@ awk '
     next
   }
   continuation { continuation = ($0 ~ /\\$/); next }
-  /^(package_group|package_alias|package_category|package_requires|procedure_needs|message_define|procedure_define|procedure_handler|procedure_finish_handler|procedure_platforms|procedure_requires|procedure_requires_root|procedure_selectable|procedure_installed_probe|procedure_packages)[[:space:]]/ {
+  /^(package_group|package_alias|package_category|package_requires|procedure_needs|procedure_ready_probe|message_define|procedure_define|procedure_handler|procedure_finish_handler|procedure_platforms|procedure_requires|procedure_requires_root|procedure_selectable|procedure_installed_probe|procedure_packages)[[:space:]]/ {
     continuation = ($0 ~ /\\$/)
     next
   }

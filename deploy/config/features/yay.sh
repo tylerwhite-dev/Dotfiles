@@ -18,6 +18,11 @@ message_define status.yay_installed \
 message_define status.yay_install_password \
   "Build complete. Installing yay with pacman. Enter your sudo password if prompted."
 
+# Reports whether yay is available, using the same check as the installer.
+yay_is_installed() {
+  command -v yay >/dev/null 2>&1
+}
+
 # Installs yay prerequisites, updates or clones its AUR checkout, and builds it.
 action_install_yay() {
   local platform="$1"
@@ -31,7 +36,7 @@ action_install_yay() {
   fi
   build_dir="${user_home}/.cache/yay-build"
 
-  if command -v yay >/dev/null 2>&1; then
+  if yay_is_installed; then
     status_report status.yay_installed
     return 0
   fi
@@ -68,7 +73,7 @@ action_install_yay_package() {
   local package_file
   local -a package_files=()
 
-  if command -v yay >/dev/null 2>&1; then
+  if yay_is_installed; then
     return 0
   fi
   if [[ -z "$user_home" ]]; then
@@ -96,7 +101,7 @@ action_install_yay_package() {
     executor_run_as_root pacman -U --needed --noconfirm -- "${package_files[@]}"
   ) || return
 
-  if ! command -v yay >/dev/null 2>&1; then
+  if ! yay_is_installed; then
     error_report error.yay_missing
     return 1
   fi
@@ -109,6 +114,7 @@ procedure_platforms yay arch
 procedure_requires_root yay arch
 procedure_packages yay native yay_prerequisites
 procedure_needs yay NATIVE_BUILD_TOOLS
+procedure_ready_probe yay yay_is_installed
 message_define procedure.yay.question "Install yay?"
 message_define procedure.yay.label "Install yay"
 message_define procedure.yay.description \

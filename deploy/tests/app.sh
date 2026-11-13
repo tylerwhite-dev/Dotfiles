@@ -90,6 +90,7 @@ for refusal_choice in 0 1 2 interrupted; do
   (
     workflow_reset
     workflow_select yay yes
+    yay_is_installed() { return 1; }
     approved_requirements=(previous_approval)
     prompt_index=0
     ui_select() {

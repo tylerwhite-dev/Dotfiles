@@ -6,6 +6,13 @@ extend a function by editing its feature file. To enable a new procedure,
 add its ID to `procedure-order.sh`. No changes to `logic/` or `ui/` are needed.
 
 `settings.sh` contains shared settings; `messages.sh` contains shared messages. `requirements.sh` maps named requirements to native packages or groups per distribution.
+
+`procedure_ready_probe <id> <function>` optionally registers a read-only,
+argument-free check. Return success when the procedure's target is already
+installed, or failure when installation is needed. The workflow skips native
+requirements of ready procedures before asking for approval. Other consumers
+of the same requirement are still considered. The procedure handler remains
+responsible for checking readiness again before installation.
 Feature-specific errors and statuses belong in the owning feature file.
 
 ## Adding a feature

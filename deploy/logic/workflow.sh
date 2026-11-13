@@ -149,7 +149,7 @@ workflow_installed_packages() {
 # Parallel output arrays contain requirement names and the first consumer.
 workflow_native_requirements() {
   local -n names_result="$1" consumers_result="$2"
-  local platform="$3" mode="$4" id key source package name resolved
+  local platform="$3" mode="$4" id key source package name resolved ready_probe
   local -a selected=() packages=() candidates=()
   local -A seen=()
   names_result=(); consumers_result=()
@@ -159,6 +159,10 @@ workflow_native_requirements() {
     workflow_selected selected "$platform"
   fi
   for id in "${selected[@]}"; do
+    catalog_ready_probe ready_probe "$id"
+    if [[ -n "$ready_probe" ]] && "$ready_probe"; then
+      continue
+    fi
     for name in ${_CATALOG_PROCEDURE_NEEDS[$id]:-}; do
       [[ ! -v "seen[$name]" ]] || continue
       catalog_native_requirement resolved "$name" "$platform"

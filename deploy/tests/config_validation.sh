@@ -14,6 +14,11 @@ catalog_validate
 [[ "${_CATALOG_PACKAGE_NEEDS[brew:sdkman-cli]}" == NATIVE_BUILD_TOOLS ]]
 [[ "${_CATALOG_PROCEDURE_NEEDS[yay]}" == NATIVE_BUILD_TOOLS ]]
 (
+  procedure_ready_probe yay missing_ready_probe
+  if catalog_validate 2>"$validation_error"; then exit 1; fi
+  grep -Fq 'unknown ready probe' "$validation_error"
+)
+(
   package_requires brew missing-package NATIVE_BUILD_TOOLS
   if catalog_validate 2>"$validation_error"; then exit 1; fi
   grep -Fq 'Invalid package requirement' "$validation_error"
