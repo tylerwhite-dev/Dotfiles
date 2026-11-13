@@ -8,6 +8,15 @@ Debian/Ubuntu, Fedora, macOS, and supported Linux distributions running in WSL.
 
 ### Setup
 
+After cloning the repository, install Git LFS and retrieve the files it tracks (mostly wallpapers)
+from the repository root:
+
+```bash
+git lfs install
+git lfs fetch
+git lfs checkout
+```
+
 Run from the repository root. Without flags, the script asks which procedures
 and packages to install:
 
