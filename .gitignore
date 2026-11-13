@@ -4,6 +4,9 @@
 # auto-generated files
 *-lock.json
 
+# Device-specific monitor settings
+/.config/niri/monitors.kdl
+
 # Ignore content in zed, except settings.json
 .config/zed/*
 !.config/zed/settings.json
