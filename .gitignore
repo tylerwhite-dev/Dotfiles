@@ -7,6 +7,7 @@
 # Device-specific monitor settings
 /.config/niri/monitors.kdl
 
-# Ignore content in zed, except settings.json
+# Ignore content in zed, except configuration files
 .config/zed/*
 !.config/zed/settings.json
+!.config/zed/keymap.json

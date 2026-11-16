@@ -1,0 +1,28 @@
+[
+  {
+    "context": "Editor",
+    "unbind": {
+      "ctrl-b": "editor::GoToDefinition"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "alt-shift-up": "editor::MoveLineUp",
+      "alt-shift-down": "editor::MoveLineDown"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "shift shift": "pane::DeploySearch"
+    }
+  },
+  {
+    "context": "os == macos > Editor",
+    "bindings": {
+      "ctrl-left": "editor::MoveToPreviousWordStart",
+      "ctrl-right": "editor::MoveToNextWordEnd"
+    }
+  }
+]
