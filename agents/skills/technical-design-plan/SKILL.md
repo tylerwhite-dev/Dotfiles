@@ -11,7 +11,11 @@ The preferred result is a concise opening decision, numbered files with exact ed
 
 ## Scope and evidence
 
-Read project instructions and inspect relevant method bodies, callers, state owners, initialization, and persistence paths before proposing edits. Use existing repository mechanisms where sufficient.
+Read project instructions and trace the relevant data flow before choosing where to change code. Follow inputs through callers, transformations, state owners, and consumers, including initialization, persistence, and asynchronous boundaries when relevant. Read method bodies on both sides of the proposed change and look for existing code solving the same or a similar problem. Continue until you can explain where the data comes from, how it changes, who owns it, and where the requested behavior belongs. Keep this investigation focused on paths that could affect the design.
+
+Choose the smallest sufficient implementation with as little new code as possible. Prefer changing or reusing an existing mechanism at the point that already owns the relevant data or responsibility. Minimize new state, functions, types, dependencies, and wiring while preserving correctness, clarity, and existing boundaries. Do not trade these for fewer lines, duplicate logic to avoid a small shared change, or add unrelated refactoring.
+
+Before proposing a new entity or function, check whether an existing owner or operation can handle the behavior directly. Add one only when it has a concrete responsibility that the existing code cannot accommodate cleanly. Justify its placement using the traced data flow and explain why extending the existing code is insufficient. Avoid speculative flexibility, forwarding wrappers, and abstractions for hypothetical future uses.
 
 For a planning-only request, do not modify application code or start implementation. Preserve the session's permissions for checks, builds, installation, deployment, and commits. If implementation is already authorized, honor any agreed review checkpoint without requesting duplicate permission.
 
@@ -71,6 +75,8 @@ Before returning the plan, check that:
 - Important methods have concrete parameters, return types, and enough body detail to review the mechanism.
 - State ownership, initialization, and calls between files agree with event ordering.
 - Existing facts are grounded in inspected code, and proposals and uncertainties are clear.
+- The chosen edit belongs at the existing owner of the relevant data or responsibility, based on traced inputs and consumers.
+- The proposal has been checked for excess code. Remove unnecessary new functions, types, state, layers, and wiring before presenting it; each remaining addition must have a concrete purpose that existing code cannot handle cleanly.
 - The response follows the file-by-file format without unnecessary architecture paperwork.
 
 Resolve routine technical choices in the plan. If a missing fact could materially change the design, identify it and the narrow investigation needed to settle it.
