@@ -6,6 +6,7 @@
 # disables its dependants. An empty queue enables no procedures.
 setup_procedure_order=(
   native_packages
+  native_desktop
   yay
   zsh_default
   macos_command_line_tools

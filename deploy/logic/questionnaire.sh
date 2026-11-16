@@ -42,25 +42,19 @@ _questionnaire_read_selectable_packages() {
   message_format prompt question.progress "$current" "$total" "$question"
   catalog_package_rows rows kinds "$procedure_id" "$platform" "" labels || return
   catalog_packages packages "$procedure_id" "$platform" || return
-  if ! workflow_installed_packages detected "$procedure_id" "${packages[@]}"; then
-    error_report error.installed_packages_probe_failed
-    return 1
-  fi
-  presets=("${detected[@]}")
-  # Base formulae default to checked only when the zsh procedure is selected.
-  if [[ "$procedure_id" == homebrew_extended ]]; then
-    local zsh_selection
-    local -a core_packages=()
-    workflow_selection zsh_selection zsh_default
-    if [[ "$zsh_selection" == yes ]]; then
-      homebrew_extended_default_packages core_packages
-    fi
-    for package in "${core_packages[@]}"; do
-      if [[ " ${packages[*]} " == *" $package "* && " ${presets[*]} " != *" $package "* ]]; then
-        presets+=("$package")
-      fi
-    done
-  fi
+  local presets_status=0
+  workflow_package_presets presets detected \
+    "$procedure_id" "$platform" "${SETUP_MODE:-standard}" \
+    "${packages[@]}" || presets_status=$?
+  case "$presets_status" in
+    0) ;;
+    1)
+      error_report error.installed_packages_probe_failed
+      return 1 ;;
+    *)
+      error_report error.package_defaults_failed
+      return 1 ;;
+  esac
   questionnaire_multiselect_texts texts || return
 
   if ! ui_multiselect_grouped selected "$prompt" texts rows kinds presets labels; then

@@ -49,7 +49,7 @@ Bash. The setup script cannot bootstrap itself using the system Bash 3.2.
 | Flag | Mandatory procedures | Optional package lists |
 | --- | --- | --- |
 | `--server` | Native packages, Zsh as default shell, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
-| `--desktop` | Native packages, yay on Arch, Zsh as default shell, Homebrew, core CLI tools, dotfiles | Nerd Fonts, extended Homebrew, Flatpak apps |
+| `--desktop` | Native packages, yay on Arch, Zsh as default shell, Homebrew, core CLI tools, dotfiles | Native desktop packages on Arch, Nerd Fonts, extended Homebrew, Flatpak apps |
 | `--wsl` | Native packages, yay on Arch, Zsh as default shell, Homebrew, core CLI tools, dotfiles | Extended Homebrew |
 | `--mac` | Apple Command Line Tools, Finder preferences, Spaces order, Homebrew, core CLI tools, dotfiles | Nerd Fonts, extended Homebrew, Homebrew casks |
 
@@ -68,7 +68,8 @@ does not uninstall a package or cancel its installation through a mandatory step
 
 ### Other flags
 
-- `-a`, `--add-optionals` selects optional packages without installing core CLI
+- `-a`, `--add-optionals` selects optional packages, including native desktop
+  packages on Arch, without installing core CLI
   tools. If selected packages need missing Homebrew, the script asks to install
   it after the final review.
 - `-h`, `--help` prints usage.
@@ -76,6 +77,22 @@ does not uninstall a package or cancel its installation through a mandatory step
 Pass at most one flag per run. The former `-y` / `--yolo` flag is no longer
 supported. See [`deploy/README.md`](deploy/README.md) for execution details and
 [`deploy/config/scenarios.sh`](deploy/config/scenarios.sh) for preset membership.
+
+### Native desktop packages
+
+On Arch, the Native desktop menu appears without a flag, with `--desktop`, and
+with `-a` / `--add-optionals`. Installed packages start checked in every mode
+and are excluded from installation. Only `--desktop` additionally checks
+`firefox`, `alacritty`, `zed`, `dosfstools`, `e2fsprogs`, `btrfs-progs`,
+`xfsprogs`, `exfatprogs`, and `ntfs-3g`. All choices remain editable.
+
+The menu groups packages into Desktop, Development, and Libs. Libs includes
+system dependencies, filesystem tools, and XCB libraries.
+It runs after base native packages and before yay. In optional-only
+mode it can run independently of Homebrew and the base package procedure.
+Installation uses `pacman -Syu --needed --noconfirm`, including a system upgrade.
+The procedure installs packages without configuring Docker services or user
+groups. No native desktop sets are currently defined for Debian or Fedora.
 
 ## Apply configs only with Stow
 

@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 
-# Base packages to preselect when zsh is chosen; menu choices remain editable.
-homebrew_extended_default_packages() {
-  local -n defaults_result="$1"
-  defaults_result=(
-    starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs zoxide
-    herdr stow
-  )
-}
-
 package_group brew shell_tools \
   starship zoxide fzf eza \
   zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch \
   taproom herdr tmux zellij
+
+# Supplies defaults when the earlier Zsh procedure was selected.
+homebrew_extended_package_defaults() {
+  local -n __homebrew_defaults_result="$1"
+  local zsh_selection
+  __homebrew_defaults_result=()
+  workflow_selection zsh_selection zsh_default
+  if [[ "$zsh_selection" == yes ]]; then
+    __homebrew_defaults_result=(
+      starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs zoxide
+      herdr stow
+    )
+  fi
+}
 
 package_alias brew zsh-autosuggestions "zsh suggestions"
 package_alias brew zsh-syntax-highlighting "zsh syntax"
@@ -72,6 +77,7 @@ procedure_platforms homebrew_extended arch debian fedora macos
 procedure_requires homebrew_extended homebrew
 procedure_selectable homebrew_extended
 procedure_installed_probe homebrew_extended homebrew_extended_installed_packages
+procedure_defaults_handler homebrew_extended homebrew_extended_package_defaults
 procedure_packages homebrew_extended \
   brew shell \
   brew utils \

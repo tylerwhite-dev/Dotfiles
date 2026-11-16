@@ -55,6 +55,9 @@ for SETUP_MODE in server desktop wsl mac; do
     if [[ "$platform" == arch && "$SETUP_MODE" != server ]]; then
       expected="${expected/native_packages /native_packages yay }"
     fi
+    if [[ "$platform" == arch && "$SETUP_MODE" == desktop ]]; then
+      ((count += 1))
+    fi
     [[ "${selected[*]}" == "$expected" ]]
     [[ "${#asked[@]}" == "$count" ]]
     # Restart must restore every mandatory selection and clear old choices.
@@ -98,8 +101,7 @@ for zsh_answer in yes no unset; do
   workflow_installed_packages() { local -n result="$1"; result=(tmux starship); }
   ui_multiselect_grouped() {
     local -n result="$1" initial="$6"
-    local -a defaults=()
-    homebrew_extended_default_packages defaults
+    local -a defaults=(starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs zoxide herdr stow)
     if [[ "$zsh_answer" == yes ]]; then
       [[ "${#initial[@]}" == $((${#defaults[@]} + 1)) ]]
       for package in "${defaults[@]}"; do

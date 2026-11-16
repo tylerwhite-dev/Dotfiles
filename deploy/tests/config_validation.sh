@@ -11,6 +11,31 @@ trap 'rm -f -- "$validation_error"' EXIT
 
 catalog_validate
 
+# Defaults handlers are optional, registered by ID and validated before use.
+defaults_handler=''
+catalog_defaults_handler defaults_handler native_desktop
+[[ "$defaults_handler" == native_desktop_default_packages ]]
+catalog_defaults_handler defaults_handler homebrew_extended
+[[ "$defaults_handler" == homebrew_extended_package_defaults ]]
+catalog_defaults_handler defaults_handler homebrew
+[[ -z "$defaults_handler" ]]
+(
+  procedure_define defaults_fixture
+  catalog_defaults_handler defaults_handler defaults_fixture
+  [[ -z "$defaults_handler" ]]
+)
+(
+  if procedure_defaults_handler unknown_defaults missing_defaults 2>"$validation_error"; then exit 1; fi
+  grep -Fq 'Unknown procedure: unknown_defaults' "$validation_error"
+)
+for invalid_defaults in missing_defaults_function 'invalid-name'; do
+  (
+    procedure_defaults_handler homebrew_extended "$invalid_defaults"
+    if catalog_validate 2>"$validation_error"; then exit 1; fi
+    grep -Fq 'unknown defaults handler' "$validation_error"
+  )
+done
+
 [[ "${_CATALOG_PACKAGE_NEEDS[brew:sdkman-cli]}" == NATIVE_BUILD_TOOLS ]]
 [[ "${_CATALOG_PROCEDURE_NEEDS[yay]}" == NATIVE_BUILD_TOOLS ]]
 (

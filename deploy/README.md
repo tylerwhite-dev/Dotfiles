@@ -97,6 +97,7 @@ bash deploy/tests/ui.sh
 bash deploy/tests/layer_dependencies.sh
 bash deploy/tests/flatpak.sh
 bash deploy/tests/optionals.sh
+bash deploy/tests/native_desktop.sh
 ```
 
 ## Manual UI tests

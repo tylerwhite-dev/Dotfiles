@@ -145,6 +145,36 @@ workflow_installed_packages() {
   __workflow_installed_result=("${__workflow_installed_found[@]}")
 }
 
+# Builds distinct preset and installed outputs, publishing only on success.
+# Outputs must be distinct direct array names, outside the __workflow_presets_ prefix.
+# Returns 1 on an installed probe failure and 2 on a defaults handler failure.
+workflow_package_presets() {
+  local -n __workflow_presets_result="$1" __workflow_presets_installed_result="$2"
+  local __workflow_presets_id="$3" __workflow_presets_platform="$4" __workflow_presets_mode="$5"
+  shift 5
+  local __workflow_presets_handler __workflow_presets_package
+  local -a __workflow_presets_candidates=("$@")
+  local -a __workflow_presets_installed=() __workflow_presets_defaults=() __workflow_presets_merged=()
+
+  __workflow_presets_result=()
+  __workflow_presets_installed_result=()
+  workflow_installed_packages __workflow_presets_installed "$__workflow_presets_id" \
+    "${__workflow_presets_candidates[@]}" || return 1
+  catalog_defaults_handler __workflow_presets_handler "$__workflow_presets_id"
+  if [[ -n "$__workflow_presets_handler" ]]; then
+    "$__workflow_presets_handler" __workflow_presets_defaults \
+      "$__workflow_presets_platform" "$__workflow_presets_mode" || return 2
+  fi
+  for __workflow_presets_package in "${__workflow_presets_installed[@]}" "${__workflow_presets_defaults[@]}"; do
+    if [[ " ${__workflow_presets_candidates[*]} " == *" $__workflow_presets_package "* &&
+          " ${__workflow_presets_merged[*]} " != *" $__workflow_presets_package "* ]]; then
+      __workflow_presets_merged+=("$__workflow_presets_package")
+    fi
+  done
+  __workflow_presets_result=("${__workflow_presets_merged[@]}")
+  __workflow_presets_installed_result=("${__workflow_presets_installed[@]}")
+}
+
 # Resolves native requirements of the current selection, once per named need.
 # Parallel output arrays contain requirement names and the first consumer.
 workflow_native_requirements() {

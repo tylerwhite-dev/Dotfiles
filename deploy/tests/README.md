@@ -21,6 +21,7 @@ bash deploy/tests/process.sh
 bash deploy/tests/macos.sh
 bash deploy/tests/flatpak.sh
 bash deploy/tests/optionals.sh
+bash deploy/tests/native_desktop.sh
 ```
 
 | Script | What it verifies |
@@ -28,10 +29,11 @@ bash deploy/tests/optionals.sh
 | `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, installed-package probes, and declaration errors. |
 | `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, installed-package probes, caller trap preservation, and configuration load failures in a temporary copy. |
 | `procedure_order.sh` | Queue order, disabled procedures and dependants, selection and optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
-| `workflow.sh` | In-memory selection, platform and dependency filtering, and cask command handoff. |
+| `workflow.sh` | In-memory selection, platform and dependency filtering, merged package presets, defaults/probe failures with cleared outputs, and cask command handoff. |
 | `homebrew.sh` | Installed-package probes with a mock Homebrew executable, missing Homebrew, empty results, command failures and diagnostics, and install policy passed through the real executor. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
 | `optionals.sh` | All optional lists per platform, installed-package presets, collection failure before list display, and shared runner finish-handler dispatch. |
+| `native_desktop.sh` | Arch categories and package membership, distribution references, mode filtering, editable defaults, installed-package detection failures and selected native installation with substituted commands. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |

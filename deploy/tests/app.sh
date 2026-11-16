@@ -213,6 +213,7 @@ else
       esac
     )
   done
+
   (
     # Existing Homebrew opens the lists without asking to install it.
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0
@@ -268,6 +269,12 @@ else
   (
     # Flatpak-only selection does not prepare Homebrew.
     events=() SETUP_MODE=optionals optional_ids=(flatpak_apps) brew_path=/missing/brew answers=(start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
+  )
+  (
+    # Native desktop alone does not prepare Homebrew or base native packages.
+    events=() SETUP_MODE=optionals test_platform=arch optional_ids=(native_desktop) brew_path=/missing/brew answers=(start) answer_index=0
     run_app 0
     assert_events 'status.distribution_detected optional-collect status.settings_confirmed optional-run elapsed'
   )

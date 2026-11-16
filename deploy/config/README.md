@@ -1,5 +1,65 @@
 # Configuration
 
+## Distribution-specific native desktop categories
+
+`features/native-desktop.sh` owns the selectable `native_desktop` procedure.
+It currently supports Arch only. Its package references use source `native`
+and category names such as `native_desktop_@distribution_desktop`.
+`@distribution` is substituted anywhere in a group or category name, so this
+resolves to `native_desktop_arch_desktop` on Arch. The existing standalone
+`native:@distribution` reference still resolves to `native:arch`.
+
+To support another distribution, declare all three corresponding categories
+and their package groups, extend `procedure_platforms`, and extend the default
+package and installed-package functions for that distribution. The installed
+probe currently reads the local Arch database with `pacman -Qq`; adding a
+platform also requires selecting its probe behavior. Package installation uses
+the shared native executor. Each supported platform's references are validated
+before the questionnaire starts.
+
+Desktop defaults live in the registered `native_desktop_default_packages`
+handler, which returns additional packages only for `--desktop`. Standard and optional
+mode start with installed packages alone. The procedure has no dependency on
+Homebrew or the base native package procedure.
+
+## Conditional package defaults
+
+Register an optional handler after defining the procedure:
+
+```bash
+procedure_defaults_handler native_desktop native_desktop_default_packages
+```
+
+The handler receives `(result_array_name, platform, mode)`. It clears and fills
+the caller's indexed array with additional packages to check in the menu. It
+returns success with an empty array when its condition does not apply. Handlers
+may read earlier procedure choices with `workflow_selection`, but must not change
+workflow state, install packages, or render UI. Catalog validation rejects a
+nonempty handler name unless it names an existing function.
+
+Native desktop checks its platform and mode in its feature file. The Homebrew
+extended handler checks the earlier `zsh_default` choice and uses its existing
+base packages in that handler. The questionnaire has no procedure-specific default rules.
+Keep procedures whose choices affect defaults earlier in `procedure-order.sh`;
+the handler reads the selection already collected, without looking ahead.
+
+`workflow_package_presets presets_result installed_result procedure_id platform
+mode candidate...` performs installed-package detection, invokes the optional
+defaults handler, and merges available candidates without duplicates. The two
+outputs must be distinct direct array names outside its reserved
+`__workflow_presets_` prefix. Presets contain installed candidates first and
+additional defaults second; the installed output is kept separately to exclude
+already installed packages from execution. Unknown defaults are ignored.
+Both outputs are cleared at entry and published only after success. Return 1
+means installed-package detection failed; return 2 means the defaults handler
+failed. Either failure stops collection before the menu opens.
+
+Both standard and optional collection use this function. Restart clears choices
+and computes defaults again. Optional-only collection resets the Zsh choice, so
+the Homebrew base defaults are not added in that mode.
+
+## Procedure configuration
+
 Each file in `features/` contains one complete procedure: package groups,
 checkbox categories, messages, handler functions and declarations. Add or
 extend a function by editing its feature file. To enable a new procedure,

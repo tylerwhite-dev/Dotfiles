@@ -9,6 +9,7 @@ declare -Ag _CATALOG_PROCEDURE_REQUIREMENT=()
 declare -Ag _CATALOG_PROCEDURE_REQUIRES_ROOT=()
 declare -Ag _CATALOG_PROCEDURE_SELECTABLE=()
 declare -Ag _CATALOG_PROCEDURE_INSTALLED_PROBE=()
+declare -Ag _CATALOG_PROCEDURE_DEFAULTS_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_PACKAGE_REFS=()
 declare -Ag _CATALOG_PACKAGE_GROUPS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_LABELS=()
@@ -149,6 +150,7 @@ procedure_define() {
   _CATALOG_PROCEDURE_REQUIRES_ROOT["$id"]=""
   _CATALOG_PROCEDURE_SELECTABLE["$id"]="no"
   _CATALOG_PROCEDURE_INSTALLED_PROBE["$id"]=""
+  _CATALOG_PROCEDURE_DEFAULTS_HANDLER["$id"]=""
   _CATALOG_PROCEDURE_PACKAGE_REFS["$id"]=""
 }
 
@@ -214,6 +216,12 @@ procedure_selectable() {
 procedure_installed_probe() {
   _catalog_require_procedure "$1" || return
   _CATALOG_PROCEDURE_INSTALLED_PROBE["$1"]="$2"
+}
+
+# Assigns a read-only handler (result_array_name, platform, mode) for defaults.
+procedure_defaults_handler() {
+  _catalog_require_procedure "$1" || return
+  _CATALOG_PROCEDURE_DEFAULTS_HANDLER["$1"]="$2"
 }
 
 # Attaches one or more source and package-group references to a procedure.
@@ -289,6 +297,11 @@ catalog_installed_probe() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_INSTALLED_PROBE[$2]:-}"
 }
 
+# Returns the optional package-defaults handler registered for a procedure.
+catalog_defaults_handler() {
+  printf -v "$1" '%s' "${_CATALOG_PROCEDURE_DEFAULTS_HANDLER[$2]:-}"
+}
+
 # Returns the procedure ID required by another procedure, if any.
 catalog_requirement() {
   printf -v "$1" '%s' "${_CATALOG_PROCEDURE_REQUIREMENT[$2]}"
@@ -319,7 +332,7 @@ catalog_is_available() {
   [[ "$platforms" == *" ${platform} "* ]]
 }
 
-# Resolves @distribution references to the current platform package group.
+# Resolves @distribution anywhere in a package group or category reference.
 _catalog_resolve_package_reference() {
   local result_name="$1"
   local reference="$2"
@@ -327,9 +340,7 @@ _catalog_resolve_package_reference() {
   local source="${reference%%:*}"
   local group="${reference#*:}"
 
-  if [[ "$group" == "@distribution" ]]; then
-    group="$platform"
-  fi
+  group="${group//@distribution/$platform}"
 
   printf -v "$result_name" '%s' "${source}:${group}"
 }
@@ -495,7 +506,7 @@ _catalog_validate_package_references() {
   local -a group_keys=()
 
   for reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]}; do
-    if [[ "${reference#*:}" == "@distribution" ]]; then
+    if [[ "${reference#*:}" == *'@distribution'* ]]; then
       for platform in ${_CATALOG_PROCEDURE_PLATFORMS[$id]}; do
         _catalog_resolve_package_reference key "$reference" "$platform"
         _catalog_reference_group_keys group_keys "$key" "Procedure $id" || return 1
@@ -507,14 +518,22 @@ _catalog_validate_package_references() {
   done
 }
 
+# Validates optional function references; the main handler is required separately.
+_catalog_validate_function() {
+  local id="$1" role="$2" function_name="$3"
+  [[ -n "$function_name" ]] || return 0
+  if [[ ! "$function_name" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || ! declare -F "$function_name" >/dev/null; then
+    printf 'Procedure %s references an unknown %s: %s\n' "$id" "$role" "$function_name" >&2
+    return 1
+  fi
+}
+
 # Validates the complete catalog before the questionnaire starts.
 catalog_validate() {
   local id
   local handler
-  local finish_handler
   local requirement
   local platform
-  local installed_probe ready_probe
   local key source package name kind target group packages needs
 
   if ((${#_CATALOG_PROCEDURE_IDS[@]} == 0)); then
@@ -524,29 +543,18 @@ catalog_validate() {
 
   for id in "${_CATALOG_PROCEDURE_IDS[@]}"; do
     handler="${_CATALOG_PROCEDURE_HANDLER[$id]}"
-    finish_handler="${_CATALOG_PROCEDURE_FINISH_HANDLER[$id]}"
     requirement="${_CATALOG_PROCEDURE_REQUIREMENT[$id]}"
 
     if [[ ! "$id" =~ ^[a-z][a-z0-9_]*$ ]]; then
       printf 'Invalid procedure ID: %s\n' "$id" >&2
       return 1
     fi
-    if [[ -z "$handler" || ! "$handler" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+    if [[ -z "$handler" ]]; then
       printf 'Invalid handler for procedure %s: %s\n' "$id" "$handler" >&2
       return 1
     fi
-    if ! declare -F "$handler" >/dev/null; then
-      printf 'Procedure %s references an unknown handler: %s\n' "$id" "$handler" >&2
-      return 1
-    fi
-    if [[ -n "$finish_handler" ]]; then
-      if [[ ! "$finish_handler" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
-        ! declare -F "$finish_handler" >/dev/null; then
-        printf 'Procedure %s references an unknown finish handler: %s\n' \
-          "$id" "$finish_handler" >&2
-        return 1
-      fi
-    fi
+    _catalog_validate_function "$id" handler "$handler" || return
+    _catalog_validate_function "$id" 'finish handler' "${_CATALOG_PROCEDURE_FINISH_HANDLER[$id]}" || return
     if [[ -z "${_CATALOG_PROCEDURE_PLATFORMS[$id]}" ]]; then
       printf 'Procedure %s has no supported platforms.\n' "$id" >&2
       return 1
@@ -568,24 +576,9 @@ catalog_validate() {
       printf 'Procedure %s has an invalid selectable flag.\n' "$id" >&2
       return 1
     fi
-    installed_probe="${_CATALOG_PROCEDURE_INSTALLED_PROBE[$id]}"
-    ready_probe="${_CATALOG_PROCEDURE_READY_PROBE[$id]:-}"
-    if [[ -n "$ready_probe" ]]; then
-      if [[ ! "$ready_probe" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
-        ! declare -F "$ready_probe" >/dev/null; then
-        printf 'Procedure %s references an unknown ready probe: %s\n' \
-          "$id" "$ready_probe" >&2
-        return 1
-      fi
-    fi
-    if [[ -n "$installed_probe" ]]; then
-      if [[ ! "$installed_probe" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || \
-        ! declare -F "$installed_probe" >/dev/null; then
-        printf 'Procedure %s references an unknown installed probe: %s\n' \
-          "$id" "$installed_probe" >&2
-        return 1
-      fi
-    fi
+    _catalog_validate_function "$id" 'defaults handler' "${_CATALOG_PROCEDURE_DEFAULTS_HANDLER[$id]}" || return
+    _catalog_validate_function "$id" 'ready probe' "${_CATALOG_PROCEDURE_READY_PROBE[$id]:-}" || return
+    _catalog_validate_function "$id" 'installed probe' "${_CATALOG_PROCEDURE_INSTALLED_PROBE[$id]}" || return
 
     _catalog_validate_messages "$id" || return
     _catalog_validate_package_references "$id" || return

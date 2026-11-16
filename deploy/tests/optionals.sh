@@ -19,6 +19,7 @@ ui_multiselect_grouped() {
   done
 }
 # The installed-package probe reports one known formula and one known cask.
+native_desktop_installed_packages() { local -n result="$1"; result=(); }
 executor_brew_installed() {
   local -n result="$1"
   local kind="$2"
@@ -39,6 +40,8 @@ for platform in arch debian fedora macos; do
   workflow_selected_optionals selected "$platform"
   if [[ "$platform" == macos ]]; then
     [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended homebrew_casks' ]]
+  elif [[ "$platform" == arch ]]; then
+    [[ "${selected[*]}" == 'native_desktop homebrew_fonts homebrew_extended flatpak_apps' ]]
   else
     [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended flatpak_apps' ]]
   fi
@@ -50,6 +53,7 @@ for platform in arch debian fedora macos; do
   # Ordinary prerequisites remain unchanged in the standard scenario.
   workflow_selected standard "$platform"
   if [[ "$platform" == macos ]]; then [[ "${#standard[@]}" == 0 ]];
+  elif [[ "$platform" == arch ]]; then [[ "${standard[*]}" == 'native_desktop flatpak_apps' ]];
   else [[ "${standard[*]}" == flatpak_apps ]]; fi
 done
 

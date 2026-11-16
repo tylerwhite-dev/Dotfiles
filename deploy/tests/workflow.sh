@@ -127,6 +127,50 @@ formula_command="$(
     fail "failed probes must propagate status and discard partial results"
 )
 
+# Presets merge defaults with installed candidates without changing workflow state.
+(
+  fixture_defaults() {
+    local -n result="$1"
+    [[ "$2:$3" == arch:desktop ]]
+    result=(firefox ghostty ghostty outside)
+  }
+  fixture_installed() { local -n result="$1"; result=(firefox); }
+  procedure_defaults_handler native_desktop fixture_defaults
+  procedure_installed_probe native_desktop fixture_installed
+  workflow_reset
+  workflow_package_presets presets installed native_desktop arch desktop firefox ghostty
+  [[ "${presets[*]}" == 'firefox ghostty' && "${installed[*]}" == firefox ]]
+  workflow_selection answer native_desktop
+  [[ "$answer" == no ]]
+  procedure_defaults_handler native_desktop ''
+  workflow_package_presets presets installed native_desktop arch desktop firefox ghostty
+  [[ "${presets[*]}" == firefox && "${installed[*]}" == firefox ]]
+  procedure_installed_probe native_desktop ''
+  workflow_package_presets presets installed native_desktop arch desktop firefox ghostty
+  [[ "${#presets[@]}" == 0 && "${#installed[@]}" == 0 ]]
+  workflow_package_presets presets installed native_desktop arch desktop
+  [[ "${#presets[@]}" == 0 && "${#installed[@]}" == 0 ]]
+)
+(
+  failing_defaults() { local -n result="$1"; result=(ghostty); return 7; }
+  fixture_installed() { local -n result="$1"; result=(firefox); }
+  procedure_defaults_handler native_desktop failing_defaults
+  procedure_installed_probe native_desktop fixture_installed
+  presets=(stale); installed=(stale); actual=0
+  workflow_package_presets presets installed native_desktop arch desktop firefox ghostty || actual=$?
+  [[ "$actual" == 2 && "${#presets[@]}" == 0 && "${#installed[@]}" == 0 ]]
+
+  failing_installed() { local -n result="$1"; result=(firefox); return 9; }
+  defaults_called=no
+  fixture_defaults() { defaults_called=yes; }
+  procedure_defaults_handler native_desktop fixture_defaults
+  procedure_installed_probe native_desktop failing_installed
+  presets=(stale); installed=(stale); actual=0
+  workflow_package_presets presets installed native_desktop arch desktop firefox ghostty || actual=$?
+  [[ "$actual" == 1 && "$defaults_called" == no ]]
+  [[ "${#presets[@]}" == 0 && "${#installed[@]}" == 0 ]]
+)
+
 # Native requirements follow selected consumers and are deduplicated.
 SETUP_MODE=standard
 workflow_reset

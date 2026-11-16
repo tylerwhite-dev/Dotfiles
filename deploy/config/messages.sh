@@ -21,6 +21,8 @@ message_define error.homebrew_missing \
   "Homebrew was not installed at %s"
 message_define error.installed_packages_probe_failed \
   "Could not read installed packages. No changes were applied."
+message_define error.package_defaults_failed \
+  "Could not determine the default package selection."
 message_define error.native_packages_unsupported \
   "Native package installation is not implemented for: %s"
 message_define error.brew_not_installed \
@@ -83,4 +85,4 @@ message_define prompt.brew_install "Selected packages require Homebrew. Install 
 message_define prompt.native_requirement "%s requires %s. Install it?"
 message_define prompt.native_requirement_declined \
   "%s cannot be installed without %s. No changes have been applied. Choose an action:"
-message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  --server              Select the server scenario.\n  --desktop             Select the desktop scenario.\n  --wsl                 Select the WSL scenario.\n  --mac                 Select the Mac scenario.\n  -a, --add-optionals    Select optional Homebrew and Linux Flatpak or macOS cask packages.\n  -h, --help             Show this help message.\n\nScenario flags require a matching environment. Mandatory steps cannot be disabled.\nOptional package lists and final confirmation remain interactive.\nAt most one flag is allowed per run, including --help.'
+message_define flags.help $'Usage: %s [flag]\n\nFlags:\n  --server              Select the server scenario.\n  --desktop             Select the desktop scenario.\n  --wsl                 Select the WSL scenario.\n  --mac                 Select the Mac scenario.\n  -a, --add-optionals    Select optional native desktop, Homebrew, Flatpak, or macOS cask packages.\n  -h, --help             Show this help message.\n\nScenario flags require a matching environment. Mandatory steps cannot be disabled.\nOptional package lists and final confirmation remain interactive.\nAt most one flag is allowed per run, including --help.'
