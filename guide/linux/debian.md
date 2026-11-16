@@ -28,10 +28,10 @@ sudo nala autoremove -y && sudo nala clean && brew autoremove && brew cleanup --
 
 ## WSL fast setup
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install git -y
-git clone https://github.com/tylerwhite-dev/Dotfiles
-chmod +x ~/Dotfiles/dotfiles-deploy.sh
+sudo apt update && sudo apt upgrade -y &&
+sudo apt install git -y &&
+git clone https://github.com/tylerwhite-dev/Dotfiles &&
+chmod +x ~/Dotfiles/dotfiles-deploy.sh &&
 bash ~/Dotfiles/dotfiles-deploy.sh --wsl
 ```
 

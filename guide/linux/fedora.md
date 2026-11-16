@@ -25,12 +25,12 @@ sudo dnf autoremove -y && sudo dnf clean all && brew autoremove && brew cleanup 
 
 ## WSL fast setup
 ```bash
-sudo passwd $USER
-sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0
-sudo dnf upgrade -y
-sudo dnf install git -y
-git clone https://github.com/tylerwhite-dev/Dotfiles
-chmod +x ~/Dotfiles/dotfiles-deploy.sh
+sudo passwd $USER &&
+sudo dnf config-manager setopt fedora-cisco-openh264.enabled=0 &&
+sudo dnf upgrade -y &&
+sudo dnf install git -y &&
+git clone https://github.com/tylerwhite-dev/Dotfiles &&
+chmod +x ~/Dotfiles/dotfiles-deploy.sh &&
 bash ~/Dotfiles/dotfiles-deploy.sh --wsl
 ```
 
