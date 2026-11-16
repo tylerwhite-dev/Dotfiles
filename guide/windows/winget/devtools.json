@@ -35,7 +35,7 @@
           "PackageIdentifier": "WiresharkFoundation.Wireshark"
         },
         {
-          "PackageIdentifier": "SST.opencode"
+          "PackageIdentifier": "Anomaly.OpenCode"
         },
         {
           "PackageIdentifier": "Starship.Starship"
