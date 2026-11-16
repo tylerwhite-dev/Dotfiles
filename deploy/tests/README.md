@@ -29,7 +29,7 @@ bash deploy/tests/native_desktop.sh
 | `config_validation.sh` | Procedure and package catalog declarations are valid, including macOS cask categories, grouped row output, installed-package probes, and declaration errors. |
 | `features.sh` | Feature discovery and explicit queue activation, packages, selection, main/finish handlers, installed-package probes, caller trap preservation, and configuration load failures in a temporary copy. |
 | `procedure_order.sh` | Queue order, disabled procedures and dependants, selection and optional filtering, empty queues, invalid queue entries, stale selection cleanup, and omitted CLT preparation. |
-| `workflow.sh` | In-memory selection, platform and dependency filtering, merged package presets, defaults/probe failures with cleared outputs, and cask command handoff. |
+| `workflow.sh` | Selection reset, platform and dependency filtering, merged package presets, defaults/probe failures with cleared outputs, stable native requirement order and deduplication, and cask command handoff. |
 | `homebrew.sh` | Installed-package probes with a mock Homebrew executable, missing Homebrew, empty results, command failures and diagnostics, and install policy passed through the real executor. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
 | `optionals.sh` | All optional lists per platform, installed-package presets, collection failure before list display, and shared runner finish-handler dispatch. |

@@ -112,7 +112,7 @@ assert_invalid_order 'place queue_a before queue_a' queue_a
   action_install_homebrew() { events+=(brew); }
   runner_run_optionals() { events+=(run); }
   events=()
-  _app_run_optionals macos macOS > /dev/null
+  SETUP_MODE=optionals _app_run macos macOS > /dev/null
   [[ "${events[*]}" == 'brew run' ]]
 )
 

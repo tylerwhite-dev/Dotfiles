@@ -68,11 +68,6 @@ ui_success() {
   printf '\n%s%s%s\n' "$ui_color_success" "$1" "$ui_color_reset"
 }
 
-# Prints a success-colored line without adding a leading blank line.
-ui_success_line() {
-  printf '%s%s%s\n' "$ui_color_success" "$1" "$ui_color_reset"
-}
-
 # Prints a heading-colored line without adding a leading blank line.
 ui_heading_line() {
   printf '%s%s%s\n' "$ui_color_heading" "$1" "$ui_color_reset"

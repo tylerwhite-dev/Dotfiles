@@ -26,6 +26,18 @@ source "${script_root}/logic/load.sh"
 
 catalog_validate
 workflow_reset
+
+(
+  workflow_select dotfiles yes
+  workflow_select_packages dotfiles stale
+  procedure_order native_packages
+  workflow_reset
+  for id in dotfiles native_packages never_selected; do
+    workflow_selection answer "$id"
+    workflow_selected_packages packages "$id"
+    [[ "$answer" == no && "${#packages[@]}" == 0 ]]
+  done
+)
 workflow_select homebrew no
 workflow_select homebrew_extended yes
 workflow_select dotfiles yes
@@ -206,5 +218,34 @@ workflow_select homebrew_extended yes
 workflow_native_requirements needs consumers arch all
 [[ "${needs[*]}" == NATIVE_BUILD_TOOLS && "${consumers[*]}" == sdkman-cli ]] ||
   fail "installed yay must not suppress SDKMAN build tools"
+
+# Requirement order follows selected packages and each declaration, not hash order.
+(
+  package_group needs_fixture apps first second unselected
+  package_requires needs_fixture first FIRST_NEED SHARED_NEED
+  package_requires needs_fixture second SECOND_NEED SHARED_NEED
+  package_requires needs_fixture unselected UNUSED_NEED
+  for name in FIRST_NEED SECOND_NEED SHARED_NEED UNUSED_NEED; do
+    requirement_define "$name" arch package fixture
+  done
+  procedure_define needs_fixture
+  procedure_platforms needs_fixture arch
+  procedure_packages needs_fixture needs_fixture apps
+  procedure_needs needs_fixture NATIVE_BUILD_TOOLS
+  procedure_order needs_fixture
+  SETUP_MODE=standard
+  workflow_reset
+  workflow_select needs_fixture yes
+  workflow_select_packages needs_fixture second first
+  workflow_native_requirements needs consumers arch all
+  [[ "${needs[*]}" == 'NATIVE_BUILD_TOOLS SECOND_NEED SHARED_NEED FIRST_NEED' ]]
+  [[ "${consumers[*]}" == 'needs_fixture second second first' ]]
+  workflow_native_requirements needs_again consumers_again arch all
+  [[ "${needs_again[*]}" == "${needs[*]}" && "${consumers_again[*]}" == "${consumers[*]}" ]]
+  SETUP_MODE=optionals
+  procedure_selectable needs_fixture
+  workflow_native_requirements needs consumers arch optionals
+  [[ "${needs[*]}" == 'NATIVE_BUILD_TOOLS SECOND_NEED SHARED_NEED FIRST_NEED' ]]
+)
 
 printf 'Workflow validation passed.\n'

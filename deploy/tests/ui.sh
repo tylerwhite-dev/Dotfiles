@@ -28,17 +28,12 @@ grep -Fq '    › one' "$menu_output"
 grep -Fq '      two' "$menu_output"
 grep -Fq '      three' "$menu_output"
 
-saved_success_color="$ui_color_success"
 saved_heading_color="$ui_color_heading"
 saved_reset_color="$ui_color_reset"
-ui_color_success='<success>'
 ui_color_reset='</reset>'
-success_output="$(ui_success_line 'Elapsed')"
-[[ "$success_output" == '<success>Elapsed</reset>' ]]
 ui_color_heading='<heading>'
 heading_output="$(ui_heading_line 'Elapsed')"
 [[ "$heading_output" == '<heading>Elapsed</reset>' ]]
-ui_color_success="$saved_success_color"
 ui_color_heading="$saved_heading_color"
 ui_color_reset="$saved_reset_color"
 

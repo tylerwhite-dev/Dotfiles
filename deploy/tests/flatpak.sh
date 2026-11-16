@@ -62,7 +62,8 @@ workflow_installed_packages installed flatpak_apps org.telegram.desktop
   }
   _questionnaire_read_selectable_packages flatpak_apps fedora 1 1
   workflow_selected_packages chosen flatpak_apps
-  [[ "${chosen[*]}" == 'org.telegram.desktop md.obsidian.Obsidian' ]]
+  workflow_selection choice flatpak_apps
+  [[ "${#chosen[@]}" == 0 && "$choice" == no ]]
 )
 workflow_select_packages flatpak_apps org.telegram.desktop md.obsidian.Obsidian
 
@@ -72,7 +73,7 @@ for platform in arch debian fedora; do
   case "$platform" in
     arch) expected='require pacman root pacman -Syu --needed --noconfirm flatpak' ;;
     debian) expected='require apt root apt update root apt install -y flatpak' ;;
-    fedora) expected='require dnf root dnf config-manager setopt fedora-cisco-openh264.enabled=0 root dnf install -y flatpak' ;;
+    fedora) expected='require dnf root dnf config-manager setopt fedora-cisco-openh264.enabled=0 root dnf --setopt=timeout=10 makecache --refresh root dnf install -y flatpak' ;;
   esac
   [[ "${events[*]}" == "$expected require flatpak status.flatpak_installed root flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo" ]]
 done

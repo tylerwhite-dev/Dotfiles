@@ -18,117 +18,95 @@ _app_print_elapsed_time() {
   ui_heading_line "$message"
 }
 
-# Collects optional choices before installing missing Homebrew.
-_app_run_optionals() {
-  local platform="$1" distribution_name="$2" started_at
-  local brew_bin prompt yes_option no_option choice action confirmation_status need_brew
+# Shares review/restart handling; optional mode prepares Homebrew separately.
+_app_run() {
+  local platform="$1" distribution_name="$2" mode=all started_at text
+  local action confirmation_status brew_bin need_brew=no requirement choice prompt yes_option no_option
   local collect_answers=yes
   local -a selected=() approved_requirements=()
-
-  if ((EUID == 0)); then
+  [[ "${SETUP_MODE:-standard}" != optionals ]] || mode=optionals
+  if [[ "$mode" == optionals ]] && ((EUID == 0)); then
     error_report error.root_execution
     return 1
   fi
   while true; do
     if [[ "$collect_answers" == yes ]]; then
-      questionnaire_collect_optionals "$platform" "$distribution_name" || return
+      if [[ "$mode" == optionals ]]; then
+        questionnaire_collect_optionals "$platform" "$distribution_name" || return
+      else
+        questionnaire_collect "$platform" "$distribution_name" || return
+      fi
       collect_answers=no
     fi
-    workflow_selected_optionals selected "$platform"
-    if ((${#selected[@]} == 0)); then
-      status_report status.optionals_none
-      return 0
+    if [[ "$mode" == optionals ]]; then
+      workflow_selected_optionals selected "$platform"
+      if ((${#selected[@]} == 0)); then
+        status_report status.optionals_none
+        return 0
+      fi
     fi
-    questionnaire_confirm action "$platform" "$distribution_name" optionals || return
+    questionnaire_confirm action "$platform" "$distribution_name" "$mode" || return
     case "$action" in
-      start)
-        if questionnaire_confirm_requirements approved_requirements "$platform" optionals; then
-          :
-        else
-          confirmation_status=$?
-          case "$confirmation_status" in
-            2) continue ;;
-            3) collect_answers=yes; continue ;;
-            4) status_report status.exited; return 0 ;;
-          esac
-          return "$confirmation_status"
-        fi
-        need_brew=no
-        for choice in "${selected[@]}"; do
-          case "$choice" in homebrew_extended|homebrew_fonts|homebrew_casks) need_brew=yes ;; esac
-        done
-        brew_bin="$(executor_brew_bin)"
-        if [[ "$need_brew" == yes && ! -x "$brew_bin" ]]; then
-          message_format prompt prompt.brew_install
-          message_format yes_option option.yes
-          message_format no_option option.no
-          if ! ui_select choice "$prompt" "" 0 minimal "$yes_option" "$no_option"; then
-            error_report error.input_interrupted
-            return 1
-          fi
-          if ((choice != 0)); then
-            collect_answers=yes
-            continue
-          fi
-        fi
-        break ;;
-      restart) collect_answers=yes; continue ;;
-      exit) status_report status.exited; return 0 ;;
-    esac
-  done
-  started_at="$SECONDS"
-  status_report status.settings_confirmed
-  runner_install_native_requirements "$platform" "${approved_requirements[@]}" || return
-  if [[ "$need_brew" == yes && ! -x "$brew_bin" ]]; then
-    status_report status.optionals_brew_prepare
-    if [[ "$platform" == macos ]] && catalog_is_enabled macos_command_line_tools; then
-      action_prepare_macos_command_line_tools "$platform" || return
-      action_install_macos_command_line_tools "$platform" || return
-    fi
-    action_install_homebrew "$platform" "$SETUP_REPOSITORY_ROOT" || return
-  fi
-  runner_run_optionals "$platform" "$distribution_name" "$SETUP_REPOSITORY_ROOT" || return
-  _app_print_elapsed_time "$((SECONDS - started_at))"
-}
-
-# Collects choices and handles review before execution.
-_app_run_standard() {
-  local platform="$1" distribution_name="$2" action text started_at confirmation_status
-  local collect_answers=yes
-  local -a approved_requirements=()
-
-  while true; do
-    if [[ "$collect_answers" == yes ]]; then
-      questionnaire_collect "$platform" "$distribution_name" || return
-      collect_answers=no
-    fi
-    questionnaire_confirm action "$platform" "$distribution_name" || return
-    case "$action" in
-      start)
-        if questionnaire_confirm_requirements approved_requirements "$platform" all; then
-          break
-        else
-          confirmation_status=$?
-          case "$confirmation_status" in
-            2) continue ;;
-            3) collect_answers=yes; continue ;;
-            4) status_report status.exited; return 0 ;;
-          esac
-          return "$confirmation_status"
-        fi ;;
       restart) collect_answers=yes; continue ;;
       exit)
-        message_format text status.exited
-        ui_success "$text"
-        return 0
-        ;;
+        if [[ "$mode" == optionals ]]; then
+          status_report status.exited
+        else
+          message_format text status.exited
+          ui_success "$text"
+        fi
+        return 0 ;;
     esac
+    confirmation_status=0
+    questionnaire_confirm_requirements approved_requirements "$platform" "$mode" || confirmation_status=$?
+    case "$confirmation_status" in
+      0) ;;
+      2) continue ;;
+      3) collect_answers=yes; continue ;;
+      4) status_report status.exited; return 0 ;;
+      *) return "$confirmation_status" ;;
+    esac
+    if [[ "$mode" == optionals ]]; then
+      need_brew=no
+      for choice in "${selected[@]}"; do
+        catalog_requirement requirement "$choice"
+        if [[ "$requirement" == homebrew ]]; then need_brew=yes; break; fi
+      done
+      brew_bin="$(executor_brew_bin)"
+      if [[ "$need_brew" == yes && ! -x "$brew_bin" ]]; then
+        message_format prompt prompt.brew_install
+        message_format yes_option option.yes
+        message_format no_option option.no
+        if ! ui_select choice "$prompt" "" 0 minimal "$yes_option" "$no_option"; then
+          error_report error.input_interrupted
+          return 1
+        fi
+        if ((choice != 0)); then collect_answers=yes; continue; fi
+      fi
+    fi
+    break
   done
   started_at="$SECONDS"
-  message_format text status.settings_confirmed
-  ui_success "$text"
+  if [[ "$mode" == optionals ]]; then
+    status_report status.settings_confirmed
+  else
+    message_format text status.settings_confirmed
+    ui_success "$text"
+  fi
   runner_install_native_requirements "$platform" "${approved_requirements[@]}" || return
-  runner_run "$platform" "$distribution_name" "$SETUP_REPOSITORY_ROOT" || return
+  if [[ "$mode" == optionals ]]; then
+    if [[ "$need_brew" == yes && ! -x "$brew_bin" ]]; then
+      status_report status.optionals_brew_prepare
+      if [[ "$platform" == macos ]] && catalog_is_enabled macos_command_line_tools; then
+        action_prepare_macos_command_line_tools "$platform" || return
+        action_install_macos_command_line_tools "$platform" || return
+      fi
+      action_install_homebrew "$platform" "$SETUP_REPOSITORY_ROOT" || return
+    fi
+    runner_run_optionals "$platform" "$distribution_name" "$SETUP_REPOSITORY_ROOT" || return
+  else
+    runner_run "$platform" "$distribution_name" "$SETUP_REPOSITORY_ROOT" || return
+  fi
   _app_print_elapsed_time "$((SECONDS - started_at))"
 }
 
@@ -155,9 +133,5 @@ setup_run() {
   message_format text status.distribution_detected "$distribution_name"
   ui_success "$text"
   ui_ansi_palette
-  if [[ "${SETUP_MODE:-standard}" == optionals ]]; then
-    _app_run_optionals "$distribution_family" "$distribution_name"
-  else
-    _app_run_standard "$distribution_family" "$distribution_name"
-  fi
+  _app_run "$distribution_family" "$distribution_name"
 }

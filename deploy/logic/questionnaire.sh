@@ -68,11 +68,6 @@ _questionnaire_read_selectable_packages() {
     fi
   done
   workflow_select_packages "$procedure_id" "${to_install[@]}"
-  if ((${#to_install[@]} > 0)); then
-    workflow_select "$procedure_id" yes
-  else
-    workflow_select "$procedure_id" no
-  fi
 }
 
 # Renders and records one procedure's yes/no answer.

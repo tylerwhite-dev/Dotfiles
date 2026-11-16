@@ -215,6 +215,17 @@ else
   done
 
   (
+    # A new optional consumer gets Homebrew preparation from its declaration.
+    procedure_define brew_fixture
+    procedure_platforms brew_fixture fedora
+    procedure_selectable brew_fixture
+    procedure_requires brew_fixture homebrew
+    procedure_order homebrew brew_fixture
+    events=() SETUP_MODE=optionals optional_ids=(brew_fixture) brew_path=/missing/brew answers=(start) answer_index=0
+    run_app 0
+    assert_events 'status.distribution_detected optional-collect status.settings_confirmed status.optionals_brew_prepare brew-install optional-run elapsed'
+  )
+  (
     # Existing Homebrew opens the lists without asking to install it.
     events=() SETUP_MODE=optionals optional_ids=(homebrew_extended) input_status=130 answers=(start) answer_index=0
     run_app 0

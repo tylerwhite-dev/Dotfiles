@@ -83,34 +83,11 @@ flatpak_installed_packages() {
   done
 }
 
-# Installs the CLI only when absent, independently of the base package choice.
+# Installs the CLI through the common native installer when absent.
 action_install_flatpak_binary() {
   local platform="$1"
-  if command -v flatpak >/dev/null 2>&1; then
-    return 0
-  fi
-  case "$platform" in
-    arch)
-      executor_require pacman || return
-      executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        pacman -Syu --needed --noconfirm flatpak || return
-      ;;
-    debian)
-      executor_require apt || return
-      executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt update || return
-      executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        apt install -y flatpak || return
-      ;;
-    fedora)
-      executor_require dnf || return
-      executor_run_as_root \
-        dnf config-manager setopt fedora-cisco-openh264.enabled=0 || return
-      executor_retry_as_root "$SETUP_RETRY_ATTEMPTS" "$SETUP_RETRY_DELAY_SECONDS" \
-        dnf install -y flatpak || return
-      ;;
-    *) error_report error.native_packages_unsupported "$platform"; return 1 ;;
-  esac
+  command -v flatpak >/dev/null 2>&1 && return 0
+  executor_install_native_items "$platform" package flatpak || return
   executor_require flatpak || return
   status_report status.flatpak_installed
 }

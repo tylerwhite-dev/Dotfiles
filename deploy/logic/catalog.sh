@@ -51,6 +51,38 @@ catalog_native_requirement() {
   printf -v "$1" '%s' "${_CATALOG_NATIVE_REQUIREMENTS[$2:$3]:-}"
 }
 
+# Returns named native needs declared for a procedure, in declaration order.
+catalog_procedure_needs() {
+  local -n __catalog_proc_needs_result="$1"
+  __catalog_proc_needs_result=()
+  if [[ -n "${_CATALOG_PROCEDURE_NEEDS[$2]:-}" ]]; then
+    read -r -a __catalog_proc_needs_result <<< "${_CATALOG_PROCEDURE_NEEDS[$2]}"
+  fi
+}
+
+# Returns declared needs from matching sources; workflow removes duplicates.
+# Sources without package requirements do not need package-group expansion.
+catalog_package_needs() {
+  local -n __catalog_pkg_needs_result="$1"
+  local __catalog_pkg_needs_id="$2" __catalog_pkg_needs_platform="$3" __catalog_pkg_needs_package="$4"
+  local __catalog_pkg_needs_reference __catalog_pkg_needs_source __catalog_pkg_needs_checked=' '
+  local -a __catalog_pkg_needs_packages=() __catalog_pkg_needs_names=() __catalog_pkg_needs_found=()
+  __catalog_pkg_needs_result=()
+  for __catalog_pkg_needs_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_pkg_needs_id]}; do
+    __catalog_pkg_needs_source="${__catalog_pkg_needs_reference%%:*}"
+    [[ "$__catalog_pkg_needs_checked" != *" $__catalog_pkg_needs_source "* ]] || continue
+    __catalog_pkg_needs_checked+="$__catalog_pkg_needs_source "
+    [[ -n "${_CATALOG_PACKAGE_NEEDS[$__catalog_pkg_needs_source:$__catalog_pkg_needs_package]:-}" ]] || continue
+    catalog_packages __catalog_pkg_needs_packages "$__catalog_pkg_needs_id" \
+      "$__catalog_pkg_needs_platform" "$__catalog_pkg_needs_source" || return
+    [[ " ${__catalog_pkg_needs_packages[*]} " == *" $__catalog_pkg_needs_package "* ]] || continue
+    read -r -a __catalog_pkg_needs_names \
+      <<< "${_CATALOG_PACKAGE_NEEDS[$__catalog_pkg_needs_source:$__catalog_pkg_needs_package]}"
+    __catalog_pkg_needs_found+=("${__catalog_pkg_needs_names[@]}")
+  done
+  __catalog_pkg_needs_result=("${__catalog_pkg_needs_found[@]}")
+}
+
 # Registers an optional display name; package identity remains source and ID.
 package_alias() {
   (($# == 3)) || return 2

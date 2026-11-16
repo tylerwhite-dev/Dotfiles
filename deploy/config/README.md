@@ -77,6 +77,37 @@ Feature-specific errors and statuses belong in the owning feature file.
 
 ## Adding a feature
 
+### Reading native requirements
+
+Workflow reads requirement declarations through the catalog:
+
+- `catalog_procedure_needs result_array_name procedure_id` returns the named
+  requirements declared with `procedure_needs`, in declaration order.
+- `catalog_package_needs result_array_name procedure_id platform package_id`
+  returns requirements of that package only from resolved groups attached to
+  the procedure. Sources remain separate, `@distribution` is expanded, and
+  declarations retain their order and duplicates. Workflow deduplicates final needs. A missing package or
+  declaration returns an empty array. Invalid references fail without publishing
+  partial output. Use direct output array names outside each function's internal
+  `__catalog_proc_needs_` or `__catalog_pkg_needs_` prefix.
+
+`workflow_native_requirements` processes selected procedures in queue order,
+skips ready procedures, and collects each procedure's needs before those of its
+selected packages. Packages follow selection order; their needs follow catalog
+declaration order. Only requirements mapped for the current platform enter the
+confirmation list. A shared requirement appears once with its first consumer.
+The workflow does not read the catalog's internal arrays.
+
+Optional-only Homebrew preparation is determined by the selected procedures'
+direct `procedure_requires ... homebrew` declarations. Adding another Homebrew
+package procedure does not require adding its ID to application logic. This
+does not introduce recursive dependency preparation for other procedures.
+
+Package selection stores the package list and sets the procedure to yes for a nonempty list or no for an empty list. Workflow reset clears both selection maps. Absent entries read as `no` and an
+empty package list, including entries for procedures removed from the queue.
+
+### Feature example
+
 Create `features/network-tools.sh`, for example:
 
 ```bash

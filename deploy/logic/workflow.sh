@@ -5,16 +5,8 @@ declare -Ag _WORKFLOW_PACKAGE_SELECTIONS=()
 
 # Clears selections, including procedures removed from the execution queue.
 workflow_reset() {
-  local -a procedure_ids=()
-  local procedure_id
-
   _WORKFLOW_SELECTIONS=()
   _WORKFLOW_PACKAGE_SELECTIONS=()
-  catalog_procedure_ids procedure_ids
-  for procedure_id in "${procedure_ids[@]}"; do
-    _WORKFLOW_SELECTIONS["$procedure_id"]="no"
-    _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]=""
-  done
 }
 
 # Stores a validated yes/no answer for one procedure.
@@ -116,6 +108,11 @@ workflow_select_packages() {
   shift
 
   _WORKFLOW_PACKAGE_SELECTIONS["$procedure_id"]="$*"
+  if (($#)); then
+    workflow_select "$procedure_id" yes
+  else
+    workflow_select "$procedure_id" no
+  fi
 }
 
 # Reads a procedure's chosen packages into a caller-owned array.
@@ -175,45 +172,45 @@ workflow_package_presets() {
   __workflow_presets_installed_result=("${__workflow_presets_installed[@]}")
 }
 
-# Resolves native requirements of the current selection, once per named need.
-# Parallel output arrays contain requirement names and the first consumer.
+# Resolves needs in consumer order, recording each mapped need once.
 workflow_native_requirements() {
-  local -n names_result="$1" consumers_result="$2"
-  local platform="$3" mode="$4" id key source package name resolved ready_probe
-  local -a selected=() packages=() candidates=()
-  local -A seen=()
-  names_result=(); consumers_result=()
-  if [[ "$mode" == optionals ]]; then
-    workflow_selected_optionals selected "$platform"
+  local -n __workflow_requirements_names_result="$1" __workflow_requirements_consumers_result="$2"
+  local __workflow_requirements_platform="$3" __workflow_requirements_mode="$4"
+  local __workflow_requirements_id __workflow_requirements_name __workflow_requirements_resolved
+  local __workflow_requirements_ready_probe __workflow_requirements_index __workflow_requirements_consumer
+  local -a __workflow_requirements_selected=() __workflow_requirements_packages=() __workflow_requirements_needs=()
+  local -a __workflow_requirements_names=() __workflow_requirements_consumers=() __workflow_requirements_sources=()
+  local -A __workflow_requirements_seen=()
+  __workflow_requirements_names_result=(); __workflow_requirements_consumers_result=()
+  if [[ "$__workflow_requirements_mode" == optionals ]]; then
+    workflow_selected_optionals __workflow_requirements_selected "$__workflow_requirements_platform"
   else
-    workflow_selected selected "$platform"
+    workflow_selected __workflow_requirements_selected "$__workflow_requirements_platform"
   fi
-  for id in "${selected[@]}"; do
-    catalog_ready_probe ready_probe "$id"
-    if [[ -n "$ready_probe" ]] && "$ready_probe"; then
-      continue
-    fi
-    for name in ${_CATALOG_PROCEDURE_NEEDS[$id]:-}; do
-      [[ ! -v "seen[$name]" ]] || continue
-      catalog_native_requirement resolved "$name" "$platform"
-      if [[ -n "$resolved" ]]; then
-        names_result+=("$name"); consumers_result+=("$id"); seen["$name"]=1
+  for __workflow_requirements_id in "${__workflow_requirements_selected[@]}"; do
+    catalog_ready_probe __workflow_requirements_ready_probe "$__workflow_requirements_id"
+    if [[ -n "$__workflow_requirements_ready_probe" ]] && "$__workflow_requirements_ready_probe"; then continue; fi
+    workflow_selected_packages __workflow_requirements_packages "$__workflow_requirements_id"
+    __workflow_requirements_sources=("$__workflow_requirements_id" "${__workflow_requirements_packages[@]}")
+    for __workflow_requirements_index in "${!__workflow_requirements_sources[@]}"; do
+      __workflow_requirements_consumer="${__workflow_requirements_sources[__workflow_requirements_index]}"
+      if ((__workflow_requirements_index == 0)); then
+        catalog_procedure_needs __workflow_requirements_needs "$__workflow_requirements_id" || return
+      else
+        catalog_package_needs __workflow_requirements_needs "$__workflow_requirements_id" \
+          "$__workflow_requirements_platform" "$__workflow_requirements_consumer" || return
       fi
-    done
-    workflow_selected_packages packages "$id"
-    for key in "${!_CATALOG_PACKAGE_NEEDS[@]}"; do
-      source="${key%%:*}"; package="${key#*:}"
-      [[ " ${packages[*]} " == *" $package "* ]] || continue
-      [[ " ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]} " == *" $source:"* ]] || continue
-      catalog_packages candidates "$id" "$platform" "$source" || return
-      [[ " ${candidates[*]} " == *" $package "* ]] || continue
-      for name in ${_CATALOG_PACKAGE_NEEDS[$key]}; do
-        [[ ! -v "seen[$name]" ]] || continue
-        catalog_native_requirement resolved "$name" "$platform"
-        if [[ -n "$resolved" ]]; then
-          names_result+=("$name"); consumers_result+=("$package"); seen["$name"]=1
-        fi
+      for __workflow_requirements_name in "${__workflow_requirements_needs[@]}"; do
+        [[ ! -v "__workflow_requirements_seen[$__workflow_requirements_name]" ]] || continue
+        catalog_native_requirement __workflow_requirements_resolved \
+          "$__workflow_requirements_name" "$__workflow_requirements_platform"
+        [[ -n "$__workflow_requirements_resolved" ]] || continue
+        __workflow_requirements_names+=("$__workflow_requirements_name")
+        __workflow_requirements_consumers+=("$__workflow_requirements_consumer")
+        __workflow_requirements_seen["$__workflow_requirements_name"]=1
       done
     done
   done
+  __workflow_requirements_names_result=("${__workflow_requirements_names[@]}")
+  __workflow_requirements_consumers_result=("${__workflow_requirements_consumers[@]}")
 }

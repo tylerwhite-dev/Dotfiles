@@ -11,6 +11,37 @@ trap 'rm -f -- "$validation_error"' EXIT
 
 catalog_validate
 
+# Native needs are read through the catalog and scoped to resolved sources.
+catalog_procedure_needs needs homebrew
+[[ "${#needs[@]}" == 0 ]]
+catalog_procedure_needs needs yay
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS ]]
+catalog_package_needs needs homebrew_extended arch sdkman-cli
+[[ "${needs[*]}" == NATIVE_BUILD_TOOLS ]]
+catalog_package_needs needs homebrew_extended arch tmux
+[[ "${#needs[@]}" == 0 ]]
+(
+  package_group needs_fixture needs_fixture_arch shared other
+  package_group needs_fixture needs_fixture_debian other
+  package_group needs_foreign apps shared
+  package_requires needs_fixture shared FIRST_NEED SECOND_NEED FIRST_NEED
+  package_requires needs_foreign shared FOREIGN_NEED
+  procedure_define needs_fixture
+  procedure_packages needs_fixture needs_fixture needs_fixture_@distribution \
+    needs_fixture needs_fixture_@distribution
+  catalog_package_needs needs needs_fixture arch shared
+  [[ "${needs[*]}" == 'FIRST_NEED SECOND_NEED FIRST_NEED' ]]
+  catalog_package_needs needs needs_fixture debian shared
+  [[ "${#needs[@]}" == 0 ]]
+  catalog_package_needs needs needs_fixture arch absent
+  [[ "${#needs[@]}" == 0 ]]
+  # An invalid later reference must not publish an earlier partial result.
+  procedure_packages needs_fixture needs_fixture missing_group
+  needs=(stale)
+  if catalog_package_needs needs needs_fixture arch shared 2>"$validation_error"; then exit 1; fi
+  [[ "${#needs[@]}" == 0 ]]
+)
+
 # Defaults handlers are optional, registered by ID and validated before use.
 defaults_handler=''
 catalog_defaults_handler defaults_handler native_desktop
