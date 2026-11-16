@@ -23,12 +23,12 @@ wsl --install archlinux
 On the first launch, Arch opens as `root`. Run these commands in Arch WSL:
 
 ```bash
-pacman -Syu --noconfirm && pacman -S --needed git sudo --noconfirm
-ARCH_USER=tyler
-useradd -m -G wheel -s /bin/bash "$ARCH_USER"
-passwd "$ARCH_USER"
-printf '%s\n' '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel
-chmod 0440 /etc/sudoers.d/10-wheel
+pacman -Syu --noconfirm && pacman -S --needed git sudo --noconfirm &&
+ARCH_USER=tyler &&
+useradd -m -G wheel -s /bin/bash "$ARCH_USER" &&
+passwd "$ARCH_USER" &&
+printf '%s\n' '%wheel ALL=(ALL:ALL) ALL' > /etc/sudoers.d/10-wheel &&
+chmod 0440 /etc/sudoers.d/10-wheel &&
 visudo -cf /etc/sudoers
 ```
 
