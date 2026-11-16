@@ -11,7 +11,7 @@ stops the questionnaire without using partial results.
 ## Errors before the questionnaire
 
 - Bash versions below 5, a non-interactive terminal, an invalid catalog, or an unsupported system cause startup to fail.
-- Multiple arguments, an unknown flag, or a defined `SETUP_DRY_RUN` variable cause an error. `-h` and `--help` display help.
+- Multiple arguments or an unknown flag cause an error. `-h` and `--help` display help.
 - macOS rejects `--wsl`, `--server`, and `--desktop`; Linux outside WSL rejects `--wsl` and `--mac`; WSL rejects `--server`, `--desktop`, and `--mac`.
 
 ## Linux presets

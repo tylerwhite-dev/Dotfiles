@@ -3,7 +3,6 @@ set -Eeuo pipefail
 
 script_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source "${script_root}/logic/load.sh"
-unset SETUP_DRY_RUN
 
 check_parse() {
   local expected_status="$1" expected_output="$2" output status=0
@@ -44,7 +43,5 @@ flags_parse --add-optionals
 [[ "$SETUP_MODE" == optionals ]]
 flags_parse
 [[ "$SETUP_MODE" == standard ]]
-SETUP_DRY_RUN=0
-check_parse 2 'SETUP_DRY_RUN is no longer supported.'
 
 printf 'CLI flag validation passed.\n'

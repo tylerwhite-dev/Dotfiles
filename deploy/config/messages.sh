@@ -9,8 +9,6 @@ message_define error.scenario_mismatch \
   "Scenario --%s is incompatible with this environment: %s. Use --mac on macOS, --wsl in WSL, or --server/--desktop on Linux outside WSL."
 message_define error.unknown_flag \
   "Unknown flag: %s"
-message_define error.dry_run_removed \
-  "SETUP_DRY_RUN is no longer supported. Unset it before running setup."
 message_define error.root_execution \
   "Run this setup as a regular user. It will request sudo when needed."
 message_define error.command_missing \

@@ -7,10 +7,6 @@ flags_parse() {
     error_report error.too_many_flags
     return 2
   fi
-  if [[ -v SETUP_DRY_RUN ]]; then
-    error_report error.dry_run_removed
-    return 2
-  fi
   (($# == 0)) && return 0
 
   case "$1" in
