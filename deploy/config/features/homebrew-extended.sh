@@ -29,9 +29,10 @@ package_group brew util_tools \
   typtea typioca
 
 package_group brew dev_tooling \
-  fresh-editor neovim mise podman \
+  fresh-editor neovim podman \
   nvm rustup uv sdkman-cli go qt bun \
-  cmake ninja 
+  cmake ninja \
+  openspec mise hyperfine
 
 package_requires brew sdkman-cli NATIVE_BUILD_TOOLS
 
@@ -39,7 +40,8 @@ package_group brew media_tools \
   yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
 
 package_group brew cli_harness \
-  opencode hermes-agent codex claude-code antigravity-cli openclaw
+  codex claude-code \
+  opencode hermes-agent kimi-code antigravity-cli openclaw
 
 package_category brew shell "Shell" shell_tools
 package_category brew utils "Utils" util_tools
