@@ -50,12 +50,6 @@
           "PackageIdentifier": "Microsoft.WindowsTerminal"
         },
         {
-          "PackageIdentifier": "WinDirStat.WinDirStat"
-        },
-        {
-          "PackageIdentifier": "CPUID.HWMonitor"
-        },
-        {
           "PackageIdentifier": "Valve.Steam"
         }
       ],
