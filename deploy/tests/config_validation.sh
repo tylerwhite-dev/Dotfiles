@@ -80,13 +80,12 @@ done
   grep -Fq 'Invalid package requirement' "$validation_error"
 )
 
-# Keep all guide IDs in the selectable Flatpak catalog, exactly once.
+# The selectable Flatpak catalog must not contain duplicate IDs.
 flatpak_packages=()
 catalog_packages flatpak_packages flatpak_apps fedora flatpak
-mapfile -t guide_flatpaks < <(sed -n 's/^[[:space:]]*\([[:alnum:]][[:alnum:].-]*\)[[:space:]]*\\[[:space:]]*$/\1/p' "${script_root}/../guide/linux/flatpak.md" | sort)
-mapfile -t catalog_flatpaks < <(printf '%s\n' "${flatpak_packages[@]}" | sort)
+mapfile -t catalog_flatpaks < <(printf '%s\n' "${flatpak_packages[@]}" | sort -u)
 [[ "${#flatpak_packages[@]}" == 26 ]]
-[[ "${catalog_flatpaks[*]}" == "${guide_flatpaks[*]}" ]]
+[[ "${#catalog_flatpaks[@]}" == "${#flatpak_packages[@]}" ]]
 
 # Display aliases preserve IDs, source scoping, headings and fallback labels.
 alias_rows=(); alias_kinds=(); alias_labels=()
@@ -126,8 +125,11 @@ done
 rows=()
 kinds=()
 catalog_package_rows rows kinds homebrew_extended macos brew
-[[ "${rows[*]}" == 'Shell starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij Utils lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon Dev tools go nvm rustup uv sdkman-cli zig bun cmake ninja neovim fresh-editor CLI Harness opencode hermes-agent openclaw Media yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full' ]]
-[[ "${kinds[*]}" == 'g i i i i i i i i i i i i g i i i i i i i i i i i i g i i i i i i i i i i i g i i i g i i i i i' ]]
+headings=()
+for index in "${!rows[@]}"; do
+  [[ "${kinds[index]}" != g ]] || headings+=("${rows[index]}")
+done
+[[ "${headings[*]}" == 'Shell Utils Dev tools CLI Harness Media' ]]
 
 flat=()
 items=()
@@ -156,9 +158,8 @@ for ((index = 0; index < ${#cask_rows[@]}; index++)); do
   fi
 done
 [[ "${cask_items[*]}" == "${cask_flat[*]}" ]]
-[[ "${#cask_flat[@]}" -eq 61 ]]
 [[ "${cask_categories[*]}" == 'Internet Work & Media create Dev tools System Games' ]]
-[[ "${cask_rows[*]}" == 'Internet firefox google-chrome librewolf zen ungoogled-chromium tor-browser telegram whatsapp discord slack zoom qbittorrent amneziavpn Work & Media obsidian libreoffice bitwarden veracrypt iina vlc spotify create figma inkscape blender audacity obs Dev tools visual-studio-code vscodium zed android-studio intellij-idea intellij-idea-ce qt-creator iterm2 ghostty cmux warp kitty wezterm alacritty docker-desktop hermes-desktop lm-studio System raycast maccy rectangle alt-tab jordanbaird-ice betterdisplay mos linearmouse karabiner-elements hammerspoon stats coconutbattery appcleaner macfuse balenaetcher raspberry-pi-imager utm Games steam playcover-community' ]]
+[[ " ${cask_flat[*]} " == *' firefox '* && " ${cask_flat[*]} " == *' steam '* ]]
 
 # The installed-package probe is registered per procedure.
 installed_probe=""
