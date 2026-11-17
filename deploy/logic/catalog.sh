@@ -11,6 +11,7 @@ declare -Ag _CATALOG_PROCEDURE_SELECTABLE=()
 declare -Ag _CATALOG_PROCEDURE_INSTALLED_PROBE=()
 declare -Ag _CATALOG_PROCEDURE_DEFAULTS_HANDLER=()
 declare -Ag _CATALOG_PROCEDURE_PACKAGE_REFS=()
+declare -Ag _CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS=()
 declare -Ag _CATALOG_PACKAGE_GROUPS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_LABELS=()
 declare -Ag _CATALOG_PACKAGE_CATEGORY_REFS=()
@@ -66,9 +67,10 @@ catalog_package_needs() {
   local -n __catalog_pkg_needs_result="$1"
   local __catalog_pkg_needs_id="$2" __catalog_pkg_needs_platform="$3" __catalog_pkg_needs_package="$4"
   local __catalog_pkg_needs_reference __catalog_pkg_needs_source __catalog_pkg_needs_checked=' '
-  local -a __catalog_pkg_needs_packages=() __catalog_pkg_needs_names=() __catalog_pkg_needs_found=()
+  local -a __catalog_pkg_needs_packages=() __catalog_pkg_needs_names=() __catalog_pkg_needs_found=() __catalog_pkg_needs_refs=()
   __catalog_pkg_needs_result=()
-  for __catalog_pkg_needs_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_pkg_needs_id]}; do
+  _catalog_package_references __catalog_pkg_needs_refs "$__catalog_pkg_needs_id" "$__catalog_pkg_needs_platform"
+  for __catalog_pkg_needs_reference in "${__catalog_pkg_needs_refs[@]}"; do
     __catalog_pkg_needs_source="${__catalog_pkg_needs_reference%%:*}"
     [[ "$__catalog_pkg_needs_checked" != *" $__catalog_pkg_needs_source "* ]] || continue
     __catalog_pkg_needs_checked+="$__catalog_pkg_needs_source "
@@ -281,6 +283,29 @@ procedure_packages() {
   done
 }
 
+# Adds package references that apply only to one supported platform.
+procedure_packages_for_platform() {
+  local id="$1" platform="$2" source group key
+  shift 2
+  _catalog_require_procedure "$id" || return
+  if (($# == 0 || $# % 2 != 0)) || [[ " ${_CATALOG_PROCEDURE_PLATFORMS[$id]} " != *" $platform "* ]]; then
+    printf 'Invalid platform package groups for procedure %s: %s\n' "$id" "$platform" >&2
+    return 1
+  fi
+  key="$id:$platform"
+  while (($#)); do
+    source="$1"; group="$2"; shift 2
+    _CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS["$key"]+="${_CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS[$key]:+ }${source}:${group}"
+  done
+}
+
+_catalog_package_references() {
+  local -n __catalog_refs_result="$1"
+  local __catalog_refs_id="$2" __catalog_refs_platform="$3"
+  __catalog_refs_result=()
+  read -r -a __catalog_refs_result <<< "${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_refs_id]} ${_CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS[$__catalog_refs_id:$__catalog_refs_platform]:-}"
+}
+
 # Sets the execution queue independently of feature declaration order.
 procedure_order() {
   _CATALOG_PROCEDURE_ORDER=("$@")
@@ -426,11 +451,12 @@ catalog_packages() {
   local __catalog_packages_id="$2" __catalog_packages_platform="$3"
   local __catalog_packages_source="${4:-}"
   local __catalog_packages_reference __catalog_packages_key __catalog_packages_group
-  local -a __catalog_packages_groups=() __catalog_packages_items=()
+  local -a __catalog_packages_groups=() __catalog_packages_items=() __catalog_packages_refs=()
   local __catalog_packages_matched=no
 
   __catalog_packages_result=()
-  for __catalog_packages_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_packages_id]}; do
+  _catalog_package_references __catalog_packages_refs "$__catalog_packages_id" "$__catalog_packages_platform"
+  for __catalog_packages_reference in "${__catalog_packages_refs[@]}"; do
     if [[ -n "$__catalog_packages_source" && "${__catalog_packages_reference%%:*}" != "$__catalog_packages_source" ]]; then
       continue
     fi
@@ -459,7 +485,7 @@ catalog_package_rows() {
   local __catalog_rows_reference __catalog_rows_key __catalog_rows_group __catalog_rows_item
   local __catalog_rows_other __catalog_rows_has_category=no __catalog_rows_other_open=no
   local __catalog_rows_matched=no
-  local -a __catalog_rows_groups=() __catalog_rows_items=()
+  local -a __catalog_rows_groups=() __catalog_rows_items=() __catalog_rows_refs=()
   # Optional sixth output carries labels parallel to the unchanged value rows.
   if [[ -n "${6:-}" ]]; then
     local -n __catalog_rows_labels="$6"
@@ -467,7 +493,8 @@ catalog_package_rows() {
   fi
 
   __catalog_rows_result=(); __catalog_rows_kinds=()
-  for __catalog_rows_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_rows_id]}; do
+  _catalog_package_references __catalog_rows_refs "$__catalog_rows_id" "$__catalog_rows_platform"
+  for __catalog_rows_reference in "${__catalog_rows_refs[@]}"; do
     [[ -z "$__catalog_rows_source" || "${__catalog_rows_reference%%:*}" == "$__catalog_rows_source" ]] || continue
     _catalog_resolve_package_reference __catalog_rows_key "$__catalog_rows_reference" "$__catalog_rows_platform"
     if [[ -v "_CATALOG_PACKAGE_CATEGORY_LABELS[$__catalog_rows_key]" ]]; then
@@ -475,7 +502,7 @@ catalog_package_rows() {
       break
     fi
   done
-  for __catalog_rows_reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$__catalog_rows_id]}; do
+  for __catalog_rows_reference in "${__catalog_rows_refs[@]}"; do
     [[ -z "$__catalog_rows_source" || "${__catalog_rows_reference%%:*}" == "$__catalog_rows_source" ]] || continue
     _catalog_resolve_package_reference __catalog_rows_key "$__catalog_rows_reference" "$__catalog_rows_platform"
     _catalog_reference_group_keys __catalog_rows_groups "$__catalog_rows_key" "Procedure $__catalog_rows_id" || return
@@ -535,6 +562,7 @@ _catalog_validate_package_references() {
   local reference
   local platform
   local key
+  local scoped_key scoped_platform
   local -a group_keys=()
 
   for reference in ${_CATALOG_PROCEDURE_PACKAGE_REFS[$id]}; do
@@ -546,6 +574,20 @@ _catalog_validate_package_references() {
     else
       _catalog_resolve_package_reference key "$reference" ""
       _catalog_reference_group_keys group_keys "$key" "Procedure $id" || return 1
+    fi
+  done
+  for platform in ${_CATALOG_PROCEDURE_PLATFORMS[$id]}; do
+    for reference in ${_CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS[$id:$platform]:-}; do
+      _catalog_resolve_package_reference key "$reference" "$platform"
+      _catalog_reference_group_keys group_keys "$key" "Procedure $id" || return 1
+    done
+  done
+  for scoped_key in "${!_CATALOG_PROCEDURE_PLATFORM_PACKAGE_REFS[@]}"; do
+    [[ "${scoped_key%%:*}" == "$id" ]] || continue
+    scoped_platform="${scoped_key#*:}"
+    if ! catalog_is_available "$id" "$scoped_platform"; then
+      printf 'Procedure %s has package groups for unsupported platform: %s\n' "$id" "$scoped_platform" >&2
+      return 1
     fi
   done
 }

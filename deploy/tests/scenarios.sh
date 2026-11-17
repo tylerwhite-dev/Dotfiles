@@ -55,7 +55,7 @@ for SETUP_MODE in server desktop wsl mac; do
     if [[ "$platform" == arch && "$SETUP_MODE" != server ]]; then
       expected="${expected/native_packages /native_packages yay }"
     fi
-    if [[ "$platform" == arch && "$SETUP_MODE" == desktop ]]; then
+    if [[ "$SETUP_MODE" == desktop ]]; then
       ((count += 1))
     fi
     [[ "${selected[*]}" == "$expected" ]]
@@ -86,8 +86,8 @@ ui_multiselect_grouped() {
 }
 questionnaire_collect fedora Fedora
 workflow_selected selected fedora
-[[ "${selected[*]}" == 'native_packages zsh_default homebrew homebrew_fonts homebrew_extended flatpak_apps dotfiles' ]]
-for procedure in homebrew_fonts homebrew_extended flatpak_apps; do
+[[ "${selected[*]}" == 'native_packages native_desktop zsh_default homebrew homebrew_fonts homebrew_extended flatpak_apps dotfiles' ]]
+for procedure in native_desktop homebrew_fonts homebrew_extended flatpak_apps; do
   workflow_selected_packages packages "$procedure"
   [[ "${#packages[@]}" == 1 ]]
 done
@@ -115,7 +115,7 @@ for zsh_answer in yes no unset; do
   }
   _questionnaire_read_selectable_packages homebrew_extended fedora 1 1
   workflow_selected_packages packages homebrew_extended
-  [[ "${packages[*]}" == 'stow tmux' ]]
+  [[ "${packages[*]}" == stow ]]
 done
 
 # --add-optionals resets zsh selection and must not preselect the base set.

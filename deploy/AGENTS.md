@@ -113,6 +113,11 @@ succeeds, with direct terminal output so interactive prompts remain visible.
 platform. `catalog_packages` expands one procedure's references into an array
 for an action.
 
+`procedure_packages_for_platform <procedure> <platform> <source> <group> ...`
+adds references for one supported platform after the shared references. Declare
+platforms first. Platform references are validated and participate in package
+requirements, flat package lists, and grouped menu rows like shared references.
+
 ### Package category
 
 `package_category` names an ordered set of package groups under a
@@ -322,7 +327,7 @@ interfaces are grouped below for quick navigation.
   `procedure_define`, `procedure_handler`,
   `procedure_finish_handler`,
   `procedure_platforms`, `procedure_requires`, `procedure_requires_root`,
-  `procedure_selectable`, `procedure_installed_probe`, `procedure_packages`, `procedure_order`,
+  `procedure_selectable`, `procedure_installed_probe`, `procedure_packages`, `procedure_packages_for_platform`, `procedure_order`,
   `catalog_procedure_ids`, `catalog_is_enabled`,
   `catalog_handler`, `catalog_finish_handler`, `catalog_requirement`, `catalog_requires_root`,
   `catalog_is_selectable`, `catalog_is_available`, `catalog_packages`,

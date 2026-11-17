@@ -15,7 +15,9 @@ ui_multiselect_grouped() {
     all_presets+=("${presets_ref[@]}")
   fi
   for ((index=0; index<${#rows_ref[@]}; index++)); do
-    if [[ "${kinds_ref[index]}" == i ]]; then result+=("${rows_ref[index]}"); break; fi
+    if [[ "${kinds_ref[index]}" == i && " ${presets_ref[*]-} " != *" ${rows_ref[index]} "* ]]; then
+      result+=("${rows_ref[index]}"); break
+    fi
   done
 }
 # The installed-package probe reports one known formula and one known cask.
@@ -40,10 +42,8 @@ for platform in arch debian fedora macos; do
   workflow_selected_optionals selected "$platform"
   if [[ "$platform" == macos ]]; then
     [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended homebrew_casks' ]]
-  elif [[ "$platform" == arch ]]; then
-    [[ "${selected[*]}" == 'native_desktop homebrew_fonts homebrew_extended flatpak_apps' ]]
   else
-    [[ "${selected[*]}" == 'homebrew_fonts homebrew_extended flatpak_apps' ]]
+    [[ "${selected[*]}" == 'native_desktop homebrew_fonts homebrew_extended flatpak_apps' ]]
   fi
   # Packages that are installed already reach the list as presets.
   [[ " ${all_presets[*]} " == *" tmux "* ]]
@@ -53,8 +53,7 @@ for platform in arch debian fedora macos; do
   # Ordinary prerequisites remain unchanged in the standard scenario.
   workflow_selected standard "$platform"
   if [[ "$platform" == macos ]]; then [[ "${#standard[@]}" == 0 ]];
-  elif [[ "$platform" == arch ]]; then [[ "${standard[*]}" == 'native_desktop flatpak_apps' ]];
-  else [[ "${standard[*]}" == flatpak_apps ]]; fi
+  else [[ "${standard[*]}" == 'native_desktop flatpak_apps' ]]; fi
 done
 
 # The optional review displays only selectable lists, not unrelated settings.
@@ -74,13 +73,13 @@ runner_run_optionals macos macOS ''
 questionnaire_collect_optionals fedora Fedora
 events=()
 runner_run_optionals fedora Fedora ''
-[[ "${events[*]}" == 'action_install_homebrew_fonts: action_install_homebrew_extended: action_prepare_flatpak:action_install_flatpak_apps' ]]
+[[ "${events[*]}" == 'action_install_native_desktop: action_install_homebrew_fonts: action_install_homebrew_extended: action_prepare_flatpak:action_install_flatpak_apps' ]]
 process_run() { events+=("$1"); return 8; }
 events=() actual=0
 runner_run_optionals fedora Fedora '' || actual=$?
-[[ "$actual" == 8 && "${events[*]}" == action_install_homebrew_fonts ]]
+[[ "$actual" == 8 && "${events[*]}" == action_install_native_desktop ]]
 
-# A failed probe stops collection before any list or installation is opened.
+# A failed Homebrew probe stops collection after the native list and before installation.
 (
   executor_brew_installed() {
     local -n found_ref="$1"
@@ -93,7 +92,7 @@ runner_run_optionals fedora Fedora '' || actual=$?
   error_report() { reported_error="$1"; }
   actual=0
   questionnaire_collect_optionals fedora Fedora || actual=$?
-  [[ "$actual" == 1 && "$list_opened" == 0 ]]
+  [[ "$actual" == 1 && "$list_opened" == 1 ]]
   [[ "$reported_error" == error.installed_packages_probe_failed ]]
   workflow_selected_optionals selected fedora
   [[ "${#selected[@]}" == 0 ]]

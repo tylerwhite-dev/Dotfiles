@@ -3,19 +3,14 @@
 ## Distribution-specific native desktop categories
 
 `features/native-desktop.sh` owns the selectable `native_desktop` procedure.
-It currently supports Arch only. Its package references use source `native`
-and category names such as `native_desktop_@distribution_desktop`.
-`@distribution` is substituted anywhere in a group or category name, so this
-resolves to `native_desktop_arch_desktop` on Arch. The existing standalone
-`native:@distribution` reference still resolves to `native:arch`.
+It supports Arch, Debian and Fedora. `procedure_packages_for_platform` declares
+ordered categories for a particular platform, allowing Fedora to omit the empty
+Development category. Ordinary `procedure_packages` references remain shared;
+platform-specific references follow them. Each reference is validated before
+the questionnaire starts. `@distribution` also works in either kind of reference.
 
-To support another distribution, declare all three corresponding categories
-and their package groups, extend `procedure_platforms`, and extend the default
-package and installed-package functions for that distribution. The installed
-probe currently reads the local Arch database with `pacman -Qq`; adding a
-platform also requires selecting its probe behavior. Package installation uses
-the shared native executor. Each supported platform's references are validated
-before the questionnaire starts.
+The installed probe reads the local database using `pacman -Qq`, `dpkg-query`,
+or `rpm -qa`. Package installation uses the shared native executor.
 
 Desktop defaults live in the registered `native_desktop_default_packages`
 handler, which returns additional packages only for `--desktop`. Standard and optional

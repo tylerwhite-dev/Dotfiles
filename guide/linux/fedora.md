@@ -63,13 +63,13 @@ flatpak remote-delete fedora
 basic
 
 ```
-git git-lfs curl ssh zsh stow wl-clipboard wmctrl
+git git-lfs curl ssh zsh wl-clipboard wmctrl
 ```
 
 common
 
 ```
-flatpak gparted timeshift
+flatpak firefox alacritty gparted timeshift
 ```
 
 ### docker

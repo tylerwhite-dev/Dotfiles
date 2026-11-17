@@ -33,7 +33,7 @@ bash deploy/tests/native_desktop.sh
 | `homebrew.sh` | Installed-package probes with a mock Homebrew executable, missing Homebrew, empty results, command failures and diagnostics, and install policy passed through the real executor. |
 | `flatpak.sh` | Mocked Flatpak installation, Flathub validation, Fedora remote removal, app commands with automatic confirmation, and failures. |
 | `optionals.sh` | All optional lists per platform, installed-package presets, collection failure before list display, and shared runner finish-handler dispatch. |
-| `native_desktop.sh` | Arch categories and package membership, distribution references, mode filtering, editable defaults, installed-package detection failures and selected native installation with substituted commands. |
+| `native_desktop.sh` | Linux categories and package membership, platform references, mode filtering, editable defaults, installed-package detection failures and selected native installation with substituted commands. |
 | `ui.sh` | UI output functions: detail text, single-choice menu, checkbox menu, stage headings, timeline rows. |
 | `layer_dependencies.sh` | Layering rules — config/UI/logic must not depend on forbidden modules. |
 | `app.sh` | Application scenarios with substituted environment, UI and actions; no installation commands run. |

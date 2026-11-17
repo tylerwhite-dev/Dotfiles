@@ -47,11 +47,6 @@ common
 flatpak firefox-esr alacritty timeshift gparted 
 ```
 
-gnome
-```
-nautilus gnome-keyring gnome-console gnome-calculator gnome-calendar gnome-text-editor gnome-font-viewer baobab gcolor3 gnome-browser-connector gnome-tweaks gnome-control-center
-```
-
 dev
 ```
 qt6-base-dev qtcreator qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls

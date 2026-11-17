@@ -26,6 +26,14 @@ procedure selections. Run without a preset flag to choose procedures individuall
 
 ## Fedora
 
+The `native_desktop` menu is available without a flag, with `--desktop`, and
+with `--add-optionals`. It offers Applications: `firefox alacritty`; System:
+`gparted timeshift`; and Dependencies: `wl-clipboard wmctrl`. Only `--desktop`
+adds `firefox alacritty` to the checked defaults. Installed packages detected
+with `rpm -qa` are checked and excluded from installation. A failed probe stops
+the questionnaire. The selected packages are installed by DNF through the
+shared native executor; an empty selection skips the action.
+
 ```text
 Start
 ├─ No flag → separate yes/no questions for native_packages, zsh_default, homebrew, dotfiles.
@@ -33,9 +41,9 @@ Start
 │  dependent Homebrew menus but does not affect dotfiles or Flatpak.
 ├─ --server (outside WSL) → native_packages, zsh_default, homebrew, dotfiles; formulae.
 ├─ --desktop (outside WSL) → native_packages, zsh_default, homebrew, dotfiles;
-│  select fonts, formulae, and Flatpak apps.
+│  select native desktop packages, fonts, formulae, and Flatpak apps.
 ├─ --wsl (WSL only) → native_packages, zsh_default, homebrew, dotfiles; formulae.
-├─ -a / --add-optionals → font, formula, and Flatpak app menus.
+├─ -a / --add-optionals → native desktop, font, formula, and Flatpak app menus.
 │  No new packages → exit. Otherwise, review → dependencies → if needed,
 │  ask to install missing Homebrew: No → restart the questionnaire;
 │  Yes → prepare Homebrew after confirmation. A Flatpak-only selection does not require Homebrew.
@@ -53,6 +61,7 @@ Start
 └─ Selected action order:
    ├─ native_packages → dnf: git git-lfs curl zsh file openssh-clients gawk openssl ca-certificates.
    │  DNF disables fedora-cisco-openh264 and refreshes the cache before installation.
+   ├─ native_desktop → dnf: selected native desktop packages, excluding installed candidates.
    ├─ zsh_default → validate the user account, chsh, and executable /bin/zsh before changing the shell.
    │  A failed check or chsh command marks the procedure failed and stops the script.
    ├─ homebrew → if missing, download and run the installer; check
@@ -87,6 +96,22 @@ flatpak / system: com.belmoussaoui.Authenticator it.mijorus.gearlever com.mattja
 
 ## Debian
 
+The `native_desktop` menu is available without a flag, with `--desktop`, and
+with `--add-optionals`. Its categories contain:
+
+| Category | Packages |
+| --- | --- |
+| Applications | `firefox-esr alacritty` |
+| Development | `build-essential qt6-base-dev qtcreator qt6-declarative-dev qml6-module-qtquick qml6-module-qtquick-controls` |
+| System | `gparted timeshift` |
+| Dependencies | `wl-clipboard wmctrl` |
+
+Only `--desktop` additionally checks `firefox-esr alacritty`. Packages detected
+as installed through `dpkg-query` are checked and excluded from installation;
+failure to read the database stops the questionnaire. The selected packages are
+installed by APT through the shared native executor; an empty selection skips
+the action.
+
 ```text
 Start
 ├─ No flag → separate yes/no questions for native_packages, zsh_default, homebrew, dotfiles.
@@ -94,9 +119,9 @@ Start
 │  dependent Homebrew menus but does not affect dotfiles or Flatpak.
 ├─ --server (outside WSL) → native_packages, zsh_default, homebrew, dotfiles; formulae.
 ├─ --desktop (outside WSL) → native_packages, zsh_default, homebrew, dotfiles;
-│  select fonts, formulae, and Flatpak apps.
+│  select native desktop packages, fonts, formulae, and Flatpak apps.
 ├─ --wsl (WSL only) → native_packages, zsh_default, homebrew, dotfiles; formulae.
-├─ -a / --add-optionals → font, formula, and Flatpak app menus.
+├─ -a / --add-optionals → native desktop, font, formula, and Flatpak app menus.
 │  No new packages → exit. Otherwise, review → dependencies → if needed,
 │  ask to install missing Homebrew: No → restart the questionnaire;
 │  Yes → prepare Homebrew after confirmation. A Flatpak-only selection does not require Homebrew.
@@ -114,6 +139,7 @@ Start
 └─ Selected action order:
    ├─ native_packages → apt: git git-lfs curl zsh file ssh nala gawk openssl ca-certificates.
    │  APT updates package lists before installation.
+   ├─ native_desktop → apt: selected native desktop packages, excluding installed candidates.
    ├─ zsh_default → validate the user account, chsh, and executable /bin/zsh before changing the shell.
    │  A failed check or chsh command marks the procedure failed and stops the script.
    ├─ homebrew → if missing, download and run the installer; check
@@ -152,7 +178,7 @@ The selectable `native_desktop` procedure follows `native_packages` and precedes
 `yay`. It is available without a flag, with `--desktop`, and with
 `-a` / `--add-optionals`; it is excluded from `--server` and `--wsl`.
 In optional-only mode, a native-only selection requires neither Homebrew nor
-the base native procedure. Debian, Fedora and macOS have no native desktop set.
+the base native procedure. macOS has no native desktop set.
 
 Installed candidates detected through `pacman -Qq` start checked in all three
 modes and are excluded from installation. A probe failure stops the questionnaire
@@ -162,9 +188,10 @@ it. Restart resets choices and repeats detection and default selection.
 
 | Category | Arch packages | Additional defaults with `--desktop` |
 | --- | --- | --- |
-| Desktop | firefox alacritty ghostty gparted veracrypt virtualbox timeshift gcolor3 | firefox alacritty |
+| Applications | firefox alacritty ghostty veracrypt virtualbox gcolor3 | firefox alacritty |
 | Development | zed qtcreator docker | zed |
-| Libs | virtualbox-host-dkms linux-headers dosfstools e2fsprogs btrfs-progs xfsprogs exfatprogs ntfs-3g xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-cursor | dosfstools e2fsprogs btrfs-progs xfsprogs exfatprogs ntfs-3g |
+| System | gparted timeshift virtualbox-host-dkms linux-headers dosfstools e2fsprogs btrfs-progs xfsprogs exfatprogs ntfs-3g | dosfstools e2fsprogs btrfs-progs xfsprogs exfatprogs ntfs-3g |
+| Dependencies | xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil xcb-util-cursor | none |
 
 After review and confirmation, only selected packages not detected as installed
 are passed to `pacman -Syu --needed --noconfirm`. An empty selection skips the
