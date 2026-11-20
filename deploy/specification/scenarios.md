@@ -85,9 +85,9 @@ Available packages by group, as defined in the source code:
 brew_cask / homebrew_fonts: font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 brew / shell_tools: starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
 brew / util_tools: lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
-brew / dev_tooling: fresh-editor neovim mise podman nvm rustup uv sdkman-cli go qt bun cmake ninja
+brew / dev_tooling: fresh-editor neovim podman nvm rustup uv sdkman-cli go qt bun cmake ninja openspec mise hyperfine
 brew / media_tools: yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
-brew / cli_harness: opencode hermes-agent codex claude-code antigravity-cli openclaw
+brew / cli_harness: codex claude-code opencode hermes-agent kimi-code antigravity-cli openclaw
 flatpak / internet: org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop org.mozilla.firefox com.discordapp.Discord com.google.Chrome
 flatpak / work_media: md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe org.libreoffice.LibreOffice com.obsproject.Studio com.spotify.Client
 flatpak / development: ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
@@ -163,9 +163,9 @@ Available packages by group, as defined in the source code:
 brew_cask / homebrew_fonts: font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 brew / shell_tools: starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
 brew / util_tools: lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
-brew / dev_tooling: fresh-editor neovim mise podman nvm rustup uv sdkman-cli go qt bun cmake ninja
+brew / dev_tooling: fresh-editor neovim podman nvm rustup uv sdkman-cli go qt bun cmake ninja openspec mise hyperfine
 brew / media_tools: yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
-brew / cli_harness: opencode hermes-agent codex claude-code antigravity-cli openclaw
+brew / cli_harness: codex claude-code opencode hermes-agent kimi-code antigravity-cli openclaw
 flatpak / internet: org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop org.mozilla.firefox com.discordapp.Discord com.google.Chrome
 flatpak / work_media: md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe org.libreoffice.LibreOffice com.obsproject.Studio com.spotify.Client
 flatpak / development: ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
@@ -261,9 +261,9 @@ Available packages by group, as defined in the source code:
 brew_cask / homebrew_fonts: font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 brew / shell_tools: starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
 brew / util_tools: lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
-brew / dev_tooling: fresh-editor neovim mise podman nvm rustup uv sdkman-cli go qt bun cmake ninja
+brew / dev_tooling: fresh-editor neovim podman nvm rustup uv sdkman-cli go qt bun cmake ninja openspec mise hyperfine
 brew / media_tools: yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
-brew / cli_harness: opencode hermes-agent codex claude-code antigravity-cli openclaw
+brew / cli_harness: codex claude-code opencode hermes-agent kimi-code antigravity-cli openclaw
 flatpak / internet: org.telegram.desktop org.qbittorrent.qBittorrent com.mattermost.Desktop org.mozilla.firefox com.discordapp.Discord com.google.Chrome
 flatpak / work_media: md.obsidian.Obsidian com.bitwarden.desktop org.videolan.VLC io.bassi.Amberol org.gnome.Snapshot com.github.johnfactotum.Foliate app.drey.EarTag org.inkscape.Inkscape org.gnome.Decibels org.gnome.Loupe org.libreoffice.LibreOffice com.obsproject.Studio com.spotify.Client
 flatpak / development: ai.lmstudio.lm-studio com.jgraph.drawio.desktop me.iepure.devtoolbox
@@ -316,9 +316,9 @@ Available packages by group, as defined in the source code:
 brew_cask / homebrew_fonts: font-jetbrains-mono-nerd-font font-hack-nerd-font font-zed-mono-nerd-font font-meslo-lg-nerd-font font-adwaita-mono-nerd-font font-commit-mono-nerd-font font-fira-code-nerd-font
 brew / shell_tools: starship zoxide fzf eza zsh-autosuggestions zsh-syntax-highlighting pfetch-rs fastfetch taproom herdr tmux zellij
 brew / util_tools: lazygit lazyjournal lazydocker mailsy tio yazi superfile zip stow nvtop btop macmon typtea typioca
-brew / dev_tooling: fresh-editor neovim mise podman nvm rustup uv sdkman-cli go qt bun cmake ninja
+brew / dev_tooling: fresh-editor neovim podman nvm rustup uv sdkman-cli go qt bun cmake ninja openspec mise hyperfine
 brew / media_tools: yt-dlp ffmpeg ffmpeg-full imagemagick imagemagick-full
-brew / cli_harness: opencode hermes-agent codex claude-code antigravity-cli openclaw
+brew / cli_harness: codex claude-code opencode hermes-agent kimi-code antigravity-cli openclaw
 brew_cask / internet: firefox google-chrome librewolf zen ungoogled-chromium tor-browser telegram whatsapp discord slack zoom qbittorrent amneziavpn
 brew_cask / work_media: obsidian libreoffice bitwarden veracrypt iina vlc spotify
 brew_cask / create: figma inkscape drawio figma blender audacity obs
