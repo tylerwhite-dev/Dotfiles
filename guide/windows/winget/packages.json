@@ -51,6 +51,9 @@
         },
         {
           "PackageIdentifier": "Valve.Steam"
+        },
+        {
+          "PackageIdentifier": "PeterPawlowski.foobar2000"
         }
       ],
       "SourceDetails": {
