@@ -49,8 +49,28 @@ Commit messages are a user-facing deliverable. Include them in the final assista
 
 ## Create commits
 
-1. Assign exact files or hunks to each commit and specify their order. Record base HEAD and retain a per-commit snapshot before requesting approval: assigned paths/hunks, resulting contents including binary data, additions/deletions, and Git file modes. Preserve unrelated changes and pre-existing staging; when changes share a file, include only the assigned hunks. If separation cannot preserve the user's staging, stop and explain the conflict before committing.
-2. Before staging or committing, publish the ordered plan in a visible assistant message and retain it in the final response as required above. For each commit, show the repository, exact message (including any body and footers), and assigned paths; describe selected hunks when a file is shared. A status such as "plan ready" is not a plan.
-3. Only after publishing the plan, request confirmation through the harness's native user-input interface, or in conversation if unavailable. In Codex, call `request_user_input_async` in this turn after displaying the plan and before the final response. Do not replace this call with a prose question or end with only a suggested message. Offer explicit approve/cancel choices. Keep the native dialog short: ask only whether to approve the displayed plan, for example, "Подтвердить показанный план коммитов?", with approve/cancel choices. Do not repeat commit subjects, bodies, footers, or assigned paths in the dialog title, question, or options; those belong in the chat plan. The question must refer to the displayed plan and introduce no new contents. Wait for an explicit affirmative answer; cancellation, dismissal, or no answer grants no approval. Approval covers only that plan; changes require renewed approval.
-4. After approval, create commits one at a time. Before each commit, verify the expected HEAD and compare the actual staged changes with the approved snapshot. Matching paths or passing `git diff --check` alone does not verify contents. Avoid rereading unrelated source or history. Pass the full message with real line breaks through `git commit -F` or separate `-m` arguments. Let configured hooks run; do not bypass them with `--no-verify` without explicit authorization or use `--amend` to recover from a failed commit. If contents differ, a hook changes files, or a commit fails, stop and report completed commits, any new diff, and remaining work. Do not auto-fix hook failures in commit-existing-changes mode; obtain approval for any revised plan before retrying.
-5. Check the resulting commit sequence against approved snapshots and full messages, and check final Git status once. Verify paragraphs and footers contain real line breaks, not accidental literal `\n`. Confirm unrelated and omitted changes remain uncommitted and unrelated staging is preserved. Report created commits and the checks actually performed, without claiming compilation or device verification from static checks.
+### Prepare and publish the plan
+
+Assign exact paths or hunks to each commit and specify their order. Before requesting approval, record the checkout, base HEAD and existing index entries. Retain a snapshot for each commit with its selected paths or hunks, resulting contents (including binary files), Git file modes, and additions or deletions. For a file split across commits, record its expected intermediate content after each commit. If the selection cannot be staged without disturbing unrelated staged changes, stop and explain the conflict.
+
+Publish the complete ordered plan in a visible chat message before opening the approval prompt. Include the repository, exact messages with bodies and footers, assigned paths and any shared-file hunk selections. Follow the final-response format above.
+
+### Request approval for the displayed plan
+
+In Codex, call `request_user_input_async` after showing the plan and before the final response. Use the native prompt with approve and cancel choices. Ask only whether to approve the displayed plan. Use conversation for confirmation if the native prompt is unavailable.
+
+A tool response such as `accepted: true` acknowledges that the prompt was opened. Wait for an explicit affirmative user response to the current plan before staging. If no answer arrives, leave the plan pending with the index and history unchanged. If the user cancels, dismisses the prompt, or says to stop, close the current attempt and invalidate its approval. A request to change messages, order, or scope, including choosing only some commits, calls for a revised visible plan and fresh approval.
+
+### Verify before staging and committing
+
+Process one approved commit at a time. Before staging, recheck the checkout, expected HEAD, index state and selected content against the approved snapshot. If they differ, stop before staging, explain the difference and obtain approval for an updated plan.
+
+Stage only the approved paths or hunks. Before committing, compare the actual staged content, Git modes and additions or deletions with the approved snapshot. Confirm that unrelated staged entries are preserved and excluded from the commit. A matching path list or a passing diff check alone does not verify the content.
+
+### Verify each result before continuing
+
+Pass the full approved message with real line breaks through `git commit -F` or separate `-m` arguments. Let configured hooks run. Do not bypass them with `--no-verify` without explicit authorization or use `--amend` to recover from a failed attempt. After each commit, verify its expected parent, full message and committed changes against the approved snapshot before staging the next commit.
+
+If a check fails, a hook changes files, a commit command fails or the user stops the operation, stop further writes. If staging or a commit attempt occurred, inspect HEAD and the index before reporting. Report verified commits, any new changes or entries left staged, and the remaining plan. If a commit exists but differs from the approved snapshot, report its hash and the mismatch. Do not auto-fix hook failures in commit-existing-changes mode. A new run after interruption requires fresh approval for the remaining work.
+
+After the last commit, check final Git status and confirm that unrelated staging and omitted changes are preserved. Report the verified hashes, full messages and checks actually performed.
