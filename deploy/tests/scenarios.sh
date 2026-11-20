@@ -30,11 +30,12 @@ ui_multiselect_grouped() {
   asked+=("$2")
   if [[ "$2" == *extended* ]]; then
     if [[ "$SETUP_MODE" == mac ]]; then
-      [[ "${#initial[@]}" == 0 ]]
+      [[ "${#initial[@]}" == 0 ]] || return 1
     else
-      for package in starship eza stow; do
-        [[ " ${initial[*]} " == *" $package "* ]]
+      for package in starship zoxide stow; do
+        [[ " ${initial[*]} " == *" $package "* ]] || return 1
       done
+      [[ " ${initial[*]} " != *" eza "* ]] || return 1
     fi
   fi
   result=()
@@ -103,12 +104,12 @@ for zsh_answer in yes no unset; do
     local -n result="$1" initial="$6"
     local -a defaults=(starship zsh-autosuggestions zsh-syntax-highlighting pfetch-rs zoxide herdr stow)
     if [[ "$zsh_answer" == yes ]]; then
-      [[ "${#initial[@]}" == $((${#defaults[@]} + 1)) ]]
+      [[ "${#initial[@]}" == $((${#defaults[@]} + 1)) ]] || return 1
       for package in "${defaults[@]}"; do
-        [[ " ${initial[*]} " == *" $package "* ]]
+        [[ " ${initial[*]} " == *" $package "* ]] || return 1
       done
     else
-      [[ "${initial[*]}" == 'tmux starship' ]]
+      [[ "${initial[*]}" == 'tmux starship' ]] || return 1
     fi
     # Users can change the list regardless of its defaults.
     result=(stow tmux)
@@ -122,7 +123,7 @@ done
 workflow_installed_packages() { local -n result="$1"; result=(); }
 ui_multiselect_grouped() {
   local -n result="$1" initial="$6"
-  [[ "${#initial[@]}" == 0 ]]
+  [[ "${#initial[@]}" == 0 ]] || return 1
   result=()
 }
 workflow_select zsh_default yes
