@@ -57,7 +57,9 @@ Publish the complete ordered plan in a visible chat message before opening the a
 
 ### Request approval for the displayed plan
 
-In Codex, call `request_user_input_async` after showing the plan and before the final response. Use the native prompt with approve and cancel choices. Ask only whether to approve the displayed plan. Use conversation for confirmation if the native prompt is unavailable.
+In Codex, call `request_user_input_async` once after showing the complete plan and before the final response. Use the native prompt with approve and cancel choices. Ask only whether to approve the entire displayed plan. Use conversation for confirmation if the native prompt is unavailable.
+
+One explicit approval authorizes every commit in that plan in the displayed order. Create and verify each commit, then proceed directly to the next. Do not ask for confirmation between commits while the approved plan still matches.
 
 A tool response such as `accepted: true` acknowledges that the prompt was opened. Wait for an explicit affirmative user response to the current plan before staging. If no answer arrives, leave the plan pending with the index and history unchanged. If the user cancels, dismisses the prompt, or says to stop, close the current attempt and invalidate its approval. A request to change messages, order, or scope, including choosing only some commits, calls for a revised visible plan and fresh approval.
 
@@ -65,12 +67,16 @@ A tool response such as `accepted: true` acknowledges that the prompt was opened
 
 Process one approved commit at a time. Before staging, recheck the checkout, expected HEAD, index state and selected content against the approved snapshot. If they differ, stop before staging, explain the difference and obtain approval for an updated plan.
 
+Compare index entries as records. When Git successfully returns no entry for an untracked path, record it as absent both when taking the snapshot and when verifying it. A command error cannot establish absence.
+
 Stage only the approved paths or hunks. Before committing, compare the actual staged content, Git modes and additions or deletions with the approved snapshot. Confirm that unrelated staged entries are preserved and excluded from the commit. A matching path list or a passing diff check alone does not verify the content.
 
 ### Verify each result before continuing
 
 Pass the full approved message with real line breaks through `git commit -F` or separate `-m` arguments. Let configured hooks run. Do not bypass them with `--no-verify` without explicit authorization or use `--amend` to recover from a failed attempt. After each commit, verify its expected parent, full message and committed changes against the approved snapshot before staging the next commit.
 
-If a check fails, a hook changes files, a commit command fails or the user stops the operation, stop further writes. If staging or a commit attempt occurred, inspect HEAD and the index before reporting. Report verified commits, any new changes or entries left staged, and the remaining plan. If a commit exists but differs from the approved snapshot, report its hash and the mismatch. Do not auto-fix hook failures in commit-existing-changes mode. A new run after interruption requires fresh approval for the remaining work.
+If a read-only check errors, pause writes and diagnose it. If a corrected check proves that HEAD, the index and the remaining approved content still match, continue the same plan under the existing approval. If verification remains inconclusive, stop.
+
+If verification confirms a mismatch, a hook changes files, a commit command fails or the user stops the operation, stop further writes. If staging or a commit attempt occurred, inspect HEAD and the index before reporting. Report verified commits, any new changes or entries left staged, and the remaining plan. If a commit exists but differs from the approved snapshot, report its hash and the mismatch. Do not auto-fix hook failures in commit-existing-changes mode. A new run after a stop requires fresh approval for the remaining work.
 
 After the last commit, check final Git status and confirm that unrelated staging and omitted changes are preserved. Report the verified hashes, full messages and checks actually performed.
