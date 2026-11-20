@@ -4,17 +4,19 @@
 .DS_Store
 .crush
 .vscode
+\.agents
 
 script
 deploy
 guide
-agents
+openspec
 nix
 
 wallpaper
 
 README.md
 IDEAS.md
+AGENTS\.md
 
 dotfiles-deploy.sh
 zsh_linux
